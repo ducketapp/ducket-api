@@ -1,0 +1,96 @@
+buildscript {
+    ext {
+        kotlin_version = "1.4.32"
+        logback_version = "1.2.1"
+        ktor_version = "1.5.1"
+        ktorm_version = "3.2.0"
+        kodein_version = "6.1.0"
+        hikaricp_version = "3.4.5"
+        exposed_version = "0.31.1"
+        junit_version = "4.12"
+        unirest_version = "1.4.9"
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+    
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: 'kotlin'
+apply plugin: 'application'
+
+group 'io.budgery.api'
+version '0.0.1'
+mainClassName = "io.ktor.server.netty.EngineMain"
+
+sourceSets {
+    main.kotlin.srcDirs = main.java.srcDirs = ['src']
+    test.kotlin.srcDirs = test.java.srcDirs = ['test']
+    main.resources.srcDirs = ['resources']
+    test.resources.srcDirs = ['testresources']
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+
+    implementation "org.kodein.di:kodein-di-generic-jvm:$kodein_version"
+
+    // validation
+    implementation "io.konform:konform:0.3.0"
+    implementation "org.valiktor:valiktor-core:0.12.0"
+
+    // password hashing
+    implementation "org.mindrot:jbcrypt:0.4"
+
+    // data mapping
+    implementation "org.modelmapper:modelmapper:2.4.2"
+
+    // Ktor's core components
+    implementation "io.ktor:ktor-server-core:$ktor_version"
+    implementation "io.ktor:ktor-server-host-common:$ktor_version"
+
+    // auth
+    implementation "io.ktor:ktor-auth:$ktor_version"
+    implementation "io.ktor:ktor-auth-jwt:$ktor_version"
+
+    // for serialization/deserialization
+    implementation "io.ktor:ktor-jackson:$ktor_version"
+
+    // Exposed offers a database access
+    implementation "org.jetbrains.exposed:exposed-core:$exposed_version"
+    implementation "org.jetbrains.exposed:exposed-dao:$exposed_version"
+    implementation "org.jetbrains.exposed:exposed-jdbc:$exposed_version"
+    implementation "org.jetbrains.exposed:exposed-java-time:$exposed_version" // for work with date and time values from db
+
+    // mysql
+    implementation 'mysql:mysql-connector-java:8.0.11'
+    implementation "org.ktorm:ktorm-core:3.2.0"
+    implementation "org.ktorm:ktorm-support-mysql:3.2.0"
+
+    // JDBC Connection Pool
+    implementation "com.zaxxer:HikariCP:3.4.5"
+
+    // Netty engine, allowing to use server functionality without having to rely on an external app container
+    implementation "io.ktor:ktor-server-netty:$ktor_version"
+
+    // An implementation of SLF4J
+    implementation "ch.qos.logback:logback-classic:$logback_version"
+
+    // provides a convenient mechanism for converting Kotlin objects into a serialized form like JSON, and vice versa
+    implementation "io.ktor:ktor-serialization:$ktor_version"
+
+    // allows us to test parts of our Ktor application without having to use the whole HTTP stack in the process
+    testImplementation "io.ktor:ktor-server-tests:$ktor_version"
+}
