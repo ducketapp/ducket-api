@@ -12,9 +12,12 @@ import domain.model.imports.ImportsTable
 import domain.model.user.User
 import domain.model.user.UserEntity
 import domain.model.user.UsersTable
+import io.budgery.api.domain.model.attachment.Attachment
+import io.budgery.api.domain.model.attachment.AttachmentEntity
 import io.budgery.api.domain.model.label.Label
 import io.budgery.api.domain.model.label.LabelEntity
 import io.budgery.api.domain.model.label.TransactionLabelsTable
+import io.budgery.api.domain.model.transaction.TransactionAttachmentsTable
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -35,7 +38,6 @@ internal object TransactionsTable : IntIdTable("transaction") {
     val note = varchar("note", 128).nullable()
     val longitude = varchar("longitude", 45).nullable()
     val latitude = varchar("latitude", 45).nullable()
-    val attachmentPath = varchar("attachment_path", 128).nullable()
     val createdAt = timestamp("created_at")
     val modifiedAt = timestamp("modified_at")
 }
@@ -54,11 +56,11 @@ class TransactionEntity(id: EntityID<Int>): IntEntity(id) {
     var note by TransactionsTable.note
     var longitude by TransactionsTable.longitude
     var latitude by TransactionsTable.latitude
-    var attachmentPath by TransactionsTable.attachmentPath
     var createdAt by TransactionsTable.createdAt
     var modifiedAt by TransactionsTable.modifiedAt
 
     var labels by LabelEntity via TransactionLabelsTable
+    var attachments by AttachmentEntity via TransactionAttachmentsTable
 
     fun toModel() = Transaction(
         id.value,
@@ -67,14 +69,14 @@ class TransactionEntity(id: EntityID<Int>): IntEntity(id) {
         user.toModel(),
         import?.toModel(),
         transactionRule?.toModel(),
-        labels.toList().map { it.toModel() },
         amount,
         date,
         payee,
         note,
         longitude,
         latitude,
-        attachmentPath,
+        labels.toList().map { it.toModel() },
+        attachments.toList().map { it.toModel() },
         createdAt,
         modifiedAt,
     )
@@ -87,14 +89,14 @@ class Transaction(
     val user: User,
     val import: Import?,
     val rule: TransactionRule?,
-    val labels: List<Label>,
     val amount: BigDecimal,
     val date: Instant,
     val payee: String,
     val note: String?,
     val longitude: String?,
     val latitude: String?,
-    val attachmentPath: String?,
+    val labels: List<Label>,
+    val attachments: List<Attachment>,
     val createdAt: Instant,
     val modifiedAt: Instant,
 )

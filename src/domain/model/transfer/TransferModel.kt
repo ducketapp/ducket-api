@@ -12,6 +12,9 @@ import domain.model.imports.ImportsTable
 import domain.model.user.User
 import domain.model.user.UserEntity
 import domain.model.user.UsersTable
+import io.budgery.api.domain.model.attachment.Attachment
+import io.budgery.api.domain.model.attachment.AttachmentEntity
+import io.budgery.api.domain.model.transaction.TransactionAttachmentsTable
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -28,14 +31,13 @@ internal object TransfersTable : IntIdTable("transfer") {
     val categoryId = reference("category_id", CategoriesTable)
     val importId = optReference("import_id", ImportsTable)
     val relationUuid = varchar("transfer_relation_uuid", 36)
-    val exchangeRate = double("exchange_rate").default(1.0)
+    val exchangeRate = decimal("exchange_rate", 10, 4)
     val amount = decimal("amount", 10, 2)
     val date = timestamp("date")
     val payee = varchar("payee", 128)
     val note = varchar("note", 128).nullable()
     val longitude = varchar("longitude", 45).nullable()
     val latitude = varchar("latitude", 45).nullable()
-    val attachmentPath = varchar("attachment_path", 128).nullable()
     val createdAt = timestamp("created_at")
     val modifiedAt = timestamp("modified_at")
 }
@@ -56,9 +58,10 @@ class TransferEntity(id: EntityID<Int>): IntEntity(id) {
     var note by TransfersTable.note
     var longitude by TransfersTable.longitude
     var latitude by TransfersTable.latitude
-    var attachmentPath by TransfersTable.attachmentPath
     var createdAt by TransfersTable.createdAt
     var modifiedAt by TransfersTable.modifiedAt
+
+    var attachments by AttachmentEntity via TransferAttachmentsTable
 
     fun toModel() = Transfer(
         id.value,
@@ -75,7 +78,7 @@ class TransferEntity(id: EntityID<Int>): IntEntity(id) {
         note,
         longitude,
         latitude,
-        attachmentPath,
+        attachments.toList().map { it.toModel() },
         createdAt,
         modifiedAt,
     )
@@ -89,14 +92,14 @@ class Transfer(
     val category: Category,
     val import: Import?,
     val relationUuid: UUID,
-    val exchangeRate: Double,
+    val exchangeRate: BigDecimal,
     val amount: BigDecimal,
     val date: Instant,
     val payee: String,
     val note: String?,
     val longitude: String?,
     val latitude: String?,
-    val attachmentPath: String?,
+    val attachments: List<Attachment>,
     val createdAt: Instant,
     val modifiedAt: Instant,
 )

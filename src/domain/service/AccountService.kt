@@ -3,8 +3,9 @@ package io.budgery.api.domain.service
 import io.budgery.api.domain.controller.account.AccountCreateDto
 import io.budgery.api.domain.controller.account.AccountDto
 import io.budgery.api.domain.controller.account.AccountUpdateDto
-import io.budgery.api.domain.controller.record.TransactionDto
-import io.budgery.api.domain.controller.record.TransferDto
+import io.budgery.api.domain.controller.record.RecordDto
+import io.budgery.api.domain.controller.transaction.TransactionDto
+import io.budgery.api.domain.controller.transfer.TransferDto
 import io.budgery.api.domain.repository.AccountRepository
 import io.budgery.api.domain.repository.TransactionRepository
 import io.budgery.api.domain.repository.TransferRepository
@@ -20,17 +21,17 @@ class AccountService(
 ) {
 
     fun getAmount(userId: Int, accountId: Int, beforeDate: Instant = Instant.now()): BigDecimal {
-        val transactionsAmount = transactionRepository.findAllByAccount(userId, accountId)
-            .map { TransactionDto(it) }
+        val transactions = transactionRepository.findAllByAccount(userId, accountId)
             .filter { it.date.isBeforeInclusive(beforeDate) }
-            .sumByDecimal { it.amount }
+            .map { RecordDto(it) }
 
-        val transfersAmount = transferRepository.findAllByAccount(userId, accountId)
-            .map { TransferDto(it) }
+        val transfers = transferRepository.findAllByAccount(userId, accountId)
             .filter { it.date.isBeforeInclusive(beforeDate) }
-            .sumByDecimal { it.amount }
+            .map { RecordDto(it) }
 
-        return transactionsAmount + transfersAmount
+        val records = transactions.plus(transfers).sortedWith(compareByDescending<RecordDto> { it.date }.thenByDescending { it.amount })
+
+        return records.sumByDecimal { it.amount }
     }
 
     fun getAccounts(userId: Int) : List<AccountDto> {

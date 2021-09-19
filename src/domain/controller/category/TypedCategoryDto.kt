@@ -5,9 +5,8 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped
 import domain.model.category.Category
 import domain.model.category.CategoryType
 
-class GroupedCategoryDto(
-    @JsonUnwrapped val categoryType: CategoryType,
-    @JsonIgnore var categories: List<Category>,
-) {
-    val nestedCategories: List<Any> = categories.map { TypelessCategoryDto(it) }
+class TypedCategoryDto(@JsonIgnore val category: Category) {
+    val id: Int = category.id
+    val name: String = category.name
+    val categoryType: CategoryType = category.categoryType
 }

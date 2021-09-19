@@ -3,6 +3,9 @@ package domain.model.user
 import domain.model.currency.CurrenciesTable
 import domain.model.currency.Currency
 import domain.model.currency.CurrencyEntity
+import io.budgery.api.domain.model.attachment.Attachment
+import io.budgery.api.domain.model.attachment.AttachmentEntity
+import io.budgery.api.domain.model.attachment.AttachmentsTable
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -19,8 +22,8 @@ internal object UsersTable : IntIdTable("user") {
     val name = varchar("name", 45)
     val email = varchar("email", 45).uniqueIndex()
     val mainCurrencyId = reference("main_currency_id", CurrenciesTable)
+    val attachmentId = optReference("attachment_id", AttachmentsTable)
     val passwordHash = varchar("password_hash", 64)
-    val imagePath = varchar("image_path", 128).nullable()
     val createdAt = timestamp("created_at")
     val modifiedAt = timestamp("modified_at")
 }
@@ -32,12 +35,22 @@ class UserEntity(id: EntityID<Int>): IntEntity(id) {
     var name by UsersTable.name
     var email by UsersTable.email
     var mainCurrency by CurrencyEntity referencedOn UsersTable.mainCurrencyId
+    var attachment by AttachmentEntity optionalReferencedOn UsersTable.attachmentId
     var passwordHash by UsersTable.passwordHash
-    var imagePath by UsersTable.imagePath
     var createdAt by UsersTable.createdAt
     var modifiedAt by UsersTable.modifiedAt
 
-    fun toModel() = User(id.value, UUID.fromString(uuid), name, email, mainCurrency.toModel(), passwordHash, imagePath, createdAt, modifiedAt)
+    fun toModel() = User(
+        id.value,
+        UUID.fromString(uuid),
+        name,
+        email,
+        mainCurrency.toModel(),
+        attachment?.toModel(),
+        passwordHash,
+        createdAt,
+        modifiedAt
+    )
 }
 
 data class User(
@@ -46,8 +59,8 @@ data class User(
     val name: String,
     val email: String,
     val mainCurrency: Currency,
+    val attachment: Attachment?,
     val passwordHash: String,
-    val imagePath: String?,
     val createdAt: Instant,
     val modifiedAt: Instant,
 )

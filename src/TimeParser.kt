@@ -16,6 +16,13 @@ class InstantDeserializer : StdDeserializer<Instant>(Instant::class.java) {
     }
 }
 
+class LocalDateDeserializer : StdDeserializer<LocalDate>(Instant::class.java) {
+
+    override fun deserialize(p: JsonParser?, ctxt: DeserializationContext?): LocalDate {
+        return LocalDate.parse(p!!.text, DateTimeFormatter.ISO_LOCAL_DATE)
+    }
+}
+
 class InstantSerializer : StdSerializer<Instant>(Instant::class.java) {
 
     override fun serialize(value: Instant?, gen: JsonGenerator?, provider: SerializerProvider?) {

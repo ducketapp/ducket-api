@@ -5,13 +5,13 @@ import domain.model.transaction.Transaction
 import io.budgery.api.InstantSerializer
 import io.budgery.api.domain.controller.imports.ImportDto
 import io.budgery.api.domain.controller.account.AccountDto
-import io.budgery.api.domain.controller.category.CompleteCategoryDto
+import io.budgery.api.domain.controller.category.TypedCategoryDto
+import io.budgery.api.domain.controller.label.LabelDto
 import io.budgery.api.domain.model.transfer.Transfer
 import java.math.BigDecimal
 import java.time.Instant
 
 open class RecordDto {
-
     val id: Int
     val amount: BigDecimal
     val isExpense: Boolean
@@ -19,11 +19,11 @@ open class RecordDto {
     val account: AccountDto
     val import: ImportDto?
     val payee: String
-    val category: CompleteCategoryDto
+    val category: TypedCategoryDto
     val note: String?
     val longitude: String?
     val latitude: String?
-    val attachment: String?
+    val attachments: List<AttachmentDto>?
     @JsonSerialize(using = InstantSerializer::class) val date: Instant
     @JsonSerialize(using = InstantSerializer::class) val createdAt: Instant
     @JsonSerialize(using = InstantSerializer::class) val modifiedAt: Instant
@@ -33,7 +33,7 @@ open class RecordDto {
         this.isTransfer = true
         this.isExpense = transfer.amount < BigDecimal.ZERO
         this.amount = transfer.amount
-        this.category = CompleteCategoryDto(transfer.category)
+        this.category = TypedCategoryDto(transfer.category)
         this.account = AccountDto(transfer.account)
         this.import = transfer.import?.let { ImportDto(transfer.import) }
         this.date = transfer.date
@@ -41,7 +41,7 @@ open class RecordDto {
         this.note = transfer.note
         this.longitude = transfer.longitude
         this.latitude = transfer.latitude
-        this.attachment = transfer.attachmentPath
+        this.attachments = transfer.attachments.map { AttachmentDto(it) }
         this.createdAt = transfer.createdAt
         this.modifiedAt = transfer.modifiedAt
     }
@@ -51,7 +51,7 @@ open class RecordDto {
         this.isTransfer = false
         this.isExpense = transaction.amount < BigDecimal.ZERO
         this.amount = transaction.amount
-        this.category = CompleteCategoryDto(transaction.category)
+        this.category = TypedCategoryDto(transaction.category)
         this.account = AccountDto(transaction.account)
         this.import = transaction.import?.let { ImportDto(transaction.import) }
         this.date = transaction.date
@@ -59,7 +59,7 @@ open class RecordDto {
         this.note = transaction.note
         this.longitude = transaction.longitude
         this.latitude = transaction.latitude
-        this.attachment = transaction.attachmentPath
+        this.attachments = transaction.attachments.map { AttachmentDto(it) }
         this.createdAt = transaction.createdAt
         this.modifiedAt = transaction.modifiedAt
     }

@@ -2,6 +2,8 @@ package io.budgery.api.domain.controller.record
 
 import io.budgery.api.config.JwtConfig
 import io.budgery.api.config.UserPrincipal
+import io.budgery.api.domain.controller.transaction.TransactionCreateDto
+import io.budgery.api.domain.controller.transfer.TransferCreateDto
 import io.budgery.api.domain.service.AccountService
 import io.budgery.api.domain.service.TransactionService
 import io.budgery.api.domain.service.TransferService
@@ -18,24 +20,6 @@ class RecordController(
     val transferService: TransferService,
     val accountService: AccountService,
 ) {
-
-    suspend fun addManualTransfer(ctx: ApplicationCall, user: UserPrincipal) {
-        ctx.receive<TransferCreateDto>().apply {
-            transferService.addTransfer(user.id, this.validate()).apply {
-                ctx.respond(HttpStatusCode.Created, this)
-            }
-        }
-    }
-
-    suspend fun addManualTransaction(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id
-
-        ctx.receive<TransactionCreateDto>().apply {
-            transactionService.addTransaction(userId, this.validate()).apply {
-                ctx.respond(HttpStatusCode.Created, this)
-            }
-        }
-    }
 
     suspend fun getUserRecords(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id
@@ -76,29 +60,5 @@ class RecordController(
         }*/
 
         ctx.respond(HttpStatusCode.OK, totalRecords)
-    }
-
-    suspend fun getTransaction(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id
-        val transactionId = ctx.parameters.getOrFail("transactionId").toInt()
-
-        val account = transactionService.getTransaction(userId, transactionId)
-        ctx.respond(HttpStatusCode.OK, account)
-    }
-
-    suspend fun deleteTransaction(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id
-        val transactionId = ctx.parameters.getOrFail("transactionId").toInt()
-
-        if (transactionService.deleteTransaction(userId, transactionId)) ctx.respond(HttpStatusCode.NoContent)
-        else ctx.respond(HttpStatusCode.UnprocessableEntity)
-    }
-
-    suspend fun deleteTransfer(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id
-        val transferId = ctx.parameters.getOrFail("transferId").toInt()
-
-        if (transferService.deleteTransfer(userId, transferId)) ctx.respond(HttpStatusCode.NoContent)
-        else ctx.respond(HttpStatusCode.UnprocessableEntity)
     }
 }

@@ -12,8 +12,8 @@ object DatabaseConfig {
             config.password = password
             config.maximumPoolSize = 3
             config.isAutoCommit = false
-            config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
         }
-        Database.connect(HikariDataSource(config))
+        val db = Database.connect(HikariDataSource(config))
+        db.useNestedTransactions = true
     }
 }

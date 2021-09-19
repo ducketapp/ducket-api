@@ -5,6 +5,8 @@ import io.budgery.api.domain.controller.budget.BudgetController
 import io.budgery.api.domain.controller.category.CategoryController
 import io.budgery.api.domain.controller.label.LabelController
 import io.budgery.api.domain.controller.record.RecordController
+import io.budgery.api.domain.controller.transaction.TransactionController
+import io.budgery.api.domain.controller.transfer.TransferController
 import io.budgery.api.domain.controller.user.UserController
 import io.budgery.api.domain.repository.*
 import io.budgery.api.domain.service.*
@@ -25,10 +27,13 @@ object DependencyInjectionConfig {
         bind() from singleton { AccountController(instance()) }
         bind() from singleton { AccountService(instance(), instance(), instance()) }
         bind() from singleton { AccountRepository() }
+        bind() from singleton { CurrencyRepository() }
     }
 
     private val recordModule = Kodein.Module(name = "recordModule") {
         bind() from singleton { RecordController(instance(), instance(), instance()) }
+        bind() from singleton { TransactionController(instance(), instance()) }
+        bind() from singleton { TransferController(instance(), instance()) }
         bind() from singleton { TransactionService(instance()) }
         bind() from singleton { TransferService(instance(), instance()) }
         bind() from singleton { TransactionRepository() }
@@ -49,7 +54,7 @@ object DependencyInjectionConfig {
 
     private val budgetModule = Kodein.Module(name = "budgetModule") {
         bind() from singleton { BudgetController(instance()) }
-        bind() from singleton { BudgetService(instance(), instance()) }
+        bind() from singleton { BudgetService(instance(), instance(), instance(), instance(), instance(), instance()) }
         bind() from singleton { BudgetRepository() }
     }
 
