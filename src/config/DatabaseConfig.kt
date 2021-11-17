@@ -1,4 +1,4 @@
-package io.budgery.api.config
+package io.ducket.api.config
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource

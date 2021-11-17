@@ -1,15 +1,15 @@
-package io.budgery.api.config
+package io.ducket.api.config
 
-import io.budgery.api.domain.controller.account.AccountController
-import io.budgery.api.domain.controller.budget.BudgetController
-import io.budgery.api.domain.controller.category.CategoryController
-import io.budgery.api.domain.controller.label.LabelController
-import io.budgery.api.domain.controller.record.RecordController
-import io.budgery.api.domain.controller.transaction.TransactionController
-import io.budgery.api.domain.controller.transfer.TransferController
-import io.budgery.api.domain.controller.user.UserController
-import io.budgery.api.domain.repository.*
-import io.budgery.api.domain.service.*
+import io.ducket.api.domain.controller.account.AccountController
+import io.ducket.api.domain.controller.budget.BudgetController
+import io.ducket.api.domain.controller.category.CategoryController
+import io.ducket.api.domain.controller.label.LabelController
+import io.ducket.api.domain.controller.record.RecordController
+import io.ducket.api.domain.controller.transaction.TransactionController
+import io.ducket.api.domain.controller.transfer.TransferController
+import io.ducket.api.domain.controller.user.UserController
+import io.ducket.api.domain.repository.*
+import io.ducket.api.domain.service.*
 import org.kodein.di.Kodein
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.instance
@@ -24,7 +24,7 @@ object DependencyInjectionConfig {
     }
 
     private val accountModule = Kodein.Module(name = "accountModule") {
-        bind() from singleton { AccountController(instance()) }
+        bind() from singleton { AccountController(instance(), instance()) }
         bind() from singleton { AccountService(instance(), instance(), instance()) }
         bind() from singleton { AccountRepository() }
         bind() from singleton { CurrencyRepository() }
@@ -59,8 +59,9 @@ object DependencyInjectionConfig {
     }
 
     private val importModule = Kodein.Module(name = "importModule") {
-        bind() from singleton { ImportService(instance()) }
+        bind() from singleton { ImportService(instance(), instance(), instance(), instance()) }
         bind() from singleton { ImportRepository() }
+        bind() from singleton { RuleRepository() }
     }
 
     internal val kodein = Kodein {

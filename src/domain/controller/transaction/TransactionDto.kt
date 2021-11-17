@@ -1,13 +1,14 @@
-package io.budgery.api.domain.controller.transaction
+package io.ducket.api.domain.controller.transaction
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import domain.model.transaction.Transaction
-import io.budgery.api.domain.controller.label.LabelDto
-import io.budgery.api.domain.controller.record.RecordDto
+import io.ducket.api.domain.controller.imports.ImportDto
+import io.ducket.api.domain.controller.record.RecordDto
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-class TransactionDto(@JsonIgnore val transaction: Transaction): RecordDto(transaction) {
-    val rule: TransactionRuleDto? = transaction.rule?.let { TransactionRuleDto(transaction.rule) }
-    val labels: List<LabelDto> = transaction.labels.map { LabelDto(it) }
+data class TransactionDto(@JsonIgnore val transaction: Transaction): RecordDto(transaction) {
+    val import: ImportDto? = transaction.import?.let { ImportDto(it) }
+    val payee: String = transaction.payee
+    val payer: String? = transaction.payer
 }

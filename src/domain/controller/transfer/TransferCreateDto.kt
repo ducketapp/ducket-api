@@ -1,7 +1,7 @@
-package io.budgery.api.domain.controller.transfer
+package io.ducket.api.domain.controller.transfer
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import io.budgery.api.InstantDeserializer
+import io.ducket.api.InstantDeserializer
 import org.valiktor.functions.*
 import java.lang.IllegalArgumentException
 import java.math.BigDecimal
@@ -9,26 +9,20 @@ import java.time.Instant
 
 data class TransferCreateDto(
     var amount: BigDecimal,
-    val payee: String,
-    val accountId: Int,
-    val transferAccountId: Int,
-    val categoryId: Int,
-    val labelIds: List<Int>?,
+    val accountId: String,
+    val transferAccountId: String,
     val note: String?,
     val longitude: String?,
     val latitude: String?,
     var exchangeRate: BigDecimal?,
-    @JsonDeserialize(using = InstantDeserializer::class) val date: Instant,
+    @JsonDeserialize(using = InstantDeserializer::class) var date: Instant,
 ) {
     fun validate(): TransferCreateDto {
         org.valiktor.validate(this) {
             validate(TransferCreateDto::exchangeRate).isGreaterThan(BigDecimal.ZERO)
-            validate(TransferCreateDto::payee).isNotEmpty()
             validate(TransferCreateDto::date).isLessThanOrEqualTo(Instant.now())
-            validate(TransferCreateDto::accountId).isGreaterThan(0)
-            validate(TransferCreateDto::transferAccountId).isGreaterThan(0)
-            validate(TransferCreateDto::categoryId).isGreaterThan(0)
-            validate(TransferCreateDto::labelIds).isValid { !it.contains(0) }
+            validate(TransferCreateDto::accountId).isNotBlank()
+            validate(TransferCreateDto::transferAccountId).isNotBlank()
             validate(TransferCreateDto::note).isNotEmpty()
             validate(TransferCreateDto::longitude).isNotEmpty()
             validate(TransferCreateDto::latitude).isNotEmpty()

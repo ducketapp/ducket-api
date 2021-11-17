@@ -1,21 +1,22 @@
-package io.budgery.api.domain.service
+package io.ducket.api.domain.service
 
-import io.budgery.api.ExchangeRateClient
-import io.budgery.api.domain.controller.budget.BudgetCreateDto
-import io.budgery.api.domain.controller.budget.BudgetDto
-import io.budgery.api.domain.controller.budget.BudgetPeriodDto
-import io.budgery.api.domain.controller.budget.BudgetProgressDto
-import io.budgery.api.domain.controller.record.RecordDto
-import io.budgery.api.domain.model.budget.Budget
-import io.budgery.api.domain.repository.*
-import io.budgery.api.extension.isAfterInclusive
-import io.budgery.api.extension.isBeforeInclusive
-import io.budgery.api.extension.sumByDecimal
-import io.budgery.api.getLogger
-import java.lang.IllegalArgumentException
+import io.ducket.api.ExchangeRateClient
+import io.ducket.api.InvalidDataError
+import io.ducket.api.NoEntityFoundError
+import io.ducket.api.domain.controller.budget.BudgetCreateDto
+import io.ducket.api.domain.controller.budget.BudgetDto
+import io.ducket.api.domain.controller.budget.BudgetPeriodBoundsDto
+import io.ducket.api.domain.controller.budget.BudgetProgressDto
+import io.ducket.api.domain.controller.record.RecordDto
+import io.ducket.api.domain.controller.transaction.TransactionDto
+import io.ducket.api.domain.model.budget.Budget
+import io.ducket.api.domain.model.budget.BudgetPeriodType
+import io.ducket.api.domain.repository.*
+import io.ducket.api.extension.isAfterInclusive
+import io.ducket.api.extension.isBeforeInclusive
+import io.ducket.api.extension.sumByDecimal
+import io.ducket.api.getLogger
 import java.math.BigDecimal
-import java.math.BigInteger
-import java.math.RoundingMode
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
@@ -30,40 +31,37 @@ class BudgetService(
 ) {
     private val logger = getLogger()
 
-    fun createBudget(userId: Int, reqObj: BudgetCreateDto): BudgetDto {
-        val periodTypeId = budgetRepository.findPeriodType(reqObj.budgetPeriod)?.id
-            ?: throw IllegalArgumentException("Unsupported '${reqObj.budgetPeriod}' period type")
-
+    fun createBudget(userId: String, reqObj: BudgetCreateDto): BudgetDto {
         val currencyId = currencyRepository.findOne(reqObj.currencyIsoCode)?.id
-            ?: throw IllegalArgumentException("Unsupported '${reqObj.currencyIsoCode}' currency code")
+            ?: throw InvalidDataError("Unsupported '${reqObj.currencyIsoCode}' currency code")
 
         accountRepository.findAll(userId).map { it.id }.takeIf { it.containsAll(reqObj.accountIds) }
-            ?: throw IllegalArgumentException("No such account(s) found")
+            ?: throw InvalidDataError("No such account(s) found")
 
         categoryRepository.findById(reqObj.categoryId)
-            ?: throw IllegalArgumentException("No such category found")
+            ?: throw InvalidDataError("No such category found")
 
         budgetRepository.findOneByName(userId, reqObj.name)?.let {
-            if (!it.isClosed) throw IllegalArgumentException("'${reqObj.name}' budget already opened")
+            if (!it.isClosed) throw InvalidDataError("'${reqObj.name}' budget already opened")
         }
 
-        val budget = budgetRepository.create(userId, periodTypeId, currencyId, reqObj)
+        val budget = budgetRepository.create(userId, currencyId, reqObj)
 
         return getBudget(userId, budget.id)
     }
 
-    fun getBudget(userId: Int, budgetId: Int): BudgetDto {
+    fun getBudget(userId: String, budgetId: String): BudgetDto {
         return getBudgets(userId).firstOrNull { it.id == budgetId }
-            ?: throw NoSuchElementException("No such budget was found")
+            ?: throw NoEntityFoundError("No such budget was found")
     }
 
-    fun getBudgets(userId: Int): List<BudgetDto> {
+    fun getBudgets(userId: String): List<BudgetDto> {
         return budgetRepository.findAll(userId).map {
-            val periodBounds = getBudgetPeriodBounds(it.periodType.period)
+            val periodBounds = getBudgetPeriodBounds(it.periodType)
 
             if (periodBounds != null) {
                 val progressDto = calculateBudgetProgress(it)
-                val periodDto = BudgetPeriodDto(it.periodType.period, periodBounds)
+                val periodDto = BudgetPeriodBoundsDto(it.periodType.name, periodBounds)
                 return@map BudgetDto(it, progressDto, periodDto)
             } else {
                 return@map BudgetDto(it, BudgetProgressDto())
@@ -71,22 +69,27 @@ class BudgetService(
         }
     }
 
+    fun deleteBudget(userId: String, budgetId: String) {
+        budgetRepository.delete(userId, budgetId)
+    }
+
     private fun calculateBudgetProgress(budget: Budget): BudgetProgressDto {
-        val transactionRecords = transactionRepository.findAll(budget.user.id).map { RecordDto(it) }
-        val transferRecords = transferRepository.findAll(budget.user.id).map { RecordDto(it) }
-        val records = transactionRecords.plus(transferRecords).sortedWith(compareByDescending<RecordDto> { it.date }.thenByDescending { it.amount })
+        val transactionRecords = transactionRepository.findAll(budget.user.id.toString()).map { TransactionDto(it) }
+        val transactions =
+            transactionRecords.sortedWith(compareByDescending<RecordDto> { it.date }.thenByDescending { it.amount })
 
-        val periodBounds = getBudgetPeriodBounds(budget.periodType.period)
-            ?: return BudgetProgressDto(0, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)
+        val periodBounds = getBudgetPeriodBounds(budget.periodType) ?: return BudgetProgressDto()
 
-        val recordsInPeriod = records.filter { r ->
-            r.date.isAfterInclusive(periodBounds.first.atStartOfDay(ZoneId.systemDefault()).toInstant())
-                    && r.date.isBeforeInclusive(periodBounds.second.atStartOfDay(ZoneId.systemDefault()).toInstant())
-                    && budget.accounts.map { it.id }.contains(r.account.id)
-                    && budget.category.id == r.category.id
+        val transactionsInPeriod = transactions.filter { transaction ->
+            transaction.date.isAfterInclusive(periodBounds.first.atStartOfDay(ZoneId.systemDefault()).toInstant())
+                    && transaction.date.isBeforeInclusive(
+                periodBounds.second.atStartOfDay(ZoneId.systemDefault()).toInstant()
+            )
+                    && budget.accounts.map { it.id.toString() }.contains(transaction.account.id)
+                    && budget.category.id.toString() == transaction.category?.id
         }
 
-        val amount = getRecordsTotalBalance(recordsInPeriod, budget.currency.isoCode)
+        val amount = resolveTransactionsTotalBalance(transactionsInPeriod, budget.currency.isoCode)
         var progress = BigDecimal.ZERO
         var spent = BigDecimal.ZERO
 
@@ -95,10 +98,10 @@ class BudgetService(
             spent = amount
         }
 
-        return BudgetProgressDto(recordsInPeriod.size, budget.limit, progress, spent)
+        return BudgetProgressDto(transactionsInPeriod.size, budget.limit, progress, spent)
     }
 
-    private fun getRecordsTotalBalance(records: List<RecordDto>, currencyIsoCode: String): BigDecimal {
+    private fun resolveTransactionsTotalBalance(records: List<RecordDto>, currencyIsoCode: String): BigDecimal {
         val exchangeRateClient = ExchangeRateClient()
 
         return records.map {
@@ -118,17 +121,13 @@ class BudgetService(
         }.sumByDecimal { it }
     }
 
-    private fun getBudgetPeriodBounds(period: String): Pair<LocalDate, LocalDate>? {
+    private fun getBudgetPeriodBounds(period: BudgetPeriodType): Pair<LocalDate, LocalDate>? {
         val now: LocalDate = LocalDate.now()
 
         return when (period) {
-            "WEEKLY" -> Pair(now.with(DayOfWeek.MONDAY), now.with(DayOfWeek.SUNDAY))
-            "MONTHLY" -> Pair(now.withDayOfMonth(1), now.withDayOfMonth(now.lengthOfMonth()))
-            "ANNUAL" -> Pair(now.withDayOfYear(1), now.withDayOfYear(now.lengthOfYear()))
-            else -> {
-                logger.error("Invalid budget period: $period")
-                null
-            }
+            BudgetPeriodType.WEEKLY -> Pair(now.with(DayOfWeek.MONDAY), now.with(DayOfWeek.SUNDAY))
+            BudgetPeriodType.MONTHLY -> Pair(now.withDayOfMonth(1), now.withDayOfMonth(now.lengthOfMonth()))
+            BudgetPeriodType.ANNUAL -> Pair(now.withDayOfYear(1), now.withDayOfYear(now.lengthOfYear()))
         }
     }
 }

@@ -1,11 +1,12 @@
-package io.budgery.api.domain.controller.user
+package io.ducket.api.domain.controller.user
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped
-import io.budgery.api.domain.controller.imports.ImportDto
-import io.budgery.api.domain.controller.account.AccountDto
+import io.ducket.api.domain.controller.imports.ImportDto
+import io.ducket.api.domain.controller.account.AccountDto
+import io.ducket.api.domain.controller.budget.BudgetDto
 
 class UserDetailsDto(
     @JsonUnwrapped val user: UserDto,
     val accounts: List<AccountDto> = emptyList(),
-    val imports: List<ImportDto> = emptyList(),
+    val budgets: List<BudgetDto> = emptyList(),
 )

@@ -1,4 +1,4 @@
-package io.budgery.api
+package io.ducket.api
 
 import io.ktor.http.*
 import kotlin.test.*

@@ -1,20 +1,27 @@
-package io.budgery.api.domain.model.budget
+package io.ducket.api.domain.model.budget
 
 import domain.model.account.Account
 import domain.model.account.AccountEntity
 import domain.model.account.AccountsTable
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
+import domain.model.user.UserEntity
+import domain.model.user.UsersTable
+import org.jetbrains.exposed.dao.*
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.dao.id.UUIDTable
+import org.jetbrains.exposed.sql.Table
+import java.util.*
 
-internal object BudgetAccountsTable : IntIdTable("budget_account") {
+internal object BudgetAccountsTable : Table("budget_account") {
     val budgetId = reference("budget_id", BudgetsTable)
     val accountId = reference("account_id", AccountsTable)
+
+    override val primaryKey = PrimaryKey(budgetId, accountId)
 }
 
-class BudgetAccountEntity(id: EntityID<Int>): IntEntity(id) {
-    companion object : IntEntityClass<BudgetAccountEntity>(BudgetAccountsTable)
+/*
+class BudgetAccountEntity(id: EntityID<String>) : Entity<String>(id) {
+    companion object : EntityClass<String, BudgetAccountEntity>(BudgetAccountsTable)
 
     var budget by BudgetEntity referencedOn BudgetAccountsTable.budgetId
     var account by AccountEntity referencedOn BudgetAccountsTable.accountId
@@ -23,7 +30,7 @@ class BudgetAccountEntity(id: EntityID<Int>): IntEntity(id) {
 }
 
 data class BudgetAccount(
-    val id: Int,
+    val id: String,
     val budget: Budget,
     val account: Account,
-)
+)*/

@@ -12,70 +12,70 @@ import domain.model.imports.ImportsTable
 import domain.model.user.User
 import domain.model.user.UserEntity
 import domain.model.user.UsersTable
-import io.budgery.api.domain.model.attachment.Attachment
-import io.budgery.api.domain.model.attachment.AttachmentEntity
-import io.budgery.api.domain.model.label.Label
-import io.budgery.api.domain.model.label.LabelEntity
-import io.budgery.api.domain.model.label.TransactionLabelsTable
-import io.budgery.api.domain.model.transaction.TransactionAttachmentsTable
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
+import io.ducket.api.domain.model.CombinedIdTable
+import io.ducket.api.domain.model.StringIdTable
+import io.ducket.api.domain.model.attachment.Attachment
+import io.ducket.api.domain.model.attachment.AttachmentEntity
+import io.ducket.api.domain.model.transaction.TransactionAttachmentsTable
+import io.ducket.api.domain.model.transfer.TransfersTable
+import io.ducket.api.domain.model.transfer.TransfersTable.default
+import org.jetbrains.exposed.dao.*
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.`java-time`.timestamp
 import java.math.BigDecimal
 import java.time.Instant
+import java.util.*
 
-internal object TransactionsTable : IntIdTable("transaction") {
-    val accountId = reference("account_id", AccountsTable)
-    val categoryId = reference("category_id", CategoriesTable)
+internal object TransactionsTable : StringIdTable("transaction") {
     val userId = reference("user_id", UsersTable)
+    val accountId = reference("account_id", AccountsTable)
+    val categoryId = optReference("category_id", CategoriesTable)
     val importId = optReference("import_id", ImportsTable)
-    val transactionRuleId = optReference("transaction_rule_id", TransactionRulesTable)
-    val amount = decimal("amount", 10, 2)
     val date = timestamp("date")
+    val amount = decimal("amount", 10, 2)
     val payee = varchar("payee", 128)
-    val note = varchar("note", 128).nullable()
+    val payer = varchar("payer", 128).nullable()
+    val notes = varchar("notes", 128).nullable()
     val longitude = varchar("longitude", 45).nullable()
     val latitude = varchar("latitude", 45).nullable()
     val createdAt = timestamp("created_at")
     val modifiedAt = timestamp("modified_at")
 }
 
-class TransactionEntity(id: EntityID<Int>): IntEntity(id) {
-    companion object : IntEntityClass<TransactionEntity>(TransactionsTable)
+class TransactionEntity(id: EntityID<String>) : Entity<String>(id) {
+    companion object : EntityClass<String, TransactionEntity>(TransactionsTable)
 
     var account by AccountEntity referencedOn TransactionsTable.accountId
-    var category by CategoryEntity referencedOn TransactionsTable.categoryId
     var user by UserEntity referencedOn TransactionsTable.userId
+    var category by CategoryEntity optionalReferencedOn TransactionsTable.categoryId
     var import by ImportEntity optionalReferencedOn TransactionsTable.importId
-    var transactionRule by TransactionRuleEntity optionalReferencedOn TransactionsTable.transactionRuleId
     var amount by TransactionsTable.amount
     var date by TransactionsTable.date
     var payee by TransactionsTable.payee
-    var note by TransactionsTable.note
+    var payer by TransactionsTable.payer
+    var notes by TransactionsTable.notes
     var longitude by TransactionsTable.longitude
     var latitude by TransactionsTable.latitude
     var createdAt by TransactionsTable.createdAt
     var modifiedAt by TransactionsTable.modifiedAt
 
-    var labels by LabelEntity via TransactionLabelsTable
     var attachments by AttachmentEntity via TransactionAttachmentsTable
 
     fun toModel() = Transaction(
         id.value,
         account.toModel(),
-        category.toModel(),
+        category?.toModel(),
         user.toModel(),
         import?.toModel(),
-        transactionRule?.toModel(),
         amount,
         date,
         payee,
-        note,
+        payer,
+        notes,
         longitude,
         latitude,
-        labels.toList().map { it.toModel() },
         attachments.toList().map { it.toModel() },
         createdAt,
         modifiedAt,
@@ -83,19 +83,18 @@ class TransactionEntity(id: EntityID<Int>): IntEntity(id) {
 }
 
 class Transaction(
-    val id: Int,
+    val id: String,
     val account: Account,
-    val category: Category,
+    val category: Category?,
     val user: User,
     val import: Import?,
-    val rule: TransactionRule?,
     val amount: BigDecimal,
     val date: Instant,
     val payee: String,
-    val note: String?,
+    val payer: String?,
+    val notes: String?,
     val longitude: String?,
     val latitude: String?,
-    val labels: List<Label>,
     val attachments: List<Attachment>,
     val createdAt: Instant,
     val modifiedAt: Instant,

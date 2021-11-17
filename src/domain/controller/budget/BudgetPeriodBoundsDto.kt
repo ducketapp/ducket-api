@@ -1,8 +1,8 @@
-package io.budgery.api.domain.controller.budget
+package io.ducket.api.domain.controller.budget
 
 import java.time.LocalDate
 
-class BudgetPeriodDto(
+class BudgetPeriodBoundsDto(
     val type: String,
     bounds: Pair<LocalDate, LocalDate>,
 ) {

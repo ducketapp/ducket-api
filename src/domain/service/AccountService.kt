@@ -1,16 +1,17 @@
-package io.budgery.api.domain.service
+package io.ducket.api.domain.service
 
-import io.budgery.api.domain.controller.account.AccountCreateDto
-import io.budgery.api.domain.controller.account.AccountDto
-import io.budgery.api.domain.controller.account.AccountUpdateDto
-import io.budgery.api.domain.controller.record.RecordDto
-import io.budgery.api.domain.controller.transaction.TransactionDto
-import io.budgery.api.domain.controller.transfer.TransferDto
-import io.budgery.api.domain.repository.AccountRepository
-import io.budgery.api.domain.repository.TransactionRepository
-import io.budgery.api.domain.repository.TransferRepository
-import io.budgery.api.extension.isBeforeInclusive
-import io.budgery.api.extension.sumByDecimal
+import io.ducket.api.DuplicateEntityError
+import io.ducket.api.NoEntityFoundError
+import io.ducket.api.domain.controller.account.AccountCreateDto
+import io.ducket.api.domain.controller.account.AccountDto
+import io.ducket.api.domain.controller.account.AccountUpdateDto
+import io.ducket.api.domain.controller.record.RecordDto
+import io.ducket.api.domain.repository.AccountRepository
+import io.ducket.api.domain.repository.CurrencyRepository
+import io.ducket.api.domain.repository.TransactionRepository
+import io.ducket.api.domain.repository.TransferRepository
+import io.ducket.api.extension.isBeforeInclusive
+import io.ducket.api.extension.sumByDecimal
 import java.math.BigDecimal
 import java.time.Instant
 
@@ -20,74 +21,55 @@ class AccountService(
     private val transferRepository: TransferRepository,
 ) {
 
-    fun getAmount(userId: Int, accountId: Int, beforeDate: Instant = Instant.now()): BigDecimal {
+    fun resolveBalance(userId: String, accountId: String, beforeDate: Instant = Instant.now()): BigDecimal {
         val transactions = transactionRepository.findAllByAccount(userId, accountId)
-            .filter { it.date.isBeforeInclusive(beforeDate) }
-            .map { RecordDto(it) }
+            .filter { it.date.isBeforeInclusive(beforeDate) }.map { RecordDto(it) }
 
         val transfers = transferRepository.findAllByAccount(userId, accountId)
-            .filter { it.date.isBeforeInclusive(beforeDate) }
-            .map { RecordDto(it) }
+            .filter { it.date.isBeforeInclusive(beforeDate) }.map { RecordDto(it) }
 
-        val records = transactions.plus(transfers).sortedWith(compareByDescending<RecordDto> { it.date }.thenByDescending { it.amount })
+        val records = transactions.plus(transfers)
+            .sortedWith(compareByDescending<RecordDto> { it.date }.thenByDescending { it.amount })
 
         return records.sumByDecimal { it.amount }
     }
 
-    fun getAccounts(userId: Int) : List<AccountDto> {
-        accountRepository.findAll(userId).also { list ->
-            return list.map {
-                val numOfTransactions = transactionRepository.getTotalByAccount(userId, it.id)
-                val numOfTransfers = transferRepository.getTotalByAccount(userId, it.id)
-                val totalAmount = getAmount(userId, it.id)
-
-                AccountDto(it, totalAmount, numOfTransactions + numOfTransfers)
+    fun getAccounts(userId: String): List<AccountDto> {
+        accountRepository.findAll(userId).also { accounts ->
+            return accounts.map {
+                val totalBalance = resolveBalance(userId, it.id)
+                AccountDto(it, totalBalance)
             }
         }
     }
 
-    fun getAccount(userId: Int, accountId: Int) : AccountDto {
-        return getAccounts(userId).firstOrNull { it.account.id == accountId }
-            ?: throw NoSuchElementException("No such account was found")
+    fun getAccount(userId: String, accountId: String): AccountDto {
+        return getAccounts(userId).firstOrNull { it.id == accountId }
+            ?: throw NoEntityFoundError("No such account was found")
     }
 
-    fun createAccount(userId: Int, reqObj: AccountCreateDto) : AccountDto {
+    fun createAccount(userId: String, reqObj: AccountCreateDto): AccountDto {
         accountRepository.findOneByName(userId, reqObj.name)?.let {
-            throw IllegalArgumentException("'${reqObj.name}' account already exists")
+            throw DuplicateEntityError("'${reqObj.name}' account already exists")
         }
 
-        val newAccount = accountRepository.create(userId, reqObj)
-
-        return AccountDto(newAccount, BigDecimal.ZERO, 0)
+        return AccountDto(accountRepository.create(userId, reqObj))
     }
 
-    fun updateAccount(userId: Int, accountId: Int, reqObj: AccountUpdateDto) : AccountDto {
-        accountRepository.findOne(userId, accountId) ?: throw NoSuchElementException("No such account was found")
+    fun updateAccount(userId: String, accountId: String, reqObj: AccountUpdateDto): AccountDto {
+        accountRepository.findOne(userId, accountId) ?: throw NoEntityFoundError("No such account was found")
 
         reqObj.name?.let {
             accountRepository.findOneByName(userId, it)?.let { found ->
-                if (found.id != accountId) throw IllegalArgumentException("'${reqObj.name}' account already exists")
+                if (found.id.toString() != accountId) throw IllegalArgumentException("'${reqObj.name}' account already exists")
             }
         }
 
-        return accountRepository.updateOne(userId, accountId, reqObj)?.let {
-            AccountDto(it)
-        } ?: throw Exception("No such account was found")
+        return accountRepository.updateOne(userId, accountId, reqObj)?.let { AccountDto(it) }
+            ?: throw Exception("Cannot update account entity")
     }
 
-    fun deleteAccount(userId: Int, accountId: Int) : Boolean {
+    fun deleteAccount(userId: String, accountId: String): Boolean {
         return accountRepository.deleteOne(userId, accountId)
     }
-
-/*    fun deleteAccounts(userId: Int, payload: AccountDeleteDTO): List<AccountDTO> {
-        if (!accountRepository.getAllByUserId(userId).map { it.id }.containsAll(payload.accountIds)) {
-            throw NoSuchElementException()
-        }
-
-        payload.accountIds.forEach {
-            accountRepository.deleteById(it, userId)
-        }
-
-        return getAccounts(userId)
-    }*/
 }

@@ -1,16 +1,16 @@
-package io.budgery.api.config
+package io.ducket.api.config
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
-import io.budgery.api.AuthenticationException
+import io.ducket.api.AuthenticationException
 import io.ktor.application.*
 import io.ktor.auth.*
 import java.util.*
 
 object JwtConfig {
     private const val secret = "cn#PGH7EgbO87VBa!"
-    private const val issuer = "io.budgery.api"
+    private const val issuer = "io.ducket.api"
     private const val validityInMs = 36_000_00 * 24 // 1 day
     private val algorithm = Algorithm.HMAC256(secret)
 
@@ -24,8 +24,7 @@ object JwtConfig {
         // .withExpiresAt(getExpiration())
         .withSubject("Authentication")
         .withIssuer(issuer)
-        .withClaim("id", userPrincipal.id)
-        .withClaim("uuid", userPrincipal.uuid.toString())
+        .withClaim("id", userPrincipal.id.toString())
         .withClaim("email", userPrincipal.email)
         .sign(algorithm)
 

@@ -1,22 +1,22 @@
-package io.budgery.api
+package io.ducket.api
 
-import com.fasterxml.jackson.databind.*
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
-import io.budgery.api.config.DatabaseConfig
-import io.budgery.api.config.DependencyInjectionConfig
-import io.budgery.api.config.JwtConfig
-import io.budgery.api.config.UserPrincipal
-import io.budgery.api.domain.controller.account.AccountController
-import io.budgery.api.domain.controller.budget.BudgetController
-import io.budgery.api.domain.controller.category.CategoryController
-import io.budgery.api.domain.controller.label.LabelController
-import io.budgery.api.domain.controller.record.RecordController
-import io.budgery.api.domain.controller.transaction.TransactionController
-import io.budgery.api.domain.controller.transfer.TransferController
-import io.budgery.api.domain.controller.user.UserController
-import io.budgery.api.domain.repository.*
-import io.budgery.api.route.*
+import io.ducket.api.config.DatabaseConfig
+import io.ducket.api.config.DependencyInjectionConfig
+import io.ducket.api.config.JwtConfig
+import io.ducket.api.config.UserPrincipal
+import io.ducket.api.domain.controller.account.AccountController
+import io.ducket.api.domain.controller.budget.BudgetController
+import io.ducket.api.domain.controller.category.CategoryController
+import io.ducket.api.domain.controller.label.LabelController
+import io.ducket.api.domain.controller.record.RecordController
+import io.ducket.api.domain.controller.transaction.TransactionController
+import io.ducket.api.domain.controller.transfer.TransferController
+import io.ducket.api.domain.controller.user.UserController
+import io.ducket.api.domain.repository.UserRepository
+import io.ducket.api.route.*
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
@@ -31,12 +31,11 @@ import io.ktor.server.netty.*
 import org.kodein.di.generic.instance
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.slf4j.event.*
+import org.slf4j.event.Level
 import org.valiktor.ConstraintViolationException
 import org.valiktor.i18n.mapToMessage
 import java.time.Instant
 import java.util.*
-
 
 const val PORT = 8080
 
@@ -46,26 +45,11 @@ fun main() {
     System.setProperty("handlers", "org.slf4j.bridge.SLF4JBridgeHandler")
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 
-    // "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml"
+    // ECB
     ExchangeRateClient().pullRates()
 
     setup().start(wait = true)
 }
-
-/*fun main() {
-    *//*java.util.logging.LogManager.getLogManager()*//*
-    *//*java.util.logging.Logger.getLogger("org.javamoney.moneta.spi.loader.LoadableResource").level = java.util.logging.Level.SEVERE
-    java.util.logging.Logger.getLogger("org.javamoney.moneta.convert.frb.USFederalReserveRateProvider").level = java.util.logging.Level.SEVERE
-    java.util.logging.Logger.getLogger("org.javamoney.moneta.spi.loader.LoadDataLoaderService").level = java.util.logging.Level.SEVERE*//*
-
-    try {
-        val ecbRateProvider: ExchangeRateProvider = MonetaryConversions.getExchangeRateProvider("ECB")
-        val rate: ExchangeRate = ecbRateProvider.getExchangeRate("USD", "PLN")
-        println(rate.factor)
-    } catch (e: Exception) {
-
-    }
-}*/
 
 @EngineAPI
 fun setup(): BaseApplicationEngine {
@@ -79,28 +63,9 @@ fun setup(): BaseApplicationEngine {
         factory = Netty,
         port = PORT,
         module = Application::module,
-        watchPaths = listOf("classes")
+        watchPaths = listOf("classes"),
     )
 }
-
-/*fun setupBudgetRenewalCronScheduler(): Scheduler {
-    val job = JobBuilder.newJob(BudgetRepository::class.java)
-        .withIdentity("budgetRenewalJob", "budget").build()
-
-    // .cronSchedule("0/10 * * * * ?")).build();
-    val trigger = newTrigger()
-        .withIdentity("budgetRenewalTrigger", "budget")
-        .startNow()
-        //.withSchedule(weeklyOnDayAndHourAndMinute(DateBuilder.MONDAY, 0,0))
-        .withSchedule(repeatSecondlyForever(3))
-        .build()
-
-    val scheduler: Scheduler = StdSchedulerFactory().scheduler
-    scheduler.start()
-    scheduler.scheduleJob(job, trigger)
-
-    return scheduler
-}*/
 
 fun Application.module() {
     val userController by DependencyInjectionConfig.kodein.instance<UserController>()
@@ -117,6 +82,13 @@ fun Application.module() {
     install(CallLogging) {
         level = Level.INFO
         filter { call -> call.request.path().startsWith("/") }
+        format { call ->
+            val status = call.response.status()
+            val path = call.request.path()
+            val httpMethod = call.request.httpMethod.value
+            val userAgent = call.request.headers["User-Agent"]
+            "($status) [$httpMethod], $userAgent - $path"
+        }
     }
 
     install(DefaultHeaders) {
@@ -125,17 +97,16 @@ fun Application.module() {
 
     install(Authentication) {
         jwt {
-            realm = "io.budgery.api"
+            realm = "io.ducket.api"
             verifier(JwtConfig.verifier)
-            challenge { scheme, realm -> throw AuthenticationException("Invalid auth token") }
+            challenge { _, _ -> throw AuthenticationException("Invalid auth token") }
             validate {
-                val jwtUserId = it.payload.getClaim("id").asInt()
-                val jwtUserUuid = it.payload.getClaim("uuid").asString()
+                val jwtUserId = it.payload.getClaim("id").asString()
                 val jwtUserEmail = it.payload.getClaim("email").asString()
-                val user = userRepository.findById(jwtUserId)
 
-                if (user == null) throw Exception("User not found")
-                else UserPrincipal(jwtUserId, UUID.fromString(jwtUserUuid), jwtUserEmail)
+                return@validate userRepository.findOne(jwtUserId)?.let {
+                    UserPrincipal(jwtUserId, jwtUserEmail)
+                } ?: throw AuthenticationException("User not found")
             }
         }
     }
@@ -191,12 +162,19 @@ fun Application.module() {
             }
         }
 
+        exception<DuplicateEntityError> { cause ->
+            log.error(cause.stackTraceToString())
+
+            HttpStatusCode.BadRequest.apply {
+                call.respond(this, ErrorResponse(this, cause.localizedMessage))
+            }
+        }
+
         /**
          * HttpStatusCode.InternalServerError
          */
         exception<Throwable> { cause ->
             log.error(cause.stackTraceToString())
-
             HttpStatusCode.InternalServerError.apply {
                 call.respond(this, ErrorResponse(this, "Oops, something went wrong!"))
             }
@@ -248,5 +226,12 @@ inline fun <reified T> T.getLogger(): Logger {
 
 class AuthenticationException(message: String = "Authentication failure") : Exception(message)
 class AuthorizationException(message: String = "Access denied") : Exception(message)
-data class ErrorResponse(val status: HttpStatusCode, val message: String, val timestamp: String? = Instant.now().toString())
+class NoEntityFoundError(message: String = "No such entity was found") : Exception(message)
+class DuplicateEntityError(message: String = "Such an entity already exists") : Exception(message)
+class InvalidDataError(message: String = "Inappropriate data") : Exception(message)
+data class ErrorResponse(
+    val status: HttpStatusCode,
+    val message: String,
+    val timestamp: String? = Instant.now().toString()
+)
 

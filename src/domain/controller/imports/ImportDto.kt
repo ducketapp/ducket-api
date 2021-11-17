@@ -1,13 +1,13 @@
-package io.budgery.api.domain.controller.imports
+package io.ducket.api.domain.controller.imports
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import io.budgery.api.InstantSerializer
+import io.ducket.api.InstantSerializer
 import domain.model.imports.Import
 import java.time.Instant
 
-class ImportDto(@JsonIgnore val import: Import) {
-    val id: Int = import.id
-    val fileName: String = import.filePath
+data class ImportDto(@JsonIgnore val import: Import) {
+    val id: String = import.id.toString()
+    val fileName: String = import.filePath.substringAfterLast("\\")
     @JsonSerialize(using = InstantSerializer::class) val importedAt: Instant = import.importedAt
 }

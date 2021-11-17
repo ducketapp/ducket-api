@@ -3,35 +3,36 @@ package domain.model.imports
 import domain.model.user.User
 import domain.model.user.UserEntity
 import domain.model.user.UsersTable
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
+import io.ducket.api.domain.model.CombinedIdTable
+import io.ducket.api.domain.model.StringIdTable
+import io.ducket.api.domain.model.transfer.TransfersTable
+import org.jetbrains.exposed.dao.*
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.`java-time`.timestamp
 import java.time.Instant
+import java.util.*
 
-internal object ImportsTable : IntIdTable("file_import") {
+internal object ImportsTable : StringIdTable("file_import") {
     val userId = reference("user_id", UsersTable)
     val filePath = varchar("file_path", 45)
-    val isExternal = bool("is_external")
     val importedAt = timestamp("imported_at")
 }
 
-class ImportEntity(id: EntityID<Int>): IntEntity(id) {
-    companion object : IntEntityClass<ImportEntity>(ImportsTable)
+class ImportEntity(id: EntityID<String>) : Entity<String>(id) {
+    companion object : EntityClass<String, ImportEntity>(ImportsTable)
 
     var user by UserEntity referencedOn ImportsTable.userId
     var filePath by ImportsTable.filePath
-    var isExternal by ImportsTable.isExternal
     var importedAt by ImportsTable.importedAt
 
-    fun toModel() = Import(id.value, user.toModel(), filePath, isExternal, importedAt)
+    fun toModel() = Import(id.value, user.toModel(), filePath, importedAt)
 }
 
 data class Import(
-    val id: Int,
+    val id: String,
     val user: User,
     val filePath: String,
-    val isExternal: Boolean,
     val importedAt: Instant,
 )

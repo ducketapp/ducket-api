@@ -1,26 +1,30 @@
 package domain.model.category
 
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
+import io.ducket.api.domain.model.StringIdTable
+import org.jetbrains.exposed.dao.Entity
+import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.IntIdTable
 
-internal object CategoriesTable : IntIdTable("category") {
+internal object CategoriesTable : StringIdTable("category") {
     val name = varchar("name", 45)
-    val categoryTypeId = reference("category_type_id", CategoryTypesTable)
+    val group = enumerationByName("group", 32, CategoryGroup::class)
 }
 
-class CategoryEntity(id: EntityID<Int>): IntEntity(id) {
-    companion object : IntEntityClass<CategoryEntity>(CategoriesTable)
+class CategoryEntity(id: EntityID<String>) : Entity<String>(id) {
+    companion object : EntityClass<String, CategoryEntity>(CategoriesTable)
 
     var name by CategoriesTable.name
-    var categoryType by CategoryTypeEntity referencedOn CategoriesTable.categoryTypeId
+    var group by CategoriesTable.group
 
-    fun toModel() = Category(id.value, name, categoryType.toModel())
+    fun toModel() = Category(id.value, name, group)
 }
 
 class Category(
-    val id: Int,
+    val id: String,
     val name: String,
-    val categoryType: CategoryType,
+    val group: CategoryGroup,
 )
+
+enum class CategoryGroup {
+    FOODSTUFF, SHOPPING, LIFE_ENTERTAINMENT, HOUSING, VEHICLE, TRANSPORT, TELECOM, FINANCIAL_COSTS, INVESTMENTS, INCOME, OTHER
+}

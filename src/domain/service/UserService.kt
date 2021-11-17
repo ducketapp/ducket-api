@@ -1,91 +1,85 @@
-package io.budgery.api.domain.service
+package io.ducket.api.domain.service
 
-import io.budgery.api.AuthenticationException
-import io.budgery.api.domain.controller.account.AccountCreateDto
-import io.budgery.api.domain.controller.user.UserDto
-import io.budgery.api.domain.controller.user.UserSignInDto
-import io.budgery.api.domain.controller.user.UserSignUpDto
-import io.budgery.api.domain.controller.user.UserUpdateDto
-import io.budgery.api.domain.repository.AccountRepository
-import io.budgery.api.domain.repository.UserRepository
+import domain.model.account.AccountType
+import io.ducket.api.*
+import io.ducket.api.domain.controller.account.AccountCreateDto
+import io.ducket.api.domain.controller.user.UserDto
+import io.ducket.api.domain.controller.user.UserSignInDto
+import io.ducket.api.domain.controller.user.UserSignUpDto
+import io.ducket.api.domain.controller.user.UserUpdateDto
+import io.ducket.api.domain.repository.AccountRepository
+import io.ducket.api.domain.repository.UserRepository
 import io.ktor.http.content.*
 import org.mindrot.jbcrypt.BCrypt
 import java.io.File
-import java.util.*
 import kotlin.NoSuchElementException
 
-class UserService(private val userRepository: UserRepository, private val accountRepository: AccountRepository) {
+class UserService(
+    private val userRepository: UserRepository,
+    private val accountRepository: AccountRepository,
+): FileService() {
+    private val logger = getLogger()
 
-    fun getUser(userId: Int): UserDto {
-        userRepository.findById(userId)?.let {
-            return UserDto(it)
-        } ?: throw NoSuchElementException("No such user was found")
+    fun getUser(userId: String): UserDto {
+        return userRepository.findOne(userId)?.let { UserDto(it) } ?: throw NoEntityFoundError("No such user was found")
     }
 
     fun createUser(reqObj: UserSignUpDto): UserDto {
-        userRepository.findByEmail(reqObj.email)?.let {
-            throw IllegalArgumentException("The user with such email already exists")
+        userRepository.findOneByEmail(reqObj.email)?.let {
+            throw DuplicateEntityError("Such email has already been taken")
         }
 
-        val newUser = userRepository.create(reqObj)
-
-        // create default account for new user
-        accountRepository.findTypeByName("Cash")?.let {
-            accountRepository.create(newUser.id,
-                AccountCreateDto(
-                    name = it.name,
-                    notes = "Account in ${newUser.mainCurrency.name}",
-                    currencyId = newUser.mainCurrency.id,
-                    accountTypeId = it.id
+        userRepository.create(reqObj).also { newUser ->
+            try {
+                accountRepository.create(newUser.id,
+                    AccountCreateDto(
+                        name = "Wallet",
+                        notes = "Account in ${newUser.mainCurrency.name}",
+                        currencyId = newUser.mainCurrency.isoCode,
+                        accountType = AccountType.CASH
+                    )
                 )
-            )
-        }
+            } catch (e: Exception) {
+                logger.error("Cannot create default user account", e)
+            }
 
-        return UserDto(newUser)
+            return UserDto(newUser)
+        }
     }
 
     fun authenticateUser(reqObj: UserSignInDto): UserDto {
-        userRepository.findByEmail(reqObj.email)?.let {
-            if (BCrypt.checkpw(reqObj.password, it.passwordHash)) {
-                return UserDto(it)
-            } else {
-                throw AuthenticationException("The entered password is incorrect")
+        val foundUser = userRepository.findOneByEmail(reqObj.email) ?: throw AuthenticationException("The user doesn't exist")
+
+        return UserDto(foundUser).takeIf { BCrypt.checkpw(reqObj.password, foundUser.passwordHash) }
+            ?: throw AuthenticationException("The password is incorrect")
+    }
+
+    fun updateUser(userId: String, reqObj: UserUpdateDto): UserDto {
+        return userRepository.updateOne(userId, reqObj)?.let { UserDto(it) }
+            ?: throw Exception("Cannot update user entity")
+    }
+
+    fun deleteUser(userId: String): Boolean {
+        return userRepository.deleteOne(userId)
+    }
+
+    fun deleteUserImage(userId: String, imageId: String): Boolean {
+        return userRepository.findImage(userId, imageId)?.let { image ->
+            userRepository.deleteImage(imageId).takeIf {
+                deleteLocalFile(image.filePath)
             }
-        } ?: throw IllegalArgumentException("The user with such email does not exist")
+        } ?: throw NoEntityFoundError("No such image was found")
     }
 
-    fun updateUser(userId: Int, reqObj: UserUpdateDto): UserDto {
-        userRepository.updateById(userId, reqObj)?.let {
-            return UserDto(it)
-        } ?: throw NoSuchElementException("Cannot update. No such user was found")
+    fun getUserImageFile(userId: String, imageId: String): File {
+        val image = userRepository.findImage(userId, imageId) ?: throw NoSuchElementException("No such image was found")
+        return getLocalFile(image.filePath) ?: throw NoSuchElementException("No such file was found")
     }
 
-    suspend fun uploadImage(userId: Int, multipart: MultiPartData): File {
-        var imageFile = File("uploads")
-        imageFile.mkdirs()
+    fun addUserImage(userUuid: String, multipartData: List<PartData>) {
+        val files = pullAttachments(multipartData).takeIf { it.size == 1 } ?: throw InvalidDataError("Only 1 image is allowed")
+        val newFile = createLocalAttachmentFile(files[0].first.extension, files[0].second)
 
-        multipart.readAllParts().forEach {
-            if (it is PartData.FileItem) {
-                val fileBytes = it.streamProvider().readBytes()
-
-                if (fileBytes.isEmpty() || fileBytes.size >= 2000000) {
-                    throw IllegalArgumentException("File size should not be 0 or greater than 2 mb")
-                }
-
-                imageFile = File(imageFile, "${UUID.randomUUID()}-${it.originalFileName}")
-                imageFile.writeBytes(fileBytes)
-
-                if (!imageFile.exists()) {
-                    throw Exception("Image doesn't exist")
-                }
-            }
-            return@forEach
-        }
-
-        return imageFile
-    }
-
-    fun deleteUser(userId: Int): Boolean {
-        return userRepository.deleteById(userId)
+        userRepository.createImage(userUuid, newFile)
     }
 }

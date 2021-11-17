@@ -1,26 +1,22 @@
-package io.budgery.api.domain.controller.record
+package io.ducket.api.domain.controller.record
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import domain.model.transaction.Transaction
-import io.budgery.api.InstantSerializer
-import io.budgery.api.domain.controller.imports.ImportDto
-import io.budgery.api.domain.controller.account.AccountDto
-import io.budgery.api.domain.controller.category.TypedCategoryDto
-import io.budgery.api.domain.controller.label.LabelDto
-import io.budgery.api.domain.model.transfer.Transfer
+import io.ducket.api.InstantSerializer
+import io.ducket.api.domain.controller.account.AccountDto
+import io.ducket.api.domain.controller.category.TypedCategoryDto
+import io.ducket.api.domain.model.transfer.Transfer
 import java.math.BigDecimal
 import java.time.Instant
 
 open class RecordDto {
-    val id: Int
+    val id: String
     val amount: BigDecimal
     val isExpense: Boolean
     val isTransfer: Boolean
     val account: AccountDto
-    val import: ImportDto?
-    val payee: String
-    val category: TypedCategoryDto
-    val note: String?
+    val category: TypedCategoryDto?
+    val notes: String?
     val longitude: String?
     val latitude: String?
     val attachments: List<AttachmentDto>?
@@ -33,12 +29,10 @@ open class RecordDto {
         this.isTransfer = true
         this.isExpense = transfer.amount < BigDecimal.ZERO
         this.amount = transfer.amount
-        this.category = TypedCategoryDto(transfer.category)
         this.account = AccountDto(transfer.account)
-        this.import = transfer.import?.let { ImportDto(transfer.import) }
+        this.category = null
         this.date = transfer.date
-        this.payee = transfer.payee
-        this.note = transfer.note
+        this.notes = transfer.notes
         this.longitude = transfer.longitude
         this.latitude = transfer.latitude
         this.attachments = transfer.attachments.map { AttachmentDto(it) }
@@ -51,12 +45,10 @@ open class RecordDto {
         this.isTransfer = false
         this.isExpense = transaction.amount < BigDecimal.ZERO
         this.amount = transaction.amount
-        this.category = TypedCategoryDto(transaction.category)
         this.account = AccountDto(transaction.account)
-        this.import = transaction.import?.let { ImportDto(transaction.import) }
+        this.category = transaction.category?.let { TypedCategoryDto(it) }
         this.date = transaction.date
-        this.payee = transaction.payee
-        this.note = transaction.note
+        this.notes = transaction.notes
         this.longitude = transaction.longitude
         this.latitude = transaction.latitude
         this.attachments = transaction.attachments.map { AttachmentDto(it) }

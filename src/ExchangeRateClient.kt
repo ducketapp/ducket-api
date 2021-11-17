@@ -1,4 +1,4 @@
-package io.budgery.api
+package io.ducket.api
 
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule

@@ -1,4 +1,4 @@
-package io.budgery.api.domain.repository
+package io.ducket.api.domain.repository
 
 import domain.model.currency.CurrenciesTable
 import domain.model.currency.Currency

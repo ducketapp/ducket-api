@@ -1,4 +1,4 @@
-package io.budgery.api.extension
+package io.ducket.api.extension
 
 import java.time.Instant
 

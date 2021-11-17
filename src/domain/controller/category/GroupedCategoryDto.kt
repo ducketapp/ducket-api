@@ -1,13 +1,13 @@
-package io.budgery.api.domain.controller.category
+package io.ducket.api.domain.controller.category
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonUnwrapped
 import domain.model.category.Category
-import domain.model.category.CategoryType
+import domain.model.category.CategoryGroup
 
-class GroupedCategoryDto(
-    @JsonUnwrapped val categoryType: CategoryType,
+data class GroupedCategoryDto(
+    val group: CategoryGroup,
     @JsonIgnore var categories: List<Category>,
 ) {
-    val nestedCategories: List<Any> = categories.map { TypelessCategoryDto(it) }
+    val groupCategories: List<Any> = categories.map { TypelessCategoryDto(it) }
 }

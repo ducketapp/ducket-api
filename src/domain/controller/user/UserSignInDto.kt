@@ -1,9 +1,10 @@
-package io.budgery.api.domain.controller.user
+package io.ducket.api.domain.controller.user
 
 import org.valiktor.functions.isNotBlank
 
 data class UserSignInDto(val email: String, val password: String) {
-    fun validate() : UserSignInDto {
+
+    fun validate(): UserSignInDto {
         org.valiktor.validate(this) {
             validate(UserSignInDto::email).isNotBlank()
             validate(UserSignInDto::password).isNotBlank()

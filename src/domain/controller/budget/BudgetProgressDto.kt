@@ -1,4 +1,4 @@
-package io.budgery.api.domain.controller.budget
+package io.ducket.api.domain.controller.budget
 
 import java.math.BigDecimal
 import java.math.RoundingMode

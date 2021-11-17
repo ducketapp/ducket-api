@@ -1,4 +1,4 @@
-package io.budgery.api.domain.controller.label
+package io.ducket.api.domain.controller.label
 
 import org.valiktor.functions.hasSize
 import org.valiktor.functions.isNotNull

@@ -1,13 +1,12 @@
-package io.budgery.api.domain.controller.account
+package io.ducket.api.domain.controller.account
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonUnwrapped
 import domain.model.currency.Currency
 
-class CurrencyDto(@JsonIgnore val currency: Currency) {
-    val id: Int = currency.id
-    val territory: String = currency.territory
+data class CurrencyDto(@JsonIgnore val currency: Currency) {
+    val id: String = currency.id.toString()
     val name: String = currency.name
+    val area: String = currency.area
     val symbol: String = currency.symbol
     val isoCode: String = currency.isoCode
 }

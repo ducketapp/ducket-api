@@ -1,9 +1,9 @@
-package io.budgery.api.domain.controller.category
+package io.ducket.api.domain.controller.category
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import domain.model.category.Category
 
-class TypelessCategoryDto(@JsonIgnore val category: Category) {
-    val id = category.id
-    val name = category.name
+data class TypelessCategoryDto(@JsonIgnore val category: Category) {
+    val id: String = category.id
+    val name: String = category.name
 }
