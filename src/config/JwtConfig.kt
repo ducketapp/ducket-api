@@ -3,15 +3,16 @@ package io.ducket.api.config
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
-import io.ducket.api.AuthenticationException
-import io.ktor.application.*
+import io.ducket.api.domain.repository.UserRepository
+import io.ducket.api.plugins.AuthenticationException
 import io.ktor.auth.*
-import java.util.*
+import io.ktor.auth.jwt.*
 
 object JwtConfig {
-    private const val secret = "cn#PGH7EgbO87VBa!"
+    // private const val secret = "cn#PGH7EgbO87VBa!"
+    const val realm = "io.ducket.api"
     private const val issuer = "io.ducket.api"
-    private const val validityInMs = 36_000_00 * 24 // 1 day
+    private var secret = System.getenv()["JWT_TOKEN"] ?: throw Exception("JWT_TOKEN property not specified")
     private val algorithm = Algorithm.HMAC256(secret)
 
     val verifier: JWTVerifier = JWT.require(algorithm).withIssuer(issuer).build()
@@ -20,13 +21,20 @@ object JwtConfig {
         return authContext.principal() ?: throw AuthenticationException("Invalid auth token content")
     }
 
-    fun generate(userPrincipal: UserPrincipal): String = JWT.create()
-        // .withExpiresAt(getExpiration())
-        .withSubject("Authentication")
-        .withIssuer(issuer)
-        .withClaim("id", userPrincipal.id.toString())
-        .withClaim("email", userPrincipal.email)
-        .sign(algorithm)
+    fun generateToken(userPrincipal: UserPrincipal): String {
+        return JWT.create()
+            .withSubject("Authentication")
+            .withIssuer(issuer)
+            .withClaim("id", userPrincipal.id)
+            .withClaim("email", userPrincipal.email)
+            .sign(algorithm)
+    }
 
-    // private fun getExpiration() = Date(System.currentTimeMillis() + validityInMs)
+    fun validateToken(jwtCredential: JWTCredential): UserPrincipal {
+        val jwtUserId = jwtCredential.payload.getClaim("id").asString()
+        val jwtUserEmail = jwtCredential.payload.getClaim("email").asString()
+
+        return UserRepository().findOne(jwtUserId)?.let { UserPrincipal(jwtUserId, jwtUserEmail) }
+            ?: throw AuthenticationException("Invalid auth token: user not found")
+    }
 }

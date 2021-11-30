@@ -10,7 +10,7 @@ import io.ktor.response.*
 
 class LabelController(val labelService: LabelService) {
 
-    suspend fun createUserLabel(ctx: ApplicationCall) {
+    suspend fun createLabel(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
 
         ctx.receive<LabelCreateDto>().apply {
@@ -20,7 +20,7 @@ class LabelController(val labelService: LabelService) {
         }
     }
 
-    suspend fun getUserLabels(ctx: ApplicationCall) {
+    suspend fun getLabels(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
 
         val labels = labelService.getLabels(userId)

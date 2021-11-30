@@ -2,8 +2,8 @@ package io.ducket.api.domain.controller.transaction
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.ducket.api.InstantDeserializer
+import io.ducket.api.plugins.InvalidDataError
 import org.valiktor.functions.*
-import java.lang.IllegalArgumentException
 import java.math.BigDecimal
 import java.time.Instant
 
@@ -29,7 +29,7 @@ data class TransactionCreateDto(
             validate(TransactionCreateDto::amount).isNotEqualTo(BigDecimal.ZERO)
 
             if (amount.scale() !in 0..2) {
-                throw IllegalArgumentException("Transaction amount scale should not be greater than 2")
+                throw InvalidDataError("Transaction amount scale should not be greater than 2")
             }
         }
         return this

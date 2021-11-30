@@ -1,8 +1,8 @@
 package io.ducket.api.domain.service
 
-import io.ducket.api.NoEntityFoundError
 import io.ducket.api.domain.controller.transaction.RuleDto
 import io.ducket.api.domain.repository.RuleRepository
+import io.ducket.api.plugins.NoEntityFoundError
 
 class RuleService(
     private val ruleRepository: RuleRepository,

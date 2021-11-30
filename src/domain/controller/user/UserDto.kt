@@ -11,12 +11,12 @@ import java.time.Instant
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class UserDto(@JsonIgnore val user: User) {
-    val id: String = user.id.toString()
+    val id: String = user.id
     val phone: String? = user.phone
     val name: String = user.name
     val email: String = user.email
     val mainCurrency: CurrencyDto = CurrencyDto(user.mainCurrency)
-    val images: List<AttachmentDto> = user.images.map { AttachmentDto(it) }
+    // val images: List<AttachmentDto> = user.images.map { AttachmentDto(it) }
     @JsonSerialize(using = InstantSerializer::class) val createdAt: Instant = user.createdAt
     @JsonSerialize(using = InstantSerializer::class) val modifiedAt: Instant = user.modifiedAt
 }

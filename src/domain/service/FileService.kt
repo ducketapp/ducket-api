@@ -1,6 +1,7 @@
 package io.ducket.api.domain.service
 
 import io.ducket.api.getLogger
+import io.ducket.api.plugins.InvalidDataError
 import io.ktor.http.*
 import io.ktor.http.content.*
 import java.io.File
@@ -19,15 +20,15 @@ abstract class FileService {
                 val fileBytes = partData.streamProvider().readBytes()
 
                 if (fileName == null || fileExtension == null || fileExtension != "csv") {
-                    throw IllegalArgumentException("Unsupported file, expected *.csv")
+                    throw InvalidDataError("Unsupported file, expected *.csv")
                 }
 
                 return Pair(File(fileName), fileBytes)
             } else {
-                throw IllegalArgumentException("Unsupported part data, expected a file")
+                throw InvalidDataError("Unsupported part data, expected a file")
             }
         } else {
-            throw IllegalArgumentException("Unsupported amount of files, expected 1")
+            throw InvalidDataError("Unsupported amount of files, expected 1")
         }
     }
 
@@ -42,28 +43,28 @@ abstract class FileService {
                     val fileSize = bytesToMegabytes(fileBytes)
 
                     if (contentType?.startsWith("image/") == false) {
-                        throw IllegalArgumentException("Unsupported mime type: $contentType")
+                        throw InvalidDataError("Unsupported mime type: $contentType")
                     }
 
                     if (fileName == null || fileExtension == null) {
-                        throw IllegalArgumentException("Invalid '$fileName' file name at index: $idx")
+                        throw InvalidDataError("Invalid '$fileName' file name at index: $idx")
                     }
 
                     if (fileSize == 0.0 || fileSize > 1.0) {
-                        throw IllegalArgumentException("Unsupported file size, limit is 1MB")
+                        throw InvalidDataError("Unsupported file size, limit is 1MB")
                     }
 
                     return@mapIndexed Pair(File(fileName), fileBytes)
                 } else {
-                    throw IllegalArgumentException("Invalid multipart key name at index: $idx")
+                    throw InvalidDataError("Invalid multipart key name at index: $idx")
                 }
             } else {
-                throw IllegalArgumentException("Unsupported part data at index: $idx")
+                throw InvalidDataError("Unsupported part data at index: $idx")
             }
         }
 
         if (result.isEmpty()) {
-            throw IllegalArgumentException("At least one attachment required!")
+            throw InvalidDataError("At least one attachment required!")
         }
 
         return result

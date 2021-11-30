@@ -5,6 +5,7 @@ import domain.model.transaction.Transaction
 import io.ducket.api.InstantSerializer
 import io.ducket.api.domain.controller.account.AccountDto
 import io.ducket.api.domain.controller.category.TypedCategoryDto
+import io.ducket.api.domain.controller.user.UserDto
 import io.ducket.api.domain.model.transfer.Transfer
 import java.math.BigDecimal
 import java.time.Instant
@@ -16,6 +17,7 @@ open class RecordDto {
     val isTransfer: Boolean
     val account: AccountDto
     val category: TypedCategoryDto?
+    val owner: UserDto
     val notes: String?
     val longitude: String?
     val latitude: String?
@@ -31,6 +33,7 @@ open class RecordDto {
         this.amount = transfer.amount
         this.account = AccountDto(transfer.account)
         this.category = null
+        this.owner = UserDto(transfer.user)
         this.date = transfer.date
         this.notes = transfer.notes
         this.longitude = transfer.longitude
@@ -47,6 +50,7 @@ open class RecordDto {
         this.amount = transaction.amount
         this.account = AccountDto(transaction.account)
         this.category = transaction.category?.let { TypedCategoryDto(it) }
+        this.owner = UserDto(transaction.user)
         this.date = transaction.date
         this.notes = transaction.notes
         this.longitude = transaction.longitude

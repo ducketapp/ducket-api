@@ -15,7 +15,7 @@ data class UserSignUpDto(
             validate(UserSignUpDto::phone).isNotEmpty().startsWith("+").hasSize(11)
             validate(UserSignUpDto::email).isNotBlank().isEmail()
             validate(UserSignUpDto::currencyId).isNotBlank()
-            validate(UserSignUpDto::password).isNotBlank().hasSize(8, 14)
+            validate(UserSignUpDto::password).isNotBlank().hasSize(4, 16)
         }
         return this
     }

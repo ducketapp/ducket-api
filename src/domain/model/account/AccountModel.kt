@@ -3,26 +3,17 @@ package domain.model.account
 import domain.model.currency.CurrenciesTable
 import domain.model.currency.Currency
 import domain.model.currency.CurrencyEntity
-import domain.model.transaction.TransactionEntity
 import domain.model.transaction.TransactionsTable
 import domain.model.user.User
 import domain.model.user.UserEntity
 import domain.model.user.UsersTable
-import io.ducket.api.domain.model.CombinedIdTable
 import io.ducket.api.domain.model.StringIdTable
-import io.ducket.api.domain.model.attachment.AttachmentEntity
-import io.ducket.api.domain.model.attachment.AttachmentsTable
-import io.ducket.api.domain.model.transaction.TransactionAttachmentsTable
 import io.ducket.api.domain.model.transfer.TransfersTable
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
-import org.jetbrains.exposed.dao.UUIDEntity
-import org.jetbrains.exposed.dao.UUIDEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.`java-time`.timestamp
 import java.time.Instant
-import java.util.*
 
 internal object AccountsTable : StringIdTable("account") {
     val userId = reference("user_id", UsersTable)

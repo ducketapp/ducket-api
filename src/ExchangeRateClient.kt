@@ -25,24 +25,22 @@ import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
 import kotlin.io.path.Path
 
-class ExchangeRateClient() {
+object ExchangeRateClient {
     private val logger = getLogger()
-    private val sourceUrl = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
-    private val fileNamePrefix = "rates"
+    private const val sourceUrl = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
+    private const val fileNamePrefix = "rates"
 
-    companion object {
-        var client: HttpClient = HttpClient(CIO) {
-            engine {
-                requestTimeout = 25000
-            }
+    private var client: HttpClient = HttpClient(CIO) {
+        engine {
+            requestTimeout = 25000
         }
-        var xmlMapper: XmlMapper = XmlMapper(
-            JacksonXmlModule().apply { setDefaultUseWrapper(false) }
-        ).apply {
-            enable(SerializationFeature.INDENT_OUTPUT)
-            enable(SerializationFeature.WRAP_ROOT_VALUE)
-        }
+    }
 
+    var xmlMapper: XmlMapper = XmlMapper(
+        JacksonXmlModule().apply { setDefaultUseWrapper(false) }
+    ).apply {
+        enable(SerializationFeature.INDENT_OUTPUT)
+        enable(SerializationFeature.WRAP_ROOT_VALUE)
     }
 
     @Throws(InvalidCurrencyException::class)

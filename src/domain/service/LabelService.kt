@@ -1,9 +1,9 @@
 package io.ducket.api.domain.service
 
-import io.ducket.api.InvalidDataError
 import io.ducket.api.domain.controller.label.LabelCreateDto
 import io.ducket.api.domain.controller.label.LabelDto
 import io.ducket.api.domain.repository.LabelRepository
+import io.ducket.api.plugins.InvalidDataError
 
 class LabelService(private val labelRepository: LabelRepository) {
 

@@ -3,18 +3,14 @@ package domain.model.user
 import domain.model.currency.CurrenciesTable
 import domain.model.currency.Currency
 import domain.model.currency.CurrencyEntity
-import io.ducket.api.domain.model.CombinedIdTable
 import io.ducket.api.domain.model.StringIdTable
 import io.ducket.api.domain.model.attachment.Attachment
 import io.ducket.api.domain.model.attachment.AttachmentEntity
 import io.ducket.api.domain.model.user.UserAttachmentsTable
 import org.jetbrains.exposed.dao.*
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.UUIDTable
-import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.`java-time`.timestamp
 import java.time.Instant
-import java.util.*
 
 internal object UsersTable : StringIdTable("user") {
     val phone = varchar("phone", 32).nullable().uniqueIndex()

@@ -1,9 +1,6 @@
 package io.ducket.api.domain.controller.budget
 
 import io.ducket.api.config.JwtConfig
-import io.ducket.api.config.UserPrincipal
-import io.ducket.api.domain.controller.transaction.TransactionDeleteDto
-import io.ducket.api.domain.controller.user.UserSignUpDto
 import io.ducket.api.domain.service.BudgetService
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -17,8 +14,8 @@ class BudgetController(
     private val budgetService: BudgetService
 ) {
 
-    suspend fun createCategoryBudget(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+    suspend fun createBudget(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
 
         ctx.receive<BudgetCreateDto>().apply {
             budgetService.createBudget(userId, this.validate()).apply {
@@ -27,25 +24,25 @@ class BudgetController(
         }
     }
 
-    suspend fun getUserBudgets(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+    suspend fun getBudgets(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
 
         budgetService.getBudgets(userId).apply {
             ctx.respond(HttpStatusCode.OK, this)
         }
     }
 
-    suspend fun getUserBudget(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+    suspend fun getBudgetDetails(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
         val budgetId = ctx.parameters.getOrFail("budgetId")
 
-        budgetService.getBudget(userId, budgetId).apply {
+        budgetService.getBudgetDetails(userId, budgetId).apply {
             ctx.respond(HttpStatusCode.OK, this)
         }
     }
 
-    suspend fun deleteUserBudget(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+    suspend fun deleteBudget(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
         val budgetId = ctx.parameters.getOrFail("budgetId")
 
         budgetService.deleteBudget(userId, budgetId).apply {

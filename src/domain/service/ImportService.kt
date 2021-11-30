@@ -1,7 +1,5 @@
 package io.ducket.api.domain.service
 
-import io.ducket.api.InvalidDataError
-import io.ducket.api.NoEntityFoundError
 import io.ducket.api.domain.controller.imports.CsvTransaction
 import io.ducket.api.domain.controller.imports.ImportDto
 import io.ducket.api.domain.controller.transaction.TransactionDto
@@ -11,6 +9,8 @@ import io.ducket.api.domain.repository.ImportRepository
 import io.ducket.api.domain.repository.RuleRepository
 import io.ducket.api.extension.trimWhitespaces
 import io.ducket.api.getLogger
+import io.ducket.api.plugins.InvalidDataError
+import io.ducket.api.plugins.NoEntityFoundError
 import io.ktor.http.content.*
 import org.ahocorasick.trie.Trie
 import org.apache.commons.csv.CSVFormat
@@ -33,7 +33,7 @@ class ImportService(
         return importRepository.getAllByUserId(userId).map { ImportDto(it) }
     }
 
-    fun importTransactions(userId: String, accountId: String, multipartData: List<PartData>): List<TransactionDto> {
+    fun importAccountTransactions(userId: String, accountId: String, multipartData: List<PartData>): List<TransactionDto> {
         accountRepository.findOne(userId, accountId) ?: throw NoEntityFoundError("No such account was found")
 
         val importDataPair = extractImportData(multipartData)

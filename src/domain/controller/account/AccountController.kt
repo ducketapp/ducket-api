@@ -16,23 +16,23 @@ class AccountController(
     private val importService: ImportService,
 ) {
 
-    suspend fun getUserAccount(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+    suspend fun getAccountDetails(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
         val accountId = ctx.parameters.getOrFail("accountId")
 
-        val account = accountService.getAccount(userId, accountId)
+        val account = accountService.getAccountDetails(userId, accountId)
         ctx.respond(HttpStatusCode.OK, account)
     }
 
-    suspend fun getUserAccounts(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+    suspend fun getAccounts(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
 
         val accounts = accountService.getAccounts(userId)
         ctx.respond(HttpStatusCode.OK, accounts)
     }
 
-    suspend fun createUserAccount(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+    suspend fun createAccount(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
 
         ctx.receive<AccountCreateDto>().apply {
             accountService.createAccount(userId, this.validate()).apply {
@@ -41,8 +41,8 @@ class AccountController(
         }
     }
 
-    suspend fun updateUserAccount(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+    suspend fun updateAccount(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
         val accountId = ctx.parameters.getOrFail("accountId")
 
         ctx.receive<AccountUpdateDto>().apply {
@@ -52,30 +52,22 @@ class AccountController(
         }
     }
 
-    suspend fun deleteUserAccount(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+    suspend fun deleteAccount(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
         val accountId = ctx.parameters.getOrFail("accountId")
 
         if (accountService.deleteAccount(userId, accountId)) ctx.respond(HttpStatusCode.NoContent)
         else ctx.respond(HttpStatusCode.UnprocessableEntity)
     }
 
-    suspend fun importTransactions(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+    suspend fun importAccountTransactions(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
         val accountId = ctx.parameters.getOrFail("accountId")
 
-        importService.importTransactions(userId, accountId,  ctx.receiveMultipart().readAllParts()).apply {
+        val payloadMultiparts = ctx.receiveMultipart().readAllParts()
+
+        importService.importAccountTransactions(userId, accountId,  payloadMultiparts).apply {
             ctx.respond(HttpStatusCode.OK, this)
         }
     }
-
-/*    suspend fun deleteUserAccounts(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipalId(ctx.authentication)
-
-        ctx.receive<AccountDeleteDTO>().apply {
-            accountService.deleteAccounts(userId, this.validate()).apply {
-                ctx.respond(HttpStatusCode.OK, this)
-            }
-        }
-    }*/
 }

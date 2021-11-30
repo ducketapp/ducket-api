@@ -1,12 +1,12 @@
 package io.ducket.api.domain.service
 
 import io.ducket.api.ExchangeRateClient
-import io.ducket.api.InvalidDataError
-import io.ducket.api.NoEntityFoundError
 import io.ducket.api.domain.controller.transfer.TransferCreateDto
 import io.ducket.api.domain.controller.transfer.TransferDto
 import io.ducket.api.domain.repository.AccountRepository
 import io.ducket.api.domain.repository.TransferRepository
+import io.ducket.api.plugins.InvalidDataError
+import io.ducket.api.plugins.NoEntityFoundError
 import io.ktor.http.content.*
 import java.io.File
 import java.math.BigDecimal
@@ -33,7 +33,7 @@ class TransferService(
 
         if (reqObj.exchangeRate == null) {
             if (fromAccount.currency.id != toAccount.currency.id) {
-                exchangeRate = ExchangeRateClient().getRate(fromAccount.currency.isoCode, toAccount.currency.isoCode)
+                exchangeRate = ExchangeRateClient.getRate(fromAccount.currency.isoCode, toAccount.currency.isoCode)
             }
         } else {
             if (fromAccount.currency.id == toAccount.currency.id && exchangeRate != BigDecimal.ONE) {
@@ -49,14 +49,14 @@ class TransferService(
         transferRepository.delete(userId, transfer.relationId)
     }
 
-    fun getAttachmentFile(userId: String, entityId: String, attachmentId: String): File {
+    fun downloadTransferAttachment(userId: String, entityId: String, attachmentId: String): File {
         transferRepository.findOne(userId, entityId) ?: throw NoEntityFoundError("No such transfer was found")
         val attachment = transferRepository.findAttachment(userId, entityId, attachmentId) ?: throw NoEntityFoundError("No such attachment was found")
 
         return getLocalFile(attachment.filePath) ?: throw NoEntityFoundError("No such file was found")
     }
 
-    fun addAttachments(userId: String, entityId: String, multipartData: List<PartData>) {
+    fun uploadTransferAttachments(userId: String, entityId: String, multipartData: List<PartData>) {
         transferRepository.findOne(userId, entityId) ?: throw NoEntityFoundError("No such transfer was found")
 
         val actualAttachmentsAmount = transferRepository.getAttachmentsAmount(entityId)

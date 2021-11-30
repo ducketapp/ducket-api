@@ -1,7 +1,5 @@
 package io.ducket.api.domain.service
 
-import io.ducket.api.DuplicateEntityError
-import io.ducket.api.NoEntityFoundError
 import io.ducket.api.domain.controller.account.AccountCreateDto
 import io.ducket.api.domain.controller.account.AccountDto
 import io.ducket.api.domain.controller.account.AccountUpdateDto
@@ -12,6 +10,9 @@ import io.ducket.api.domain.repository.TransactionRepository
 import io.ducket.api.domain.repository.TransferRepository
 import io.ducket.api.extension.isBeforeInclusive
 import io.ducket.api.extension.sumByDecimal
+import io.ducket.api.plugins.DuplicateEntityError
+import io.ducket.api.plugins.InvalidDataError
+import io.ducket.api.plugins.NoEntityFoundError
 import java.math.BigDecimal
 import java.time.Instant
 
@@ -43,7 +44,7 @@ class AccountService(
         }
     }
 
-    fun getAccount(userId: String, accountId: String): AccountDto {
+    fun getAccountDetails(userId: String, accountId: String): AccountDto {
         return getAccounts(userId).firstOrNull { it.id == accountId }
             ?: throw NoEntityFoundError("No such account was found")
     }
@@ -61,7 +62,7 @@ class AccountService(
 
         reqObj.name?.let {
             accountRepository.findOneByName(userId, it)?.let { found ->
-                if (found.id.toString() != accountId) throw IllegalArgumentException("'${reqObj.name}' account already exists")
+                if (found.id != accountId) throw InvalidDataError("'${reqObj.name}' account already exists")
             }
         }
 

@@ -2,6 +2,7 @@ package io.ducket.api.domain.controller.user
 
 import io.ducket.api.config.JwtConfig
 import io.ducket.api.config.UserPrincipal
+import io.ducket.api.domain.controller.follow.FollowUserDto
 import io.ducket.api.domain.service.*
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -19,36 +20,32 @@ class UserController(
 
     suspend fun signUp(ctx: ApplicationCall) {
         ctx.receive<UserSignUpDto>().apply {
-            userService.createUser(this.validate()).apply {
-                ctx.response.header(HttpHeaders.Authorization, JwtConfig.generate(UserPrincipal(this.user)))
+            userService.signUp(this.validate()).apply {
+                ctx.response.header(HttpHeaders.Authorization, JwtConfig.generateToken(UserPrincipal(this.user)))
                 ctx.respond(HttpStatusCode.Created, this)
             }
-
         }
     }
 
     suspend fun signIn(ctx: ApplicationCall) {
         ctx.receive<UserSignInDto>().apply {
-            userService.authenticateUser(this.validate()).apply {
-                ctx.response.header(HttpHeaders.Authorization, JwtConfig.generate(UserPrincipal(this.user)))
+            userService.signIn(this.validate()).apply {
+                ctx.response.header(HttpHeaders.Authorization, JwtConfig.generateToken(UserPrincipal(this.user)))
                 ctx.respond(HttpStatusCode.OK, this)
             }
         }
     }
 
-    suspend fun getUserDetails(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+    suspend fun getUser(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
 
-        val user = userService.getUser(userId)
-        val userAccounts = accountService.getAccounts(userId)
-        val userBudgets = budgetService.getBudgets(userId)
-        // TODO discounts
-
-        ctx.respond(HttpStatusCode.OK, UserDetailsDto(user, userAccounts, userBudgets))
+        userService.getUser(userId).apply {
+            ctx.respond(HttpStatusCode.OK, this)
+        }
     }
 
-    suspend fun updateUserInfo(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+    suspend fun updateUser(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
 
         ctx.receive<UserUpdateDto>().apply {
             userService.updateUser(userId, this.validate()).apply {
@@ -58,24 +55,27 @@ class UserController(
     }
 
     suspend fun uploadUserImage(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
 
-        userService.addUserImage(userId, ctx.receiveMultipart().readAllParts())
-        getUserDetails(ctx)
+        userService.uploadUserImage(userId, ctx.receiveMultipart().readAllParts())
+
+        userService.getUser(userId).apply {
+            ctx.respond(HttpStatusCode.OK, this)
+        }
     }
 
     suspend fun downloadUserImage(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
         val imageId = ctx.parameters.getOrFail("imageId")
 
-        userService.getUserImageFile(userId, imageId).apply {
+        userService.downloadUserImage(userId, imageId).apply {
             ctx.response.header("Content-Disposition", "attachment; filename=\"${this.name}\"")
             ctx.respondFile(this)
         }
     }
 
     suspend fun deleteUserImage(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
         val imageId = ctx.parameters.getOrFail("imageId")
 
         userService.deleteUserImage(userId, imageId).apply {
@@ -84,10 +84,55 @@ class UserController(
         }
     }
 
-    suspend fun deleteUserProfile(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+    suspend fun deleteUser(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
 
         userService.deleteUser(userId).apply {
+            if (this) ctx.respond(HttpStatusCode.NoContent)
+            else ctx.respond(HttpStatusCode.UnprocessableEntity)
+        }
+    }
+
+    suspend fun getUserFollowing(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+
+        userService.getUserFollowing(userId).apply {
+            ctx.respond(HttpStatusCode.OK, this)
+        }
+    }
+
+    suspend fun getUserFollowers(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+
+        userService.getUserFollowers(userId).apply {
+            ctx.respond(HttpStatusCode.OK, this)
+        }
+    }
+
+    suspend fun createUserFollowRequest(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+
+        ctx.receive<FollowUserDto>().apply {
+            userService.createUserFollowRequest(userId, this.validate()).apply {
+                ctx.respond(HttpStatusCode.OK, this)
+            }
+        }
+    }
+
+    suspend fun approveUserFollowRequest(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+        val followRequestId = ctx.parameters.getOrFail("followId")
+
+        userService.approveUserFollowRequest(userId, followRequestId).apply {
+            ctx.respond(HttpStatusCode.OK, this)
+        }
+    }
+
+    suspend fun unfollowUser(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+        val followId = ctx.parameters.getOrFail("followId")
+
+        userService.unfollowUser(userId, followId).apply {
             if (this) ctx.respond(HttpStatusCode.NoContent)
             else ctx.respond(HttpStatusCode.UnprocessableEntity)
         }

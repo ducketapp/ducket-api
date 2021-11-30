@@ -16,8 +16,8 @@ class RecordController(
     val accountService: AccountService,
 ) {
 
-    suspend fun getUserRecords(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+    suspend fun getRecords(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
 
         // get all user transactions
         val transactions = transactionService.getTransactions(userId).stream().peek {
@@ -30,7 +30,7 @@ class RecordController(
             it.transferAccount.balance = accountService.resolveBalance(userId, it.transferAccount.id, it.date)
         }.toList()
 
-        var totalRecords = listOf(transactions, transfers)
+        val totalRecords = listOf(transactions, transfers)
             .flatten()
             .sortedWith(compareByDescending<RecordDto> { it.date }.thenByDescending { it.amount })
 

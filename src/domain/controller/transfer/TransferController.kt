@@ -17,7 +17,7 @@ class TransferController(
 ) {
 
     suspend fun addTransfer(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
 
         ctx.receive<TransferCreateDto>().apply {
             transferService.addTransfer(userId, this.validate()).apply {
@@ -27,7 +27,7 @@ class TransferController(
     }
 
     suspend fun getTransfer(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
         val transferId = ctx.parameters.getOrFail("transferId")
 
         transferService.getTransfer(userId, transferId).apply {
@@ -36,7 +36,7 @@ class TransferController(
     }
 
     suspend fun deleteTransfer(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
         val transferId = ctx.parameters.getOrFail("transferId")
 
         transferService.deleteTransfer(userId, transferId).apply {
@@ -45,10 +45,10 @@ class TransferController(
     }
 
     suspend fun uploadTransferAttachments(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
         val transferId = ctx.parameters.getOrFail("transferId")
 
-        transferService.addAttachments(userId, transferId, ctx.receiveMultipart().readAllParts()).apply {
+        transferService.uploadTransferAttachments(userId, transferId, ctx.receiveMultipart().readAllParts()).apply {
             transferService.getTransfer(userId, transferId).apply {
                 ctx.respond(HttpStatusCode.OK, this)
             }
@@ -56,11 +56,11 @@ class TransferController(
     }
 
     suspend fun downloadTransferAttachment(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
         val transferId = ctx.parameters.getOrFail("transferId")
         val attachmentId = ctx.parameters.getOrFail("attachmentId")
 
-        transferService.getAttachmentFile(userId, transferId, attachmentId).apply {
+        transferService.downloadTransferAttachment(userId, transferId, attachmentId).apply {
             ctx.response.header("Content-Disposition", "attachment; filename=\"${this.name}\"")
             ctx.respondFile(this)
         }

@@ -1,9 +1,9 @@
 package io.ducket.api.domain.controller.user
 
+import io.ducket.api.plugins.InvalidDataError
 import org.valiktor.functions.hasSize
 import org.valiktor.functions.isNotEmpty
 import org.valiktor.functions.startsWith
-import java.lang.IllegalArgumentException
 
 data class UserUpdateDto(val name: String?, val phone: String?, val password: String?) {
     fun validate() : UserUpdateDto {
@@ -13,7 +13,7 @@ data class UserUpdateDto(val name: String?, val phone: String?, val password: St
             validate(UserUpdateDto::password).isNotEmpty().hasSize(8, 14)
 
             if (name == null && phone == null && password == null) {
-                throw IllegalArgumentException("No one field is specified for updating")
+                throw InvalidDataError("No one field is specified for updating")
             }
         }
         return this

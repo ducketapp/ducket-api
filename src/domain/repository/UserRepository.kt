@@ -1,6 +1,5 @@
 package io.ducket.api.domain.repository
 
-import domain.model.currency.CurrenciesTable
 import io.ducket.api.domain.controller.user.UserSignUpDto
 import io.ducket.api.domain.controller.user.UserUpdateDto
 import domain.model.user.UserEntity
@@ -10,15 +9,16 @@ import domain.model.user.User
 import io.ducket.api.domain.model.attachment.Attachment
 import io.ducket.api.domain.model.attachment.AttachmentEntity
 import io.ducket.api.domain.model.attachment.AttachmentsTable
+import io.ducket.api.domain.model.follow.Follow
+import io.ducket.api.domain.model.follow.FollowEntity
+import io.ducket.api.domain.model.follow.FollowsTable
 
 import io.ducket.api.domain.model.user.UserAttachmentsTable
-import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
 import java.io.File
 import java.time.Instant
-import java.util.*
 
 class UserRepository {
 
@@ -32,16 +32,6 @@ class UserRepository {
             createdAt = Instant.now()
             modifiedAt = Instant.now()
         }.toModel()
-        /*val id = UsersTable.insertAndGetId {
-            it[name] = dto.name
-            it[phone] = dto.phone
-            it[email] = dto.email
-            it[mainCurrencyId] = EntityID(UUID.fromString(dto.currencyId), CurrenciesTable)
-            it[passwordHash] = BCrypt.hashpw(dto.password, BCrypt.gensalt(10))
-            it[createdAt] = Instant.now()
-            it[modifiedAt] = Instant.now()
-        }.value
-        UserEntity[id].toModel()*/
     }
 
     fun findOneByEmail(email: String): User? = transaction {

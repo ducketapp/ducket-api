@@ -4,9 +4,6 @@ import io.ducket.api.domain.model.StringIdTable
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.IdTable
-import org.jetbrains.exposed.sql.Column
-
 
 internal object CurrenciesTable : StringIdTable("currency") {
     val area = varchar("area", 45)

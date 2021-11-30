@@ -3,7 +3,6 @@ package io.ducket.api.domain.model.label
 import domain.model.user.User
 import domain.model.user.UserEntity
 import domain.model.user.UsersTable
-import io.ducket.api.domain.model.CombinedIdTable
 import io.ducket.api.domain.model.StringIdTable
 import org.jetbrains.exposed.dao.*
 import org.jetbrains.exposed.dao.id.EntityID

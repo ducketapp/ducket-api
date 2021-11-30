@@ -6,7 +6,9 @@ import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.util.*
 
-class CategoryController(val categoryService: CategoryService) {
+class CategoryController(
+    val categoryService: CategoryService,
+) {
 
     suspend fun getCategories(ctx: ApplicationCall) {
         val categories = categoryService.getCategories()

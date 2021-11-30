@@ -17,7 +17,7 @@ class TransactionController(
 ) {
 
     suspend fun getTransaction(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
         val transactionId = ctx.parameters.getOrFail("transactionId")
 
         transactionService.getTransaction(userId, transactionId).apply {
@@ -26,7 +26,7 @@ class TransactionController(
     }
 
     suspend fun addTransaction(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
 
         ctx.receive<TransactionCreateDto>().apply {
             transactionService.addTransaction(userId, this.validate()).apply {
@@ -36,7 +36,7 @@ class TransactionController(
     }
 
     suspend fun deleteTransaction(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
         val transactionId = ctx.parameters.getOrFail("transactionId")
 
         transactionService.deleteTransaction(userId, transactionId).apply {
@@ -45,7 +45,7 @@ class TransactionController(
     }
 
     suspend fun deleteTransactions(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
 
         ctx.receive<TransactionDeleteDto>().apply {
             transactionService.deleteTransactions(userId, this.validate()).apply {
@@ -55,10 +55,10 @@ class TransactionController(
     }
 
     suspend fun uploadTransactionAttachments(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
         val transactionId = ctx.parameters.getOrFail("transactionId")
 
-        transactionService.addAttachments(userId, transactionId, ctx.receiveMultipart().readAllParts()).apply {
+        transactionService.uploadTransactionAttachments(userId, transactionId, ctx.receiveMultipart().readAllParts()).apply {
             transactionService.getTransaction(userId, transactionId).apply {
                 ctx.respond(HttpStatusCode.OK, this)
             }
@@ -66,22 +66,22 @@ class TransactionController(
     }
 
     suspend fun downloadTransactionAttachment(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
         val transactionId = ctx.parameters.getOrFail("transactionId")
         val attachmentId = ctx.parameters.getOrFail("attachmentId")
 
-        transactionService.getAttachmentFile(userId, transactionId, attachmentId).apply {
+        transactionService.downloadTransactionAttachment(userId, transactionId, attachmentId).apply {
             ctx.response.header("Content-Disposition", "attachment; filename=\"${this.name}\"")
             ctx.respondFile(this)
         }
     }
 
     suspend fun deleteTransactionAttachment(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id.toString()
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
         val transactionId = ctx.parameters.getOrFail("transactionId")
         val attachmentId = ctx.parameters.getOrFail("attachmentId")
 
-        transactionService.deleteAttachment(userId, transactionId, attachmentId).apply {
+        transactionService.deleteTransactionAttachment(userId, transactionId, attachmentId).apply {
             if (this) ctx.respond(HttpStatusCode.NoContent)
             else ctx.respond(HttpStatusCode.UnprocessableEntity)
         }

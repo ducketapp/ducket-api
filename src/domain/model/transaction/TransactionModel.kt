@@ -12,21 +12,15 @@ import domain.model.imports.ImportsTable
 import domain.model.user.User
 import domain.model.user.UserEntity
 import domain.model.user.UsersTable
-import io.ducket.api.domain.model.CombinedIdTable
 import io.ducket.api.domain.model.StringIdTable
 import io.ducket.api.domain.model.attachment.Attachment
 import io.ducket.api.domain.model.attachment.AttachmentEntity
 import io.ducket.api.domain.model.transaction.TransactionAttachmentsTable
-import io.ducket.api.domain.model.transfer.TransfersTable
-import io.ducket.api.domain.model.transfer.TransfersTable.default
 import org.jetbrains.exposed.dao.*
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.`java-time`.timestamp
 import java.math.BigDecimal
 import java.time.Instant
-import java.util.*
 
 internal object TransactionsTable : StringIdTable("transaction") {
     val userId = reference("user_id", UsersTable)

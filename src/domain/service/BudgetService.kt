@@ -1,8 +1,6 @@
 package io.ducket.api.domain.service
 
 import io.ducket.api.ExchangeRateClient
-import io.ducket.api.InvalidDataError
-import io.ducket.api.NoEntityFoundError
 import io.ducket.api.domain.controller.budget.BudgetCreateDto
 import io.ducket.api.domain.controller.budget.BudgetDto
 import io.ducket.api.domain.controller.budget.BudgetPeriodBoundsDto
@@ -16,6 +14,8 @@ import io.ducket.api.extension.isAfterInclusive
 import io.ducket.api.extension.isBeforeInclusive
 import io.ducket.api.extension.sumByDecimal
 import io.ducket.api.getLogger
+import io.ducket.api.plugins.InvalidDataError
+import io.ducket.api.plugins.NoEntityFoundError
 import java.math.BigDecimal
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -42,15 +42,15 @@ class BudgetService(
             ?: throw InvalidDataError("No such category found")
 
         budgetRepository.findOneByName(userId, reqObj.name)?.let {
-            if (!it.isClosed) throw InvalidDataError("'${reqObj.name}' budget already opened")
+            if (!it.isClosed) throw InvalidDataError("'${reqObj.name}' budget already exists")
         }
 
         val budget = budgetRepository.create(userId, currencyId, reqObj)
 
-        return getBudget(userId, budget.id)
+        return getBudgetDetails(userId, budget.id)
     }
 
-    fun getBudget(userId: String, budgetId: String): BudgetDto {
+    fun getBudgetDetails(userId: String, budgetId: String): BudgetDto {
         return getBudgets(userId).firstOrNull { it.id == budgetId }
             ?: throw NoEntityFoundError("No such budget was found")
     }
@@ -74,19 +74,16 @@ class BudgetService(
     }
 
     private fun calculateBudgetProgress(budget: Budget): BudgetProgressDto {
-        val transactionRecords = transactionRepository.findAll(budget.user.id.toString()).map { TransactionDto(it) }
-        val transactions =
-            transactionRecords.sortedWith(compareByDescending<RecordDto> { it.date }.thenByDescending { it.amount })
+        val transactionRecords = transactionRepository.findAll(budget.user.id).map { TransactionDto(it) }
+        val transactions = transactionRecords.sortedWith(compareByDescending<RecordDto> { it.date }.thenByDescending { it.amount })
 
         val periodBounds = getBudgetPeriodBounds(budget.periodType) ?: return BudgetProgressDto()
 
         val transactionsInPeriod = transactions.filter { transaction ->
             transaction.date.isAfterInclusive(periodBounds.first.atStartOfDay(ZoneId.systemDefault()).toInstant())
-                    && transaction.date.isBeforeInclusive(
-                periodBounds.second.atStartOfDay(ZoneId.systemDefault()).toInstant()
-            )
-                    && budget.accounts.map { it.id.toString() }.contains(transaction.account.id)
-                    && budget.category.id.toString() == transaction.category?.id
+                    && transaction.date.isBeforeInclusive(periodBounds.second.atStartOfDay(ZoneId.systemDefault()).toInstant())
+                    && budget.accounts.map { it.id }.contains(transaction.account.id)
+                    && budget.category.id == transaction.category?.id
         }
 
         val amount = resolveTransactionsTotalBalance(transactionsInPeriod, budget.currency.isoCode)
@@ -102,14 +99,12 @@ class BudgetService(
     }
 
     private fun resolveTransactionsTotalBalance(records: List<RecordDto>, currencyIsoCode: String): BigDecimal {
-        val exchangeRateClient = ExchangeRateClient()
-
         return records.map {
             val recordCurrencyIsoCode = it.account.accountCurrency.isoCode
 
             if (recordCurrencyIsoCode != currencyIsoCode) {
                 try {
-                    val rate = exchangeRateClient.getRate(recordCurrencyIsoCode, currencyIsoCode)
+                    val rate = ExchangeRateClient.getRate(recordCurrencyIsoCode, currencyIsoCode)
                     return@map it.amount * rate
                 } catch (e: ExchangeRateClient.ExchangeRateClientException) {
                     logger.error("Cannot convert record amount: $it")
