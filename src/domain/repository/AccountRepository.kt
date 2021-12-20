@@ -5,15 +5,25 @@ import domain.model.account.AccountsTable
 import io.ducket.api.domain.controller.account.AccountCreateDto
 import io.ducket.api.domain.controller.account.AccountUpdateDto
 import domain.model.currency.CurrencyEntity
+import domain.model.transaction.TransactionEntity
+import domain.model.transaction.TransactionsTable
 import domain.model.user.UserEntity
+import io.ducket.api.domain.model.follow.FollowEntity
+import io.ducket.api.domain.model.follow.FollowsTable
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.or
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Instant
 
-class AccountRepository {
+class AccountRepository(
+    private val userRepository: UserRepository,
+) {
 
-    fun create(userId: String, dto: AccountCreateDto): Account = transaction {
+    fun create(userId: Long, dto: AccountCreateDto): Account = transaction {
         AccountEntity.new {
             name = dto.name
             notes = dto.notes
@@ -25,25 +35,36 @@ class AccountRepository {
         }.toModel()
     }
 
-    fun findAll(userId: String): List<Account> = transaction {
+    fun findAllIncludingObserved(userId: Long): List<Account> = transaction {
+        val followedUsers = userRepository.findUsersFollowingByUser(userId)
+
+        AccountEntity.wrapRows(
+            AccountsTable.select {
+                AccountsTable.userId.eq(userId)
+                    .or(AccountsTable.userId.inList(followedUsers.map { it.id }))
+            }
+        ).toList().map { it.toModel() }
+    }
+
+    fun findAll(userId: Long): List<Account> = transaction {
         AccountEntity.find {
             AccountsTable.userId.eq(userId)
         }.sortedByDescending { it.createdAt }.toList().map { it.toModel() }
     }
 
-    fun findOne(userId: String, accountId: String): Account? = transaction {
+    fun findOne(userId: Long, accountId: Long): Account? = transaction {
         AccountEntity.find {
             AccountsTable.id.eq(accountId).and(AccountsTable.userId.eq(userId))
         }.firstOrNull()?.toModel()
     }
 
-    fun findOneByName(userId: String, name: String): Account? = transaction {
+    fun findOneByName(userId: Long, name: String): Account? = transaction {
         AccountEntity.find {
             AccountsTable.name.eq(name).and(AccountsTable.userId.eq(userId))
         }.firstOrNull()?.toModel()
     }
 
-    fun updateOne(userId: String, accountId: String, dto: AccountUpdateDto): Account? = transaction {
+    fun updateOne(userId: Long, accountId: Long, dto: AccountUpdateDto): Account? = transaction {
         AccountEntity.find {
             AccountsTable.id.eq(accountId).and(AccountsTable.userId.eq(userId))
         }.firstOrNull()?.also { found ->
@@ -54,7 +75,7 @@ class AccountRepository {
         }?.toModel()
     }
 
-    fun deleteOne(userId: String, accountId: String): Boolean = transaction {
+    fun deleteOne(userId: Long, accountId: Long): Boolean = transaction {
         AccountsTable.deleteWhere {
             AccountsTable.id.eq(accountId).and(AccountsTable.userId.eq(userId))
         } > 0

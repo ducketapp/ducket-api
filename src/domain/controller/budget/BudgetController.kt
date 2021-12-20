@@ -27,23 +27,23 @@ class BudgetController(
     suspend fun getBudgets(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id
 
-        budgetService.getBudgets(userId).apply {
+        budgetService.getBudgetsAccessibleToUser(userId).apply {
             ctx.respond(HttpStatusCode.OK, this)
         }
     }
 
     suspend fun getBudgetDetails(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id
-        val budgetId = ctx.parameters.getOrFail("budgetId")
+        val budgetId = ctx.parameters.getOrFail("budgetId").toLong()
 
-        budgetService.getBudgetDetails(userId, budgetId).apply {
+        budgetService.getBudgetDetailsAccessibleToUser(userId, budgetId).apply {
             ctx.respond(HttpStatusCode.OK, this)
         }
     }
 
     suspend fun deleteBudget(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id
-        val budgetId = ctx.parameters.getOrFail("budgetId")
+        val budgetId = ctx.parameters.getOrFail("budgetId").toLong()
 
         budgetService.deleteBudget(userId, budgetId).apply {
             ctx.respond(HttpStatusCode.NoContent)

@@ -8,12 +8,13 @@ import io.ducket.api.config.JwtConfig
 import io.ducket.api.domain.controller.account.AccountController
 import io.ducket.api.domain.controller.budget.BudgetController
 import io.ducket.api.domain.controller.category.CategoryController
-import io.ducket.api.domain.controller.label.LabelController
+import io.ducket.api.domain.controller.currency.CurrencyController
 import io.ducket.api.domain.controller.record.RecordController
 import io.ducket.api.domain.controller.transaction.TransactionController
 import io.ducket.api.domain.controller.transfer.TransferController
 import io.ducket.api.domain.controller.user.UserController
 import io.ducket.api.plugins.AuthenticationException
+import io.ducket.api.plugins.AuthorizationException
 import io.ducket.api.plugins.applicationStatusPages
 import io.ducket.api.plugins.defaultStatusPages
 import io.ducket.api.routes.*
@@ -22,6 +23,7 @@ import io.ktor.auth.*
 import io.ktor.auth.jwt.*
 import io.ktor.config.*
 import io.ktor.features.*
+import io.ktor.http.*
 import io.ktor.jackson.*
 import io.ktor.request.*
 import io.ktor.routing.*
@@ -76,11 +78,11 @@ fun Application.module() {
     val userController by KodeinConfig.kodein.instance<UserController>()
     val accountController by KodeinConfig.kodein.instance<AccountController>()
     val recordController by KodeinConfig.kodein.instance<RecordController>()
-    val labelController by KodeinConfig.kodein.instance<LabelController>()
     val categoryController by KodeinConfig.kodein.instance<CategoryController>()
     val budgetController by KodeinConfig.kodein.instance<BudgetController>()
     val transactionController by KodeinConfig.kodein.instance<TransactionController>()
     val transferController by KodeinConfig.kodein.instance<TransferController>()
+    val currencyController by KodeinConfig.kodein.instance<CurrencyController>()
 
     install(CallLogging) {
         level = Level.DEBUG
@@ -88,10 +90,10 @@ fun Application.module() {
         filter { call -> call.request.path().startsWith("/") }
         format { call ->
             val status = call.response.status()
-            val path = call.request.path()
+            val uri = call.request.uri
             val httpMethod = call.request.httpMethod.value
             val userAgent = call.request.headers["User-Agent"]
-            "($status) [$httpMethod], $userAgent - $path"
+            "($status) [$httpMethod], $userAgent - $uri"
         }
     }
 
@@ -101,7 +103,9 @@ fun Application.module() {
 
             verifier(JwtConfig.verifier)
             challenge { _, _ -> throw AuthenticationException("Invalid auth token") }
-            validate { JwtConfig.validateToken(it) }
+            validate {
+                JwtConfig.validateToken(jwtCredential = it)
+            }
         }
     }
 
@@ -117,14 +121,27 @@ fun Application.module() {
 
     install(Routing) {
         route("/api/v1") {
+            intercept(ApplicationCallPipeline.Call) {
+                if (!call.request.path().contains("auth")) {
+                    val currentUserId = JwtConfig.getPrincipal(call.authentication).id
+
+                    call.parameters["userId"]?.toLong()?.let { requestedUserId ->
+                        if (currentUserId != requestedUserId) {
+                            // let the user to access user data in readonly mode
+                            if (call.request.httpMethod != HttpMethod.Get) {
+                                throw AuthorizationException("Access restricted")
+                            }
+                        }
+                    }
+                }
+            }
+
             users(userController)
             accounts(accountController)
             categories(categoryController)
-            records(recordController)
-            transfers(transferController)
-            transactions(transactionController)
-            labels(labelController)
+            records(recordController, transactionController, transferController, userController)
             budgets(budgetController)
+            currencies(currencyController)
         }
     }
 
@@ -133,183 +150,3 @@ fun Application.module() {
         applicationStatusPages()
     }
 }
-
-/*fun main() {
-    val trainingFile = File("resources/labeled_transactions.csv")
-    val trainingFileReader = BufferedReader(InputStreamReader(trainingFile.inputStream()))
-    val trainingFileParser = CSVParser(
-        trainingFileReader, CSVFormat.DEFAULT
-            .withFirstRecordAsHeader()
-            .withDelimiter(',')
-            .withIgnoreHeaderCase().withTrim()
-    )
-
-    var data = trainingFileParser.records.map {
-        try {
-            val category = it[0]
-            val text = it[1].trimWhitespaces()
-
-            return@map category to text
-        } catch (e: Exception) {
-            throw InvalidDataError("Invalid value, row #${it.recordNumber}: ${e.message}\n${it.toMap()}")
-        }
-    }
-
-    val nbc = data.toNaiveBayesClassifier(
-        featuresSelector = { pair ->
-            pair.second.split(Regex("\\s")).asSequence()
-                .map { it.replace(Regex("[^A-Za-z]"), "").toLowerCase() }
-                .filter { it.isNotEmpty() }.distinct().toSet()
-        },
-        categorySelector = { it.first!! }
-    )
-
-    val millenniumFile = File("resources/Account_activity_20210923_200103.csv")
-    val millenniumFileReader = BufferedReader(InputStreamReader(millenniumFile.inputStream()))
-    val millenniumFileParser = CSVParser(
-        millenniumFileReader, CSVFormat.DEFAULT
-            .withFirstRecordAsHeader()
-            .withDelimiter(',')
-            .withIgnoreHeaderCase().withTrim()
-    )
-
-    var memos = millenniumFileParser.records.map {
-        try {
-            val payee = it[6].trimWhitespaces()
-            val notes = it[3].trimWhitespaces()
-
-            return@map "$payee $notes"
-        } catch (e: Exception) {
-            throw InvalidDataError("Invalid value, row #${it.recordNumber}: ${e.message}\n${it.toMap()}")
-        }
-    }
-
-    memos.forEach {
-        val s = it.split(Regex("\\s")).asSequence()
-            .map { it.replace(Regex("[^A-Za-z]"), "").toLowerCase() }
-            .filter { it.isNotEmpty() }.distinct().toSet()
-
-        val result = nbc.predict(s)
-
-        println("${result.toString()}\t${it}")
-    }
-}*/
-
-/*fun main() {
-    val millenniumExportFile = File("resources/Account_activity_20210923_200103.csv")
-
-    val reader = BufferedReader(InputStreamReader(millenniumExportFile.inputStream()))
-
-    val millenniumCsvParser = CSVParser(reader, CSVFormat.DEFAULT
-        .withFirstRecordAsHeader()
-        .withDelimiter(',')
-        .withIgnoreHeaderCase().withTrim())
-
-    var csvTransactions = millenniumCsvParser.records.map {
-        try {
-            val date = LocalDate.parse(it[1]).atStartOfDay().toInstant(ZoneOffset.UTC)
-            val beneficiaryOrSender = it[5].trimWhitespaces()
-            val category = ""
-            val notes = it[6].trimWhitespaces()
-            val amount = it[7].toBigDecimalOrNull() ?: it[8].toBigDecimal()
-
-            return@map CsvTransaction(date, category, beneficiaryOrSender, notes, amount)
-        } catch (e: Exception) {
-            throw InvalidDataError("Invalid value, row #${it.recordNumber}: ${e.message}\n${it.toMap()}")
-        }
-    }
-
-    val memo = csvTransactions.map { e ->
-        val text = "${e.beneficiaryOrSender} ${e.notes}"
-        text.split(Regex("\\s")).asSequence()
-            .map { it.replace(Regex("[^A-Za-z]"), "").toLowerCase() }
-            .filter { it.isNotEmpty() }.distinct().joinToString(" ")
-    }
-    val distinctMemo = memo.toMutableList()
-    val start = Instant.now()
-
-    for (i in memo.indices) {
-        for (j in i + 1 until memo.size) {
-            val e1 = memo[i]
-            val e2 = memo[j]
-
-            val cosineDistance = CosineDistance().apply(e1, e2)
-            val cosineSimilarityPercentage = ((1 - cosineDistance) * 100).roundToInt().toDouble()
-
-            if (cosineSimilarityPercentage >= 70) {
-                distinctMemo.remove(e2)
-            }
-        }
-    }
-
-    *//*memo.forEachIndexed { i1, e1 ->
-        for (i2 in i1 + 1 until memo.size) {
-            *//**//*val e2 = distinct[i2].payee
-
-            if (e2.isNotBlank() && e1.isNotBlank()) {
-                val distance = LevenshteinDistance.getDefaultInstance().apply(e2.toLowerCase(), e1.toLowerCase())
-                if (distance in 1..10) {
-                    res.remove(distinct[i2])
-                }
-            }*//**//*
-
-            val input2 = memo[i2]
-            val input1 = e1
-
-            if (input1.isNotBlank() && input2.isNotBlank()) {
-                val cosineDistance = CosineDistance().apply(input1, input2)
-                val cosineSimilarityPercentage = Math.round((1 - cosineDistance) * 100).toDouble()
-
-                if (cosineSimilarityPercentage >= 75) {
-                    distinctMemo.remove(memo[i2])
-                }
-            }
-        }
-    }*//*
-
-    val end = Instant.now()
-    distinctMemo.forEach {
-        println(it)
-    }
-
-    val m = distinctMemo.joinToString("\n")
-
-    println(csvTransactions.size)
-    println(distinctMemo.size)
-    println(Duration.between(start, end).toMillis())
-
-    println("All set!")
-}*/
-
-//@EngineAPI
-//fun main() {
-//    // System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager")
-//    System.setProperty("handlers", "org.slf4j.bridge.SLF4JBridgeHandler")
-//    TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
-//
-//    // ECB
-//    ExchangeRateClient().pullRates()
-//
-//    setup().start(wait = true)
-//}
-
-//fun main(args: Array<String>) {
-//    System.setProperty("handlers", "org.slf4j.bridge.SLF4JBridgeHandler")
-//    TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
-//
-//    val env = System.getenv()["ENVIRONMENT"] ?: "dev"
-//    val appConfig = HoconApplicationConfig(ConfigFactory.load()).config("ktor.deployment.$env")
-//
-//    DatabaseConfig.init(appConfig)
-//
-//    ExchangeRateClient().pullRates()
-//
-////    DatabaseConfig.setup(
-////        "jdbc:mysql://127.0.0.1:3306/budgery?useUnicode=true&serverTimezone=UTC&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true",
-////        "root",
-////        "toor",
-////    )
-//
-//    EngineMain.main(args)
-//}
-

@@ -23,7 +23,7 @@ import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.xpath.XPath
 import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
-import kotlin.io.path.Path
+
 
 object ExchangeRateClient {
     private val logger = getLogger()
@@ -44,7 +44,7 @@ object ExchangeRateClient {
     }
 
     @Throws(InvalidCurrencyException::class)
-    fun getRate(base: String, term: String): BigDecimal {
+    fun getExchangeRate(base: String, term: String): BigDecimal {
         logger.debug("Getting exchange rate: $base -> $term")
 
         val fileWithRates = pullRates()
@@ -62,9 +62,17 @@ object ExchangeRateClient {
         }
     }
 
+    @Throws(ExchangeRateDataParseException::class)
+    fun getRatesMap(): Map<String, BigDecimal> {
+        logger.debug("Getting rates map")
+
+        val fileWithRates = pullRates()
+        return parseXml(fileWithRates)
+    }
+
     @Throws(ExchangeRateSourcePullException::class)
     fun pullRates(): File {
-        logger.debug("Resolving exchange rates file")
+        logger.debug("Resolving currencies rates file")
 
         val filesDirPath = "resources/rates"
         val relevantFileName = "${fileNamePrefix}_${LocalDate.now()}.xml"

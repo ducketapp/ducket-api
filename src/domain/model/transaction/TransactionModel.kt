@@ -12,25 +12,24 @@ import domain.model.imports.ImportsTable
 import domain.model.user.User
 import domain.model.user.UserEntity
 import domain.model.user.UsersTable
-import io.ducket.api.domain.model.StringIdTable
 import io.ducket.api.domain.model.attachment.Attachment
 import io.ducket.api.domain.model.attachment.AttachmentEntity
 import io.ducket.api.domain.model.transaction.TransactionAttachmentsTable
 import org.jetbrains.exposed.dao.*
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.`java-time`.timestamp
 import java.math.BigDecimal
 import java.time.Instant
 
-internal object TransactionsTable : StringIdTable("transaction") {
+internal object TransactionsTable : LongIdTable("transaction") {
     val userId = reference("user_id", UsersTable)
     val accountId = reference("account_id", AccountsTable)
     val categoryId = optReference("category_id", CategoriesTable)
     val importId = optReference("import_id", ImportsTable)
     val date = timestamp("date")
     val amount = decimal("amount", 10, 2)
-    val payee = varchar("payee", 128)
-    val payer = varchar("payer", 128).nullable()
+    val payeeOrPayer = varchar("payee_or_payer", 128)
     val notes = varchar("notes", 128).nullable()
     val longitude = varchar("longitude", 45).nullable()
     val latitude = varchar("latitude", 45).nullable()
@@ -38,8 +37,8 @@ internal object TransactionsTable : StringIdTable("transaction") {
     val modifiedAt = timestamp("modified_at")
 }
 
-class TransactionEntity(id: EntityID<String>) : Entity<String>(id) {
-    companion object : EntityClass<String, TransactionEntity>(TransactionsTable)
+class TransactionEntity(id: EntityID<Long>) : LongEntity(id) {
+    companion object : LongEntityClass<TransactionEntity>(TransactionsTable)
 
     var account by AccountEntity referencedOn TransactionsTable.accountId
     var user by UserEntity referencedOn TransactionsTable.userId
@@ -47,8 +46,7 @@ class TransactionEntity(id: EntityID<String>) : Entity<String>(id) {
     var import by ImportEntity optionalReferencedOn TransactionsTable.importId
     var amount by TransactionsTable.amount
     var date by TransactionsTable.date
-    var payee by TransactionsTable.payee
-    var payer by TransactionsTable.payer
+    var payeeOrPayer by TransactionsTable.payeeOrPayer
     var notes by TransactionsTable.notes
     var longitude by TransactionsTable.longitude
     var latitude by TransactionsTable.latitude
@@ -65,8 +63,7 @@ class TransactionEntity(id: EntityID<String>) : Entity<String>(id) {
         import?.toModel(),
         amount,
         date,
-        payee,
-        payer,
+        payeeOrPayer,
         notes,
         longitude,
         latitude,
@@ -77,15 +74,14 @@ class TransactionEntity(id: EntityID<String>) : Entity<String>(id) {
 }
 
 class Transaction(
-    val id: String,
+    val id: Long,
     val account: Account,
     val category: Category?,
     val user: User,
     val import: Import?,
     val amount: BigDecimal,
     val date: Instant,
-    val payee: String,
-    val payer: String?,
+    val payeeOrPayer: String,
     val notes: String?,
     val longitude: String?,
     val latitude: String?,

@@ -1,14 +1,14 @@
-package io.ducket.api.domain.controller.transaction
+package io.ducket.api.domain.controller.rule
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import domain.model.rule.Rule
+import domain.model.imports.ImportRule
 import io.ducket.api.InstantSerializer
 import io.ducket.api.domain.controller.category.TypelessCategoryDto
 import java.time.Instant
 
-class RuleDto(@JsonIgnore val rule: Rule) {
-    val id: String = rule.id
+class ImportRuleDto(@JsonIgnore val rule: ImportRule) {
+    val id: Long = rule.id
     val name: String = rule.name
     val categoryToApply: TypelessCategoryDto = TypelessCategoryDto(rule.recordCategory)
     val keywords: List<String> = rule.keywords

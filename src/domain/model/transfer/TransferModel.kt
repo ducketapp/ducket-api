@@ -11,12 +11,15 @@ import io.ducket.api.domain.model.attachment.Attachment
 import io.ducket.api.domain.model.attachment.AttachmentEntity
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
+import org.jetbrains.exposed.dao.LongEntity
+import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.`java-time`.timestamp
 import java.math.BigDecimal
 import java.time.Instant
 
-internal object TransfersTable : StringIdTable("transfer") {
+internal object TransfersTable : LongIdTable("transfer") {
     val userId = reference("user_id", UsersTable)
     val accountId = reference("account_id", AccountsTable)
     val transferAccountId = reference("transfer_account_id", AccountsTable)
@@ -31,8 +34,8 @@ internal object TransfersTable : StringIdTable("transfer") {
     val modifiedAt = timestamp("modified_at")
 }
 
-class TransferEntity(id: EntityID<String>) : Entity<String>(id) {
-    companion object : EntityClass<String, TransferEntity>(TransfersTable)
+class TransferEntity(id: EntityID<Long>) : LongEntity(id) {
+    companion object : LongEntityClass<TransferEntity>(TransfersTable)
 
     var transferAccount by AccountEntity referencedOn TransfersTable.transferAccountId
     var account by AccountEntity referencedOn TransfersTable.accountId
@@ -68,7 +71,7 @@ class TransferEntity(id: EntityID<String>) : Entity<String>(id) {
 }
 
 class Transfer(
-    val id: String,
+    val id: Long,
     val transferAccount: Account,
     val account: Account,
     val user: User,

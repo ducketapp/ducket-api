@@ -10,6 +10,8 @@ import io.ducket.api.domain.controller.transaction.TransactionCreateDto
 import io.ducket.api.domain.model.attachment.Attachment
 import io.ducket.api.domain.model.attachment.AttachmentEntity
 import io.ducket.api.domain.model.attachment.AttachmentsTable
+import io.ducket.api.domain.model.follow.FollowEntity
+import io.ducket.api.domain.model.follow.FollowsTable
 import io.ducket.api.domain.model.transaction.TransactionAttachmentsTable
 import org.jetbrains.exposed.sql.*
 
@@ -18,19 +20,32 @@ import java.io.File
 import java.time.Instant
 import java.util.*
 
-class TransactionRepository : AttachmentRepository() {
+class TransactionRepository(
+    private val userRepository: UserRepository,
+) : AttachmentRepository() {
 
-    fun findOne(userId: String, transactionId: String): Transaction? = transaction {
+    fun findOne(userId: Long, transactionId: Long): Transaction? = transaction {
         TransactionEntity.find {
             TransactionsTable.userId.eq(userId)
                 .and(TransactionsTable.id.eq(transactionId))
         }.firstOrNull()?.toModel()
     }
 
-    fun findAll(userId: String): List<Transaction> = transaction {
+    fun findAll(userId: Long): List<Transaction> = transaction {
         TransactionEntity.find {
             TransactionsTable.userId.eq(userId)
         }.sortedByDescending { it.date }.map { it.toModel() }
+    }
+
+    fun findAllIncludingObserved(userId: Long): List<Transaction> = transaction {
+        val followedUsers = userRepository.findUsersFollowingByUser(userId)
+
+        TransactionEntity.wrapRows(
+            TransactionsTable.select {
+                TransactionsTable.userId.eq(userId)
+                    .or(TransactionsTable.userId.inList(followedUsers.map { it.id }))
+            }
+        ).toList().map { it.toModel() }
     }
 
 /*    fun findAllByCategories(userId: Int, categoryIds: List<Int>): List<Transaction> = transaction {
@@ -39,13 +54,13 @@ class TransactionRepository : AttachmentRepository() {
         }.map { it.toModel() }
     }*/
 
-    fun findAllByAccount(userId: String, accountId: String): List<Transaction> = transaction {
+    fun findAllByAccount(userId: Long, accountId: Long): List<Transaction> = transaction {
         TransactionEntity.find {
             TransactionsTable.userId.eq(userId).and(TransactionsTable.accountId.eq(accountId))
         }.sortedByDescending { it.date }.map { it.toModel() }
     }
 
-    fun create(userId: String, dto: TransactionCreateDto): Transaction = transaction {
+    fun create(userId: Long, dto: TransactionCreateDto): Transaction = transaction {
         TransactionEntity.new {
             account = AccountEntity[dto.accountId]
             category = CategoryEntity[dto.categoryId]
@@ -53,8 +68,7 @@ class TransactionRepository : AttachmentRepository() {
             import = null
             amount = dto.amount
             date = dto.date
-            payee = dto.payee
-            payer = null
+            payeeOrPayer = dto.payee
             notes = dto.notes
             longitude = dto.longitude
             latitude = dto.latitude
@@ -63,11 +77,11 @@ class TransactionRepository : AttachmentRepository() {
         }.toModel()
     }
 
-    fun getTotalByAccount(userId: String, accountId: String): Int = transaction {
+    fun getTotalByAccount(userId: Long, accountId: Long): Int = transaction {
         findAllByAccount(userId, accountId).size
     }
 
-    fun delete(userId: String, vararg transactionIds: String): Unit = transaction {
+    fun delete(userId: Long, vararg transactionIds: Long): Unit = transaction {
         transactionIds.forEach { id ->
             TransactionEntity.find {
                 TransactionsTable.id.eq(id).and(TransactionsTable.userId.eq(userId))
@@ -75,7 +89,7 @@ class TransactionRepository : AttachmentRepository() {
         }
     }
 
-    override fun findAttachment(userId: String, entityId: String, attachmentId: String): Attachment? = transaction {
+    override fun findAttachment(userId: Long, entityId: Long, attachmentId: Long): Attachment? = transaction {
         val query = AttachmentsTable.select {
             AttachmentsTable.id.eq(attachmentId)
                 .and {
@@ -88,13 +102,13 @@ class TransactionRepository : AttachmentRepository() {
         AttachmentEntity.wrapRows(query).firstOrNull()?.toModel()
     }
 
-    override fun getAttachmentsAmount(entityId: String): Int = transaction {
+    override fun getAttachmentsAmount(entityId: Long): Int = transaction {
         TransactionAttachmentsTable.select {
             TransactionAttachmentsTable.transactionId.eq(entityId)
         }.count().toInt()
     }
 
-    override fun createAttachment(userId: String, entityId: String, newFile: File): Unit = transaction {
+    override fun createAttachment(userId: Long, entityId: Long, newFile: File): Unit = transaction {
         val newAttachment = AttachmentEntity.new {
             filePath = newFile.path
             createdAt = Instant.now()
@@ -110,7 +124,7 @@ class TransactionRepository : AttachmentRepository() {
         }
     }
 
-    override fun deleteAttachment(userId: String, entityId: String, attachmentId: String): Boolean = transaction {
+    override fun deleteAttachment(userId: Long, entityId: Long, attachmentId: Long): Boolean = transaction {
         AttachmentsTable.deleteWhere { AttachmentsTable.id.eq(attachmentId) } > 0
     }
 }

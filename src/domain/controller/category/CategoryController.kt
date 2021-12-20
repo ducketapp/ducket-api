@@ -17,7 +17,7 @@ class CategoryController(
     }
 
     suspend fun getCategory(ctx: ApplicationCall) {
-        val categoryId = ctx.parameters.getOrFail("categoryId")
+        val categoryId = ctx.parameters.getOrFail("categoryId").toLong()
 
         val categoryDto = categoryService.getCategory(categoryId)
         ctx.respond(HttpStatusCode.OK, categoryDto)

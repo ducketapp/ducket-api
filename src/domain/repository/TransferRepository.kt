@@ -1,42 +1,61 @@
 package io.ducket.api.domain.repository
 
 import domain.model.account.AccountEntity
+import domain.model.transaction.TransactionEntity
+import domain.model.transaction.TransactionsTable
 import domain.model.user.UserEntity
 import io.ducket.api.domain.controller.transfer.TransferCreateDto
 import io.ducket.api.domain.model.attachment.Attachment
 import io.ducket.api.domain.model.attachment.AttachmentEntity
 import io.ducket.api.domain.model.attachment.AttachmentsTable
+import io.ducket.api.domain.model.follow.FollowEntity
+import io.ducket.api.domain.model.follow.FollowsTable
 import io.ducket.api.domain.model.transfer.*
 import io.ducket.api.domain.model.transfer.TransferAttachmentsTable
 import io.ducket.api.domain.model.transfer.TransfersTable
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.*
 
-class TransferRepository : AttachmentRepository() {
+class TransferRepository(
+    private val userRepository: UserRepository,
+) : AttachmentRepository() {
 
-    fun findOne(userId: String, transferId: String): Transfer? = transaction {
+    fun findOne(userId: Long, transferId: Long): Transfer? = transaction {
         TransferEntity.find {
             TransfersTable.userId.eq(userId).and(TransfersTable.id.eq(transferId))
         }.firstOrNull()?.toModel()
     }
 
-    fun findAllByRelation(userId: String, relationId: String): List<Transfer> = transaction {
+    fun findAllByRelation(userId: Long, relationId: String): List<Transfer> = transaction {
         TransferEntity.find {
             TransfersTable.userId.eq(userId).and(TransfersTable.relationId.eq(relationId))
         }.map { it.toModel() }
     }
 
-    fun findAllByUserId(userId: String): List<Transfer> = transaction {
+    fun findAllByUserId(userId: Long): List<Transfer> = transaction {
         TransferEntity.find {
             TransfersTable.userId.eq(userId)
         }.sortedByDescending { it.date }.map { it.toModel() }
     }
 
-    fun findAllOutgoing(userId: String, accountId: String): List<Transfer> = transaction {
+    fun findAllIncludingObserved(userId: Long): List<Transfer> = transaction {
+        val followedUsers = userRepository.findUsersFollowingByUser(userId)
+
+        TransferEntity.wrapRows(
+            TransfersTable.select {
+                TransfersTable.userId.eq(userId)
+                    .or(TransfersTable.userId.inList(followedUsers.map { it.id }))
+            }
+        ).toList().map { it.toModel() }
+    }
+
+    fun findAllOutgoing(userId: Long, accountId: Long): List<Transfer> = transaction {
         TransferEntity.find {
             TransfersTable.userId.eq(userId)
                 .and(TransfersTable.amount.less(0))
@@ -44,7 +63,7 @@ class TransferRepository : AttachmentRepository() {
         }.map { it.toModel() }
     }
 
-    fun findAllIncoming(userId: String, accountId: String): List<Transfer> = transaction {
+    fun findAllIncoming(userId: Long, accountId: Long): List<Transfer> = transaction {
         TransferEntity.find {
             TransfersTable.userId.eq(userId)
                 .and(TransfersTable.amount.greater(0))
@@ -52,23 +71,23 @@ class TransferRepository : AttachmentRepository() {
         }.map { it.toModel() }
     }
 
-    fun findAllByAccount(userId: String, accountId: String): List<Transfer> = transaction {
+    fun findAllByAccount(userId: Long, accountId: Long): List<Transfer> = transaction {
         TransferEntity.find {
             TransfersTable.userId.eq(userId).and(TransfersTable.accountId.eq(accountId))
         }.sortedByDescending { it.date }.map { it.toModel() }
     }
 
-    fun findAll(userId: String): List<Transfer> = transaction {
+    fun findAll(userId: Long): List<Transfer> = transaction {
         TransferEntity.find {
             TransfersTable.userId.eq(userId)
         }.sortedByDescending { it.date }.map { it.toModel() }
     }
 
-    fun getTotalByAccount(userId: String, accountId: String): Int = transaction {
+    fun getTotalByAccount(userId: Long, accountId: Long): Int = transaction {
         findAllByAccount(userId, accountId).size
     }
 
-    fun create(userId: String, senderDto: TransferCreateDto, rate: BigDecimal): List<Transfer> = transaction {
+    fun create(userId: Long, senderDto: TransferCreateDto, rate: BigDecimal): List<Transfer> = transaction {
         val relationId = UUID.randomUUID().toString().substring(0, 8).toUpperCase()
 
         val senderTransfer = createNewTransfer(userId, senderDto, rate, relationId).toModel()
@@ -83,13 +102,13 @@ class TransferRepository : AttachmentRepository() {
         return@transaction listOf(recipientTransfer, senderTransfer)
     }
 
-    fun delete(userId: String, relationId: String) = transaction {
+    fun delete(userId: Long, relationId: String) = transaction {
         TransferEntity.find {
             TransfersTable.userId.eq(userId).and(TransfersTable.relationId.eq(relationId))
         }.toList().forEach { it.delete() }
     }
 
-    override fun findAttachment(userId: String, entityId: String, attachmentId: String): Attachment? = transaction {
+    override fun findAttachment(userId: Long, entityId: Long, attachmentId: Long): Attachment? = transaction {
         val query = AttachmentsTable.select {
             AttachmentsTable.id.eq(attachmentId)
                 .and {
@@ -102,13 +121,13 @@ class TransferRepository : AttachmentRepository() {
         return@transaction AttachmentEntity.wrapRows(query).firstOrNull()?.toModel()
     }
 
-    override fun getAttachmentsAmount(entityId: String): Int = transaction {
+    override fun getAttachmentsAmount(entityId: Long): Int = transaction {
         TransferAttachmentsTable.select {
             TransferAttachmentsTable.transferId.eq(entityId)
         }.count().toInt()
     }
 
-    override fun createAttachment(userId: String, entityId: String, newFile: File): Unit = transaction {
+    override fun createAttachment(userId: Long, entityId: Long, newFile: File): Unit = transaction {
         val newAttachment = AttachmentEntity.new {
             filePath = newFile.path
             createdAt = Instant.now()
@@ -124,17 +143,17 @@ class TransferRepository : AttachmentRepository() {
         }
     }
 
-    override fun deleteAttachment(userId: String, entityId: String, attachmentId: String): Boolean = transaction {
+    override fun deleteAttachment(userId: Long, entityId: Long, attachmentId: Long): Boolean = transaction {
         AttachmentsTable.deleteWhere { AttachmentsTable.id.eq(attachmentId) } > 0
     }
 
     private fun createNewTransfer(
-        userId: String,
+        userId: Long,
         dto: TransferCreateDto,
         rate: BigDecimal,
         relation: String
     ): TransferEntity {
-        return TransferEntity.new(UUID.randomUUID().toString()) { // to prevent duplicate id
+        return TransferEntity.new { // to prevent duplicate id
             account = AccountEntity[dto.accountId]
             transferAccount = AccountEntity[dto.transferAccountId]
             user = UserEntity[userId]

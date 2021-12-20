@@ -10,8 +10,8 @@ class BudgetCreateDto(
     val name: String,
     val currencyIsoCode: String,
     val budgetPeriod: BudgetPeriodType,
-    val accountIds: List<String>,
-    val categoryId: String,
+    val accountIds: List<Long>,
+    val categoryId: Long,
 ) {
     fun validate(): BudgetCreateDto {
         org.valiktor.validate(this) {
@@ -20,7 +20,7 @@ class BudgetCreateDto(
             validate(BudgetCreateDto::currencyIsoCode).isNotBlank().hasSize(3)
             validate(BudgetCreateDto::budgetPeriod).isNotNull().isIn(BudgetPeriodType.values().toList())
             validate(BudgetCreateDto::accountIds).isNotNull().isNotEmpty()
-            validate(BudgetCreateDto::categoryId).isNotNull()
+            validate(BudgetCreateDto::categoryId).isNotZero().isPositive()
         }
         return this
     }

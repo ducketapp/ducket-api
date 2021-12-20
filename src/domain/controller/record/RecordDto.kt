@@ -11,7 +11,7 @@ import java.math.BigDecimal
 import java.time.Instant
 
 open class RecordDto {
-    val id: String
+    val id: Long
     val amount: BigDecimal
     val isExpense: Boolean
     val isTransfer: Boolean
@@ -21,10 +21,8 @@ open class RecordDto {
     val notes: String?
     val longitude: String?
     val latitude: String?
-    val attachments: List<AttachmentDto>?
+    val images: List<RecordImageDto>?
     @JsonSerialize(using = InstantSerializer::class) val date: Instant
-    @JsonSerialize(using = InstantSerializer::class) val createdAt: Instant
-    @JsonSerialize(using = InstantSerializer::class) val modifiedAt: Instant
 
     constructor(transfer: Transfer) {
         this.id = transfer.id
@@ -38,9 +36,7 @@ open class RecordDto {
         this.notes = transfer.notes
         this.longitude = transfer.longitude
         this.latitude = transfer.latitude
-        this.attachments = transfer.attachments.map { AttachmentDto(it) }
-        this.createdAt = transfer.createdAt
-        this.modifiedAt = transfer.modifiedAt
+        this.images = transfer.attachments.map { TransferImageDto(id, it) }
     }
 
     constructor(transaction: Transaction) {
@@ -55,8 +51,6 @@ open class RecordDto {
         this.notes = transaction.notes
         this.longitude = transaction.longitude
         this.latitude = transaction.latitude
-        this.attachments = transaction.attachments.map { AttachmentDto(it) }
-        this.createdAt = transaction.createdAt
-        this.modifiedAt = transaction.modifiedAt
+        this.images = transaction.attachments.map { TransactionImageDto(id, it) }
     }
 }

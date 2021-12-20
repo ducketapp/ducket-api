@@ -7,15 +7,15 @@ import domain.model.transaction.TransactionsTable
 import domain.model.user.User
 import domain.model.user.UserEntity
 import domain.model.user.UsersTable
-import io.ducket.api.domain.model.StringIdTable
 import io.ducket.api.domain.model.transfer.TransfersTable
-import org.jetbrains.exposed.dao.Entity
-import org.jetbrains.exposed.dao.EntityClass
+import org.jetbrains.exposed.dao.LongEntity
+import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.`java-time`.timestamp
 import java.time.Instant
 
-internal object AccountsTable : StringIdTable("account") {
+internal object AccountsTable : LongIdTable("account") {
     val userId = reference("user_id", UsersTable)
     val currencyId = reference("currency_id", CurrenciesTable)
     val accountType = enumerationByName("account_type", 32, AccountType::class)
@@ -25,8 +25,8 @@ internal object AccountsTable : StringIdTable("account") {
     val modifiedAt = timestamp("modified_at")
 }
 
-class AccountEntity(id: EntityID<String>) : Entity<String>(id) {
-    companion object : EntityClass<String, AccountEntity>(AccountsTable)
+class AccountEntity(id: EntityID<Long>) : LongEntity(id) {
+    companion object : LongEntityClass<AccountEntity>(AccountsTable)
 
     var name by AccountsTable.name
     var notes by AccountsTable.notes
@@ -36,8 +36,8 @@ class AccountEntity(id: EntityID<String>) : Entity<String>(id) {
     var createdAt by AccountsTable.createdAt
     var modifiedAt by AccountsTable.modifiedAt
 
-    private var transactions by AccountEntity via TransactionsTable
-    private var transfers by AccountEntity.via(TransfersTable.accountId, TransfersTable.accountId)
+    private var transactionsAccount by AccountEntity via TransactionsTable
+    private var transfersAccount by AccountEntity.via(TransfersTable.accountId, TransfersTable.accountId)
 
     fun toModel() = Account(
         id.value,
@@ -46,14 +46,14 @@ class AccountEntity(id: EntityID<String>) : Entity<String>(id) {
         user.toModel(),
         currency.toModel(),
         accountType,
-        (transactions.count() + transfers.count()).toInt(),
+        (transactionsAccount + transfersAccount).count(),
         createdAt,
         modifiedAt,
     )
 }
 
 data class Account(
-    val id: String,
+    val id: Long,
     val name: String,
     val notes: String?,
     val user: User,

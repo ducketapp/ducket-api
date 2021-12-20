@@ -28,16 +28,16 @@ class TransferController(
 
     suspend fun getTransfer(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id
-        val transferId = ctx.parameters.getOrFail("transferId")
+        val transferId = ctx.parameters.getOrFail("transferId").toLong()
 
-        transferService.getTransfer(userId, transferId).apply {
+        transferService.getTransferDetailsAccessibleToUser(userId, transferId).apply {
             ctx.respond(HttpStatusCode.OK, this)
         }
     }
 
     suspend fun deleteTransfer(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id
-        val transferId = ctx.parameters.getOrFail("transferId")
+        val transferId = ctx.parameters.getOrFail("transferId").toLong()
 
         transferService.deleteTransfer(userId, transferId).apply {
             ctx.respond(HttpStatusCode.NoContent)
@@ -46,10 +46,10 @@ class TransferController(
 
     suspend fun uploadTransferAttachments(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id
-        val transferId = ctx.parameters.getOrFail("transferId")
+        val transferId = ctx.parameters.getOrFail("transferId").toLong()
 
         transferService.uploadTransferAttachments(userId, transferId, ctx.receiveMultipart().readAllParts()).apply {
-            transferService.getTransfer(userId, transferId).apply {
+            transferService.getTransferDetailsAccessibleToUser(userId, transferId).apply {
                 ctx.respond(HttpStatusCode.OK, this)
             }
         }
@@ -57,12 +57,23 @@ class TransferController(
 
     suspend fun downloadTransferAttachment(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id
-        val transferId = ctx.parameters.getOrFail("transferId")
-        val attachmentId = ctx.parameters.getOrFail("attachmentId")
+        val transferId = ctx.parameters.getOrFail("transferId").toLong()
+        val attachmentId = ctx.parameters.getOrFail("imageId").toLong()
 
         transferService.downloadTransferAttachment(userId, transferId, attachmentId).apply {
             ctx.response.header("Content-Disposition", "attachment; filename=\"${this.name}\"")
             ctx.respondFile(this)
+        }
+    }
+
+    suspend fun deleteTransferAttachment(ctx: ApplicationCall) {
+        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+        val transferId = ctx.parameters.getOrFail("transferId").toLong()
+        val attachmentId = ctx.parameters.getOrFail("imageId").toLong()
+
+        transferService.deleteTransferAttachment(userId, transferId, attachmentId).apply {
+            if (this) ctx.respond(HttpStatusCode.NoContent)
+            else ctx.respond(HttpStatusCode.UnprocessableEntity)
         }
     }
 }

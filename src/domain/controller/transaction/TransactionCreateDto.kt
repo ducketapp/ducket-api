@@ -10,8 +10,8 @@ import java.time.Instant
 data class TransactionCreateDto(
     var amount: BigDecimal,
     val payee: String,
-    val accountId: String,
-    val categoryId: String,
+    val accountId: Long,
+    val categoryId: Long,
     val notes: String?,
     val longitude: String?,
     val latitude: String?,
@@ -21,8 +21,8 @@ data class TransactionCreateDto(
         org.valiktor.validate(this) {
             validate(TransactionCreateDto::payee).isNotEmpty()
             validate(TransactionCreateDto::date).isLessThanOrEqualTo(Instant.now())
-            validate(TransactionCreateDto::accountId).isNotEmpty()
-            validate(TransactionCreateDto::categoryId).isNotEmpty()
+            validate(TransactionCreateDto::accountId).isNotZero().isPositive()
+            validate(TransactionCreateDto::categoryId).isNotZero().isPositive()
             validate(TransactionCreateDto::notes).isNotEmpty()
             validate(TransactionCreateDto::longitude).isNotEmpty()
             validate(TransactionCreateDto::latitude).isNotEmpty()

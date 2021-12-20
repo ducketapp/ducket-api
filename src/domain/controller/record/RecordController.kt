@@ -4,11 +4,11 @@ import io.ducket.api.config.JwtConfig
 import io.ducket.api.domain.service.AccountService
 import io.ducket.api.domain.service.TransactionService
 import io.ducket.api.domain.service.TransferService
+import io.ducket.api.domain.service.UserService
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
 import io.ktor.response.*
-import kotlin.streams.toList
 
 class RecordController(
     val transactionService: TransactionService,
@@ -19,20 +19,17 @@ class RecordController(
     suspend fun getRecords(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id
 
-        // get all user transactions
-        val transactions = transactionService.getTransactions(userId).stream().peek {
-            it.account.balance = accountService.resolveBalance(userId, it.account.id, it.date)
-        }.toList()
+        val allRecords = listOf(
+            transactionService.getTransactionsAccessibleToUser(userId),
+            transferService.getTransfersAccessibleToUser(userId),
+        ).flatten().sortedWith(compareByDescending<RecordDto> { it.date }.thenByDescending { it.id })
 
-        // get all user transfers
-        val transfers = transferService.getTransfers(userId).stream().peek {
-            it.account.balance = accountService.resolveBalance(userId, it.account.id, it.date)
-            it.transferAccount.balance = accountService.resolveBalance(userId, it.transferAccount.id, it.date)
-        }.toList()
-
-        val totalRecords = listOf(transactions, transfers)
-            .flatten()
-            .sortedWith(compareByDescending<RecordDto> { it.date }.thenByDescending { it.amount })
+//        val followedUsersRecords = userService.getUserFollowings(userId).map {
+//            getRecordsByOwner(it.followedUser.id)
+//        }.flatten()
+//
+//        val allRecords = getRecordsByOwner(userId).plus(followedUsersRecords)
+//            .sortedWith(compareByDescending<RecordDto> { it.date }.thenByDescending { it.id })
 
         /*ctx.request.queryParameters["startDate"]?.let { queryParam ->
             val startDate = LocalDate.parse(queryParam, DateTimeFormatter.ISO_LOCAL_DATE)
@@ -52,6 +49,6 @@ class RecordController(
             }
         }*/
 
-        ctx.respond(HttpStatusCode.OK, totalRecords)
+        ctx.respond(HttpStatusCode.OK, allRecords)
     }
 }

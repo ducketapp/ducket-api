@@ -18,9 +18,9 @@ class TransactionController(
 
     suspend fun getTransaction(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id
-        val transactionId = ctx.parameters.getOrFail("transactionId")
+        val transactionId = ctx.parameters.getOrFail("transactionId").toLong()
 
-        transactionService.getTransaction(userId, transactionId).apply {
+        transactionService.getTransactionDetailsAccessibleToUser(userId, transactionId).apply {
             ctx.respond(HttpStatusCode.OK, this)
         }
     }
@@ -37,7 +37,7 @@ class TransactionController(
 
     suspend fun deleteTransaction(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id
-        val transactionId = ctx.parameters.getOrFail("transactionId")
+        val transactionId = ctx.parameters.getOrFail("transactionId").toLong()
 
         transactionService.deleteTransaction(userId, transactionId).apply {
             ctx.respond(HttpStatusCode.NoContent)
@@ -56,10 +56,10 @@ class TransactionController(
 
     suspend fun uploadTransactionAttachments(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id
-        val transactionId = ctx.parameters.getOrFail("transactionId")
+        val transactionId = ctx.parameters.getOrFail("transactionId").toLong()
 
         transactionService.uploadTransactionAttachments(userId, transactionId, ctx.receiveMultipart().readAllParts()).apply {
-            transactionService.getTransaction(userId, transactionId).apply {
+            transactionService.getTransactionDetailsAccessibleToUser(userId, transactionId).apply {
                 ctx.respond(HttpStatusCode.OK, this)
             }
         }
@@ -67,10 +67,11 @@ class TransactionController(
 
     suspend fun downloadTransactionAttachment(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id
-        val transactionId = ctx.parameters.getOrFail("transactionId")
-        val attachmentId = ctx.parameters.getOrFail("attachmentId")
+        val transactionId = ctx.parameters.getOrFail("transactionId").toLong()
+        val attachmentId = ctx.parameters.getOrFail("imageId").toLong()
+        val ownerId = ctx.request.queryParameters["ownerId"]?.toLong() ?: userId
 
-        transactionService.downloadTransactionAttachment(userId, transactionId, attachmentId).apply {
+        transactionService.downloadTransactionAttachment(ownerId, transactionId, attachmentId).apply {
             ctx.response.header("Content-Disposition", "attachment; filename=\"${this.name}\"")
             ctx.respondFile(this)
         }
@@ -78,8 +79,8 @@ class TransactionController(
 
     suspend fun deleteTransactionAttachment(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id
-        val transactionId = ctx.parameters.getOrFail("transactionId")
-        val attachmentId = ctx.parameters.getOrFail("attachmentId")
+        val transactionId = ctx.parameters.getOrFail("transactionId").toLong()
+        val attachmentId = ctx.parameters.getOrFail("imageId").toLong()
 
         transactionService.deleteTransactionAttachment(userId, transactionId, attachmentId).apply {
             if (this) ctx.respond(HttpStatusCode.NoContent)

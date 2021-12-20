@@ -5,7 +5,7 @@ import domain.model.category.Category
 import domain.model.category.CategoryGroup
 
 data class TypedCategoryDto(@JsonIgnore val category: Category) {
-    val id: String = category.id
+    val id: Long = category.id
     val name: String = category.name
     val group: CategoryGroup = category.group
 }

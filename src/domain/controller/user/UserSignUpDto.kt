@@ -6,7 +6,7 @@ data class UserSignUpDto(
     val name: String,
     val phone: String?,
     val email: String,
-    val currencyId: String,
+    val currencyId: Long,
     val password: String,
 ) {
     fun validate(): UserSignUpDto {
@@ -14,7 +14,7 @@ data class UserSignUpDto(
             validate(UserSignUpDto::name).isNotBlank().hasSize(2, 45)
             validate(UserSignUpDto::phone).isNotEmpty().startsWith("+").hasSize(11)
             validate(UserSignUpDto::email).isNotBlank().isEmail()
-            validate(UserSignUpDto::currencyId).isNotBlank()
+            validate(UserSignUpDto::currencyId).isNotZero().isPositive()
             validate(UserSignUpDto::password).isNotBlank().hasSize(4, 16)
         }
         return this

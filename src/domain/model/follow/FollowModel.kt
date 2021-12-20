@@ -6,19 +6,22 @@ import domain.model.user.UsersTable
 import io.ducket.api.domain.model.StringIdTable
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
+import org.jetbrains.exposed.dao.LongEntity
+import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.`java-time`.timestamp
 import java.time.Instant
 
-internal object FollowsTable : StringIdTable("follow") {
+internal object FollowsTable : LongIdTable("follow") {
     val followerUserId = reference("follower_id", UsersTable)
     val followedUserId = reference("followed_id", UsersTable)
-    val isPending = bool("followed_id").default(true)
+    val isPending = bool("is_pending").default(true)
     val createdAt = timestamp("created_at")
 }
 
-class FollowEntity(id: EntityID<String>) : Entity<String>(id) {
-    companion object : EntityClass<String, FollowEntity>(FollowsTable)
+class FollowEntity(id: EntityID<Long>) : LongEntity(id) {
+    companion object : LongEntityClass<FollowEntity>(FollowsTable)
 
     var followerUser by UserEntity referencedOn FollowsTable.followerUserId
     var followedUser by UserEntity referencedOn FollowsTable.followedUserId
@@ -35,7 +38,7 @@ class FollowEntity(id: EntityID<String>) : Entity<String>(id) {
 }
 
 data class Follow(
-    val id: String,
+    val id: Long,
     val follower: User,
     val followed: User,
     val isPending: Boolean,

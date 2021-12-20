@@ -3,6 +3,7 @@ package io.ducket.api.domain.controller.account
 import io.ducket.api.config.JwtConfig
 import io.ducket.api.domain.service.AccountService
 import io.ducket.api.domain.service.ImportService
+import io.ducket.api.domain.service.UserService
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
@@ -18,17 +19,17 @@ class AccountController(
 
     suspend fun getAccountDetails(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id
-        val accountId = ctx.parameters.getOrFail("accountId")
+        val accountId = ctx.parameters.getOrFail("accountId").toLong()
 
-        val account = accountService.getAccountDetails(userId, accountId)
+        val account = accountService.getAccountDetailsAccessibleToUser(userId, accountId)
         ctx.respond(HttpStatusCode.OK, account)
     }
 
     suspend fun getAccounts(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id
+        val allAccounts = accountService.getAccountsAccessibleToUser(userId)
 
-        val accounts = accountService.getAccounts(userId)
-        ctx.respond(HttpStatusCode.OK, accounts)
+        ctx.respond(HttpStatusCode.OK, allAccounts)
     }
 
     suspend fun createAccount(ctx: ApplicationCall) {
@@ -43,7 +44,7 @@ class AccountController(
 
     suspend fun updateAccount(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id
-        val accountId = ctx.parameters.getOrFail("accountId")
+        val accountId = ctx.parameters.getOrFail("accountId").toLong()
 
         ctx.receive<AccountUpdateDto>().apply {
             accountService.updateAccount(userId, accountId, this.validate()).apply {
@@ -54,7 +55,7 @@ class AccountController(
 
     suspend fun deleteAccount(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id
-        val accountId = ctx.parameters.getOrFail("accountId")
+        val accountId = ctx.parameters.getOrFail("accountId").toLong()
 
         if (accountService.deleteAccount(userId, accountId)) ctx.respond(HttpStatusCode.NoContent)
         else ctx.respond(HttpStatusCode.UnprocessableEntity)
@@ -62,7 +63,7 @@ class AccountController(
 
     suspend fun importAccountTransactions(ctx: ApplicationCall) {
         val userId = JwtConfig.getPrincipal(ctx.authentication).id
-        val accountId = ctx.parameters.getOrFail("accountId")
+        val accountId = ctx.parameters.getOrFail("accountId").toLong()
 
         val payloadMultiparts = ctx.receiveMultipart().readAllParts()
 

@@ -8,8 +8,8 @@ import io.ktor.routing.*
 fun Route.accounts(accountController: AccountController) {
     authenticate {
         route("/accounts") {
-            post { accountController.createAccount(this.context) }
             get { accountController.getAccounts(this.context) }
+            post { accountController.createAccount(this.context) }
 
             route("/{accountId}") {
                 get { accountController.getAccountDetails(this.context) }

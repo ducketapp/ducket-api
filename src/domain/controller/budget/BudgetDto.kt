@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import io.ducket.api.InstantSerializer
 import io.ducket.api.domain.controller.account.AccountDto
-import io.ducket.api.domain.controller.account.CurrencyDto
+import io.ducket.api.domain.controller.currency.CurrencyDto
 import io.ducket.api.domain.controller.category.TypelessCategoryDto
 import io.ducket.api.domain.controller.user.UserDto
 import io.ducket.api.domain.model.budget.Budget
@@ -18,7 +18,7 @@ data class BudgetDto(
     @JsonIgnore val progressDto: BudgetProgressDto,
     @JsonIgnore val periodDto: BudgetPeriodBoundsDto? = null,
 ) {
-    val id: String = budget.id
+    val id: Long = budget.id
     val isClosed: Boolean = budget.isClosed
     val period: BudgetPeriodBoundsDto? = periodDto
     val name: String = budget.name

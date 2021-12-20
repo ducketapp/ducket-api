@@ -13,7 +13,7 @@ class CategoryService(private val categoryRepository: CategoryRepository) {
             .map { GroupedCategoryDto(it.key, it.value) }
     }
 
-    fun getCategory(id: String): TypedCategoryDto {
+    fun getCategory(id: Long): TypedCategoryDto {
         return categoryRepository.findById(id)?.let { TypedCategoryDto(it) }
             ?: throw NoEntityFoundError("No such category was found")
     }

@@ -11,16 +11,20 @@ import io.ducket.api.domain.model.budget.*
 import io.ducket.api.domain.model.budget.BudgetsTable
 import io.ducket.api.getLogger
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.or
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Instant
 import java.util.*
 
-class BudgetRepository {
-    private val logger = getLogger()
+class BudgetRepository(
+    private val userRepository: UserRepository,
+) {
 
-    fun create(userId: String, currencyId: String, dto: BudgetCreateDto): Budget = transaction {
+    fun create(userId: Long, currencyId: Long, dto: BudgetCreateDto): Budget = transaction {
         val newBudget = BudgetEntity.new {
             name = dto.name
             category = CategoryEntity[dto.categoryId]
@@ -43,23 +47,34 @@ class BudgetRepository {
         return@transaction newBudget
     }
 
-    fun findOne(userId: String, budgetId: String): Budget? = transaction {
+    fun findOne(userId: Long, budgetId: Long): Budget? = transaction {
         BudgetEntity.find {
             BudgetsTable.userId.eq(userId).and(BudgetsTable.id.eq(budgetId))
         }.firstOrNull()?.toModel()
     }
 
-    fun findOneByName(userId: String, name: String): Budget? = transaction {
+    fun findOneByName(userId: Long, name: String): Budget? = transaction {
         BudgetEntity.find {
             BudgetsTable.userId.eq(userId).and(BudgetsTable.name.eq(name))
         }.firstOrNull()?.toModel()
     }
 
-    fun findAll(userId: String): List<Budget> = transaction {
+    fun findAll(userId: Long): List<Budget> = transaction {
         BudgetEntity.find { BudgetsTable.userId.eq(userId) }.map { it.toModel() }
     }
 
-    fun delete(userId: String, vararg budgetIds: String): Unit = transaction {
+    fun findAllIncludingObserved(userId: Long): List<Budget> = transaction {
+        val followedUsers = userRepository.findUsersFollowingByUser(userId)
+
+        BudgetEntity.wrapRows(
+            BudgetsTable.select {
+                BudgetsTable.userId.eq(userId)
+                    .or(BudgetsTable.userId.inList(followedUsers.map { it.id }))
+            }
+        ).toList().map { it.toModel() }
+    }
+
+    fun delete(userId: Long, vararg budgetIds: Long): Unit = transaction {
         budgetIds.forEach { id ->
             BudgetEntity.find {
                 BudgetsTable.id.eq(id).and(BudgetsTable.userId.eq(userId))

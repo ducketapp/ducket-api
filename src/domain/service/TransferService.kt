@@ -14,18 +14,24 @@ import java.math.BigDecimal
 class TransferService(
     private val transferRepository: TransferRepository,
     private val accountRepository: AccountRepository,
+    private val accountService: AccountService,
 ): FileService() {
 
-    fun getTransfers(userId: String): List<TransferDto> {
-        return transferRepository.findAllByUserId(userId).map { TransferDto(it) }
-    }
-
-    fun getTransfer(userId: String, transferId: String): TransferDto {
-        return transferRepository.findOne(userId, transferId)?.let { TransferDto(it) }
+    fun getTransferDetailsAccessibleToUser(userId: Long, transferId: Long): TransferDto {
+        return getTransfersAccessibleToUser(userId).firstOrNull { it.id == transferId }
             ?: throw NoEntityFoundError("No such transfer was found")
     }
 
-    fun addTransfer(userId: String, reqObj: TransferCreateDto): List<TransferDto> {
+    fun getTransfersAccessibleToUser(userId: Long): List<TransferDto> {
+        return transferRepository.findAllIncludingObserved(userId)
+            .map { TransferDto(it) }
+            .onEach {
+                it.account.balance = accountService.calculateBalance(it.account.owner.id, it.account.id, it.date)
+                it.transferAccount.balance = accountService.calculateBalance(it.account.owner.id, it.transferAccount.id, it.date)
+            }
+    }
+
+    fun addTransfer(userId: Long, reqObj: TransferCreateDto): List<TransferDto> {
         val fromAccount = accountRepository.findOne(userId, reqObj.accountId) ?: throw NoEntityFoundError("Origin account was not found")
         val toAccount = accountRepository.findOne(userId, reqObj.transferAccountId) ?: throw NoEntityFoundError("Target account was not found")
 
@@ -33,7 +39,7 @@ class TransferService(
 
         if (reqObj.exchangeRate == null) {
             if (fromAccount.currency.id != toAccount.currency.id) {
-                exchangeRate = ExchangeRateClient.getRate(fromAccount.currency.isoCode, toAccount.currency.isoCode)
+                exchangeRate = ExchangeRateClient.getExchangeRate(fromAccount.currency.isoCode, toAccount.currency.isoCode)
             }
         } else {
             if (fromAccount.currency.id == toAccount.currency.id && exchangeRate != BigDecimal.ONE) {
@@ -44,19 +50,20 @@ class TransferService(
         return transferRepository.create(userId, reqObj, exchangeRate).map { TransferDto(it) }
     }
 
-    fun deleteTransfer(userId: String, transferId: String) {
+    fun deleteTransfer(userId: Long, transferId: Long) {
         val transfer = transferRepository.findOne(userId, transferId) ?: throw NoEntityFoundError("No such transfer was found")
         transferRepository.delete(userId, transfer.relationId)
     }
 
-    fun downloadTransferAttachment(userId: String, entityId: String, attachmentId: String): File {
-        transferRepository.findOne(userId, entityId) ?: throw NoEntityFoundError("No such transfer was found")
-        val attachment = transferRepository.findAttachment(userId, entityId, attachmentId) ?: throw NoEntityFoundError("No such attachment was found")
+    fun downloadTransferAttachment(userId: Long, entityId: Long, attachmentId: Long): File {
+        val transfer = getTransferDetailsAccessibleToUser(userId, entityId)
+        val attachment = transferRepository.findAttachment(transfer.owner.id, entityId, attachmentId)
+            ?: throw NoEntityFoundError("No such attachment was found")
 
         return getLocalFile(attachment.filePath) ?: throw NoEntityFoundError("No such file was found")
     }
 
-    fun uploadTransferAttachments(userId: String, entityId: String, multipartData: List<PartData>) {
+    fun uploadTransferAttachments(userId: Long, entityId: Long, multipartData: List<PartData>) {
         transferRepository.findOne(userId, entityId) ?: throw NoEntityFoundError("No such transfer was found")
 
         val actualAttachmentsAmount = transferRepository.getAttachmentsAmount(entityId)
@@ -68,5 +75,13 @@ class TransferService(
             val newFile = createLocalAttachmentFile(pair.first.extension, pair.second)
             transferRepository.createAttachment(userId, entityId, newFile)
         }
+    }
+
+    fun deleteTransferAttachment(userId: Long, entityId: Long, attachmentId: Long): Boolean {
+        return transferRepository.findAttachment(userId, entityId, attachmentId)?.let { attachment ->
+            transferRepository.deleteAttachment(userId, entityId, attachmentId).takeIf {
+                deleteLocalFile(attachment.filePath)
+            }
+        } ?: throw NoEntityFoundError("No such attachment was found")
     }
 }

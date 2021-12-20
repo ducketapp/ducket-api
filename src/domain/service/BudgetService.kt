@@ -31,7 +31,7 @@ class BudgetService(
 ) {
     private val logger = getLogger()
 
-    fun createBudget(userId: String, reqObj: BudgetCreateDto): BudgetDto {
+    fun createBudget(userId: Long, reqObj: BudgetCreateDto): BudgetDto {
         val currencyId = currencyRepository.findOne(reqObj.currencyIsoCode)?.id
             ?: throw InvalidDataError("Unsupported '${reqObj.currencyIsoCode}' currency code")
 
@@ -47,16 +47,16 @@ class BudgetService(
 
         val budget = budgetRepository.create(userId, currencyId, reqObj)
 
-        return getBudgetDetails(userId, budget.id)
+        return getBudgetDetailsAccessibleToUser(userId, budget.id)
     }
 
-    fun getBudgetDetails(userId: String, budgetId: String): BudgetDto {
-        return getBudgets(userId).firstOrNull { it.id == budgetId }
+    fun getBudgetDetailsAccessibleToUser(userId: Long, budgetId: Long): BudgetDto {
+        return getBudgetsAccessibleToUser(userId).firstOrNull { it.id == budgetId }
             ?: throw NoEntityFoundError("No such budget was found")
     }
 
-    fun getBudgets(userId: String): List<BudgetDto> {
-        return budgetRepository.findAll(userId).map {
+    fun getBudgetsAccessibleToUser(userId: Long): List<BudgetDto> {
+        return budgetRepository.findAllIncludingObserved(userId).map {
             val periodBounds = getBudgetPeriodBounds(it.periodType)
 
             if (periodBounds != null) {
@@ -69,7 +69,7 @@ class BudgetService(
         }
     }
 
-    fun deleteBudget(userId: String, budgetId: String) {
+    fun deleteBudget(userId: Long, budgetId: Long) {
         budgetRepository.delete(userId, budgetId)
     }
 
@@ -86,16 +86,14 @@ class BudgetService(
                     && budget.category.id == transaction.category?.id
         }
 
-        val amount = resolveTransactionsTotalBalance(transactionsInPeriod, budget.currency.isoCode)
-        var progress = BigDecimal.ZERO
-        var spent = BigDecimal.ZERO
-
-        if (amount < BigDecimal.ZERO) {
-            progress = amount * BigDecimal(100) / budget.limit
-            spent = amount
+        return resolveTransactionsTotalBalance(transactionsInPeriod, budget.currency.isoCode).let { amount ->
+            BudgetProgressDto(transactionsInPeriod.size, budget.limit).also {
+                if (amount > BigDecimal.ZERO) {
+                    it.progressPercentage = amount * BigDecimal(100) / budget.limit
+                    it.moneySpent = amount
+                }
+            }
         }
-
-        return BudgetProgressDto(transactionsInPeriod.size, budget.limit, progress, spent)
     }
 
     private fun resolveTransactionsTotalBalance(records: List<RecordDto>, currencyIsoCode: String): BigDecimal {
@@ -104,7 +102,7 @@ class BudgetService(
 
             if (recordCurrencyIsoCode != currencyIsoCode) {
                 try {
-                    val rate = ExchangeRateClient.getRate(recordCurrencyIsoCode, currencyIsoCode)
+                    val rate = ExchangeRateClient.getExchangeRate(recordCurrencyIsoCode, currencyIsoCode)
                     return@map it.amount * rate
                 } catch (e: ExchangeRateClient.ExchangeRateClientException) {
                     logger.error("Cannot convert record amount: $it")

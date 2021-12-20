@@ -9,41 +9,66 @@ import io.ducket.api.plugins.NoEntityFoundError
 import io.ktor.http.content.*
 import java.io.File
 
-class TransactionService(private val transactionRepository: TransactionRepository): FileService() {
+class TransactionService(
+    private val transactionRepository: TransactionRepository,
+    private val accountService: AccountService,
+): FileService() {
 
-    fun getTransaction(userId: String, transactionId: String): TransactionDto {
-        return transactionRepository.findOne(userId, transactionId)?.let { TransactionDto(it) }
+    /**
+     * Find the user's transaction among all the transactions, including observed ones
+     */
+    fun getTransactionDetailsAccessibleToUser(userId: Long, transactionId: Long): TransactionDto {
+        return getTransactionsAccessibleToUser(userId).firstOrNull { it.id == transactionId }
             ?: throw NoEntityFoundError("No such transaction was found")
     }
 
-    fun getTransactions(userId: String): List<TransactionDto> {
-        return transactionRepository.findAll(userId).map { TransactionDto(it) }
+    /**
+     * Find all the user's transactions, including observed ones
+     */
+    fun getTransactionsAccessibleToUser(userId: Long): List<TransactionDto> {
+        return transactionRepository.findAllIncludingObserved(userId)
+            .map { TransactionDto(it) }
+            .onEach {
+                it.account.balance = accountService.calculateBalance(it.account.owner.id, it.account.id, it.date)
+            }
     }
 
-    fun addTransaction(userId: String, reqObj: TransactionCreateDto): TransactionDto {
-        val newTransaction = transactionRepository.create(userId, reqObj)
-        return TransactionDto(newTransaction)
+    /**
+     * Add new transaction
+     */
+    fun addTransaction(userId: Long, reqObj: TransactionCreateDto): TransactionDto {
+        return TransactionDto(transactionRepository.create(userId, reqObj))
     }
 
-    fun deleteTransaction(userId: String, transactionId: String) {
+    /**
+     * Delete one transaction
+     */
+    fun deleteTransaction(userId: Long, transactionId: Long) {
         transactionRepository.delete(userId, transactionId)
     }
 
-    fun deleteTransactions(userId: String, reqObj: TransactionDeleteDto) {
-        transactionRepository.delete(userId, *reqObj.transactionIds.toTypedArray())
+    /**
+     * Delete multiple transactions
+     */
+    fun deleteTransactions(userId: Long, reqObj: TransactionDeleteDto) {
+        transactionRepository.delete(userId, *reqObj.transactionIds.toLongArray())
     }
 
-    fun downloadTransactionAttachment(userId: String, transactionId: String, attachmentId: String): File {
-        transactionRepository.findOne(userId, transactionId)
-            ?: throw NoEntityFoundError("No such transaction was found")
-
-        val attachment = transactionRepository.findAttachment(userId, transactionId, attachmentId)
+    /**
+     * Download transaction attachment file, including observed ones
+     */
+    fun downloadTransactionAttachment(userId: Long, transactionId: Long, attachmentId: Long): File {
+        val transaction = getTransactionDetailsAccessibleToUser(userId, transactionId)
+        val attachment = transactionRepository.findAttachment(transaction.owner.id, transactionId, attachmentId)
             ?: throw NoEntityFoundError("No such attachment was found")
 
         return getLocalFile(attachment.filePath) ?: throw NoEntityFoundError("No such file was found")
     }
 
-    fun uploadTransactionAttachments(userId: String, transactionId: String, multipartData: List<PartData>) {
+    /**
+     * Upload transaction attachment file
+     */
+    fun uploadTransactionAttachments(userId: Long, transactionId: Long, multipartData: List<PartData>) {
         transactionRepository.findOne(userId, transactionId) ?: throw NoEntityFoundError("No such transaction was found")
 
         val actualAttachmentsAmount = transactionRepository.getAttachmentsAmount(transactionId)
@@ -57,7 +82,10 @@ class TransactionService(private val transactionRepository: TransactionRepositor
         }
     }
 
-    fun deleteTransactionAttachment(userId: String, transactionId: String, attachmentId: String): Boolean {
+    /**
+     * Delete attachment from transaction
+     */
+    fun deleteTransactionAttachment(userId: Long, transactionId: Long, attachmentId: Long): Boolean {
         return transactionRepository.findAttachment(userId, transactionId, attachmentId)?.let { attachment ->
             transactionRepository.deleteAttachment(userId, transactionId, attachmentId).takeIf {
                 deleteLocalFile(attachment.filePath)

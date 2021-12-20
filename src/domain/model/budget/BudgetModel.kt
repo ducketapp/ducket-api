@@ -14,11 +14,12 @@ import domain.model.user.UsersTable
 import io.ducket.api.domain.model.StringIdTable
 import org.jetbrains.exposed.dao.*
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.`java-time`.timestamp
 import java.math.BigDecimal
 import java.time.Instant
 
-internal object BudgetsTable : StringIdTable("budget") {
+internal object BudgetsTable : LongIdTable("budget") {
     val userId = reference("user_id", UsersTable)
     val currencyId = reference("currency_id", CurrenciesTable)
     val categoryId = reference("category_id", CategoriesTable)
@@ -31,8 +32,8 @@ internal object BudgetsTable : StringIdTable("budget") {
     val modifiedAt = timestamp("modified_at")
 }
 
-class BudgetEntity(id: EntityID<String>) : Entity<String>(id) {
-    companion object : EntityClass<String, BudgetEntity>(BudgetsTable)
+class BudgetEntity(id: EntityID<Long>) : LongEntity(id) {
+    companion object : LongEntityClass<BudgetEntity>(BudgetsTable)
 
     var user by UserEntity referencedOn BudgetsTable.userId
     var currency by CurrencyEntity referencedOn BudgetsTable.currencyId
@@ -65,7 +66,7 @@ class BudgetEntity(id: EntityID<String>) : Entity<String>(id) {
 }
 
 data class Budget(
-    val id: String,
+    val id: Long,
     val accounts: List<Account>,
     val category: Category,
     val currency: Currency,

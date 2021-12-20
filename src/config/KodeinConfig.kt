@@ -3,7 +3,7 @@ package io.ducket.api.config
 import io.ducket.api.domain.controller.account.AccountController
 import io.ducket.api.domain.controller.budget.BudgetController
 import io.ducket.api.domain.controller.category.CategoryController
-import io.ducket.api.domain.controller.label.LabelController
+import io.ducket.api.domain.controller.currency.CurrencyController
 import io.ducket.api.domain.controller.record.RecordController
 import io.ducket.api.domain.controller.transaction.TransactionController
 import io.ducket.api.domain.controller.transfer.TransferController
@@ -26,25 +26,18 @@ object KodeinConfig {
 
     private val accountModule = Kodein.Module(name = "accountModule") {
         bind() from singleton { AccountController(instance(), instance()) }
-        bind() from singleton { AccountService(instance(), instance(), instance()) }
-        bind() from singleton { AccountRepository() }
-        bind() from singleton { CurrencyRepository() }
+        bind() from singleton { AccountService(instance(), instance(), instance(), instance()) }
+        bind() from singleton { AccountRepository(instance()) }
     }
 
     private val recordModule = Kodein.Module(name = "recordModule") {
         bind() from singleton { RecordController(instance(), instance(), instance()) }
         bind() from singleton { TransactionController(instance(), instance()) }
         bind() from singleton { TransferController(instance(), instance()) }
-        bind() from singleton { TransactionService(instance()) }
-        bind() from singleton { TransferService(instance(), instance()) }
-        bind() from singleton { TransactionRepository() }
-        bind() from singleton { TransferRepository() }
-    }
-
-    private val labelModule = Kodein.Module(name = "labelModule") {
-        bind() from singleton { LabelController(instance()) }
-        bind() from singleton { LabelService(instance()) }
-        bind() from singleton { LabelRepository() }
+        bind() from singleton { TransactionService(instance(), instance()) }
+        bind() from singleton { TransferService(instance(), instance(), instance()) }
+        bind() from singleton { TransactionRepository(instance()) }
+        bind() from singleton { TransferRepository(instance()) }
     }
 
     private val categoryModule = Kodein.Module(name = "categoryModule") {
@@ -56,22 +49,28 @@ object KodeinConfig {
     private val budgetModule = Kodein.Module(name = "budgetModule") {
         bind() from singleton { BudgetController(instance()) }
         bind() from singleton { BudgetService(instance(), instance(), instance(), instance(), instance(), instance()) }
-        bind() from singleton { BudgetRepository() }
+        bind() from singleton { BudgetRepository(instance()) }
     }
 
     private val importModule = Kodein.Module(name = "importModule") {
         bind() from singleton { ImportService(instance(), instance(), instance(), instance()) }
         bind() from singleton { ImportRepository() }
-        bind() from singleton { RuleRepository() }
+        bind() from singleton { ImportRuleRepository() }
+    }
+
+    private val currencyModule = Kodein.Module(name = "currencyModule") {
+        bind() from singleton { CurrencyController(instance()) }
+        bind() from singleton { CurrencyService(instance()) }
+        bind() from singleton { CurrencyRepository() }
     }
 
     internal val kodein = Kodein {
         import(userModule)
         import(accountModule)
         import(recordModule)
-        import(labelModule)
         import(categoryModule)
         import(budgetModule)
         import(importModule)
+        import(currencyModule)
     }
 }

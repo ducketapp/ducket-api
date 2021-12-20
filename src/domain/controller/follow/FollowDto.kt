@@ -9,9 +9,10 @@ import io.ducket.api.domain.model.follow.Follow
 import java.time.Instant
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-class FollowerDto(@JsonIgnore val follow: Follow) {
+class FollowDto(@JsonIgnore private val follow: Follow) {
     val id: Long = follow.id
-    val followerUser: UserDto = UserDto(follow.follower)
+    val followed: UserDto = UserDto(follow.followed)
+    val follower: UserDto = UserDto(follow.follower)
     val isPending: Boolean = follow.isPending
     @JsonSerialize(using = InstantSerializer::class) val createdAt: Instant = follow.createdAt
 }

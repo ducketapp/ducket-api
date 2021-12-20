@@ -9,8 +9,8 @@ import java.time.Instant
 
 data class TransferCreateDto(
     var amount: BigDecimal,
-    val accountId: String,
-    val transferAccountId: String,
+    val accountId: Long,
+    val transferAccountId: Long,
     val note: String?,
     val longitude: String?,
     val latitude: String?,
@@ -21,8 +21,8 @@ data class TransferCreateDto(
         org.valiktor.validate(this) {
             validate(TransferCreateDto::exchangeRate).isGreaterThan(BigDecimal.ZERO)
             validate(TransferCreateDto::date).isLessThanOrEqualTo(Instant.now())
-            validate(TransferCreateDto::accountId).isNotBlank()
-            validate(TransferCreateDto::transferAccountId).isNotBlank()
+            validate(TransferCreateDto::accountId).isNotZero().isPositive()
+            validate(TransferCreateDto::transferAccountId).isNotZero().isPositive()
             validate(TransferCreateDto::note).isNotEmpty()
             validate(TransferCreateDto::longitude).isNotEmpty()
             validate(TransferCreateDto::latitude).isNotEmpty()

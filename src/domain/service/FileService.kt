@@ -88,7 +88,7 @@ abstract class FileService {
     }
 
     protected fun createLocalAttachmentFile(extension: String, content: ByteArray): File {
-        return createLocalFile("uploads", extension, content)
+        return createLocalFile("images", extension, content)
     }
 
     protected fun createLocalImportFile(extension: String, content: ByteArray): File {
@@ -97,7 +97,7 @@ abstract class FileService {
 
     private fun createLocalFile(dir: String, extension: String, content: ByteArray): File {
         val fileName = "${Instant.now().toEpochMilli()}_${(1000..9999).random()}.$extension"
-        val file = File("resources/$dir/$fileName")
+        val file = File("resources/files/$dir/$fileName")
 
         logger.debug("Create local file: ${file.path}")
         file.writeBytes(content)

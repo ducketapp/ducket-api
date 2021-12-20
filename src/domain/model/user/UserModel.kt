@@ -9,10 +9,11 @@ import io.ducket.api.domain.model.attachment.AttachmentEntity
 import io.ducket.api.domain.model.user.UserAttachmentsTable
 import org.jetbrains.exposed.dao.*
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.`java-time`.timestamp
 import java.time.Instant
 
-internal object UsersTable : StringIdTable("user") {
+internal object UsersTable : LongIdTable("user") {
     val phone = varchar("phone", 32).nullable().uniqueIndex()
     val email = varchar("email", 128).uniqueIndex()
     val name = varchar("name", 64)
@@ -22,8 +23,8 @@ internal object UsersTable : StringIdTable("user") {
     val modifiedAt = timestamp("modified_at")
 }
 
-class UserEntity(id: EntityID<String>) : Entity<String>(id) {
-    companion object : EntityClass<String, UserEntity>(UsersTable)
+class UserEntity(id: EntityID<Long>) : LongEntity(id) {
+    companion object : LongEntityClass<UserEntity>(UsersTable)
 
     var phone by UsersTable.phone
     var name by UsersTable.name
@@ -49,7 +50,7 @@ class UserEntity(id: EntityID<String>) : Entity<String>(id) {
 }
 
 data class User(
-    val id: String,
+    val id: Long,
     val phone: String?,
     val name: String,
     val email: String,

@@ -5,6 +5,8 @@ import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import io.ducket.api.domain.repository.UserRepository
 import io.ducket.api.plugins.AuthenticationException
+import io.ducket.api.plugins.AuthorizationException
+import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
 
@@ -18,7 +20,7 @@ object JwtConfig {
     val verifier: JWTVerifier = JWT.require(algorithm).withIssuer(issuer).build()
 
     fun getPrincipal(authContext: AuthenticationContext): UserPrincipal {
-        return authContext.principal() ?: throw AuthenticationException("Invalid auth token content")
+        return authContext.principal() ?: throw AuthenticationException("Invalid auth token data")
     }
 
     fun generateToken(userPrincipal: UserPrincipal): String {
@@ -31,10 +33,11 @@ object JwtConfig {
     }
 
     fun validateToken(jwtCredential: JWTCredential): UserPrincipal {
-        val jwtUserId = jwtCredential.payload.getClaim("id").asString()
+        val jwtUserId = jwtCredential.payload.getClaim("id").asLong()
         val jwtUserEmail = jwtCredential.payload.getClaim("email").asString()
 
-        return UserRepository().findOne(jwtUserId)?.let { UserPrincipal(jwtUserId, jwtUserEmail) }
-            ?: throw AuthenticationException("Invalid auth token: user not found")
+        return UserRepository().findOne(jwtUserId)?.let {
+            UserPrincipal(jwtUserId, jwtUserEmail)
+        } ?: throw AuthenticationException("Invalid auth token: user not found")
     }
 }

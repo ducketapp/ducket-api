@@ -9,27 +9,26 @@ import domain.model.imports.ImportsTable
 import domain.model.transaction.Transaction
 import domain.model.transaction.TransactionEntity
 import domain.model.user.UserEntity
-import io.ducket.api.domain.controller.imports.CsvTransaction
+import io.ducket.api.domain.controller.imports.CsvTransactionDto
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
 import java.time.Instant
-import java.util.*
 
 
 class ImportRepository {
 
-    fun getAllByUserId(userId: String): List<Import> = transaction {
+    fun getAllByUserId(userId: Long): List<Import> = transaction {
         ImportEntity.find { ImportsTable.userId.eq(userId) }.map { it.toModel() }
     }
 
-    fun getOneByUserId(userId: String): Import? = transaction {
+    fun getOneByUserId(userId: Long): Import? = transaction {
         ImportEntity.find { ImportsTable.userId.eq(userId) }.firstOrNull()?.toModel()
     }
 
     fun importTransactions(
-        userId: String,
-        accountId: String,
-        csvTransactions: List<CsvTransaction>,
+        userId: Long,
+        accountId: Long,
+        csvTransactions: List<CsvTransactionDto>,
         importFile: File,
     ): List<Transaction> = transaction {
 
@@ -47,8 +46,8 @@ class ImportRepository {
                 import = importEntity
                 amount = csvTransaction.amount
                 date = csvTransaction.date
-                payee = csvTransaction.beneficiaryOrSender
-                notes = csvTransaction.notes
+                payeeOrPayer = csvTransaction.beneficiaryOrSender
+                notes = csvTransaction.description
                 longitude = null
                 latitude = null
                 createdAt = Instant.now()

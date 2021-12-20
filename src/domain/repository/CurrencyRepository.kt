@@ -10,4 +10,8 @@ class CurrencyRepository {
     fun findOne(currencyIsoCode: String): Currency? = transaction {
         CurrencyEntity.find { CurrenciesTable.isoCode.eq(currencyIsoCode) }.firstOrNull()?.toModel()
     }
+
+    fun findAll(): List<Currency> = transaction {
+        CurrencyEntity.all().map { it.toModel() }
+    }
 }
