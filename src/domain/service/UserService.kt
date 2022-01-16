@@ -17,9 +17,7 @@ import io.ducket.api.plugins.AuthenticationException
 import io.ducket.api.plugins.DuplicateEntityError
 import io.ducket.api.plugins.InvalidDataError
 import io.ducket.api.plugins.NoEntityFoundError
-import io.ktor.http.content.*
 import org.mindrot.jbcrypt.BCrypt
-import java.io.File
 
 class UserService(
     private val userRepository: UserRepository,
@@ -78,31 +76,6 @@ class UserService(
 
     fun deleteUserData(userId: Long): Boolean {
         return userRepository.deleteUserData(userId)
-    }
-
-    fun deleteUserImage(userId: Long, imageId: Long): Boolean {
-        return userRepository.findImage(userId, imageId)?.let { image ->
-            userRepository.deleteImage(imageId).takeIf {
-                deleteLocalFile(image.filePath)
-            }
-        } ?: throw NoEntityFoundError("No such image was found")
-    }
-
-    fun downloadUserImage(userId: Long, imageId: Long): File {
-        val image = userRepository.findImage(userId, imageId)
-            ?: throw NoEntityFoundError("No such image was found")
-
-        return getLocalFile(image.filePath)
-            ?: throw NoEntityFoundError("No such file was found")
-    }
-
-    fun uploadUserImage(userId: Long, multipartData: List<PartData>) {
-        val files = pullAttachments(multipartData)
-            .takeIf { it.size == 1 } ?: throw InvalidDataError("Only 1 image is allowed")
-
-        val newFile = createLocalAttachmentFile(files[0].first.extension, files[0].second)
-
-        userRepository.createImage(userId, newFile)
     }
 
     fun createUserFollowRequest(userId: Long, userToFollowId: Long) : FollowedDto {

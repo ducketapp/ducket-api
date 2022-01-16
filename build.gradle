@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        kotlin_version = "1.4.32"
+        kotlin_version = "1.6.10"
         logback_version = "1.2.1"
         log4j_version = "2.14.1"
         ktor_version = "1.5.1"
@@ -8,27 +8,39 @@ buildscript {
         kodein_version = "6.1.0"
         hikaricp_version = "3.4.5"
         exposed_version = "0.31.1"
-        junit_version = "4.12"
         unirest_version = "1.4.9"
+        flyway_version = "8.1.0"
     }
 
     repositories {
         mavenLocal()
         mavenCentral()
-        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.1"
+        classpath "gradle.plugin.org.flywaydb:gradle-plugin-publishing:8.3.0"
     }
 }
 
 apply plugin: 'kotlin'
 apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: "org.flywaydb.flyway"
 
 group 'io.ducket.api'
 version '0.0.1'
 mainClassName = "io.ktor.server.netty.EngineMain"
+
+shadowJar {
+    manifest {
+        attributes 'Main-Class': 'io.ktor.server.netty.EngineMain'
+    }
+}
 
 compileKotlin {
     kotlinOptions {
@@ -46,13 +58,24 @@ sourceSets {
 repositories {
     mavenLocal()
     mavenCentral()
-    jcenter()
+}
+
+tasks.named("shadowJar") {
+    dependsOn tasks.named("test")
+}
+
+test {
+    useJUnitPlatform()
 }
 
 dependencies {
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     implementation "org.kodein.di:kodein-di-generic-jvm:$kodein_version"
+
+    // Koin DI
+    implementation "io.insert-koin:koin-ktor:3.1.4"
+    implementation "io.insert-koin:koin-logger-slf4j:3.1.4"
 
     // csv
     implementation "org.apache.commons:commons-csv:1.5"
@@ -89,21 +112,16 @@ dependencies {
     implementation "io.ktor:ktor-auth:$ktor_version"
     implementation "io.ktor:ktor-auth-jwt:$ktor_version"
 
-    // Exposed offers a database access
+    // Database
+    implementation 'mysql:mysql-connector-java:8.0.11'
+    implementation "com.zaxxer:HikariCP:3.4.5"
     implementation "org.jetbrains.exposed:exposed-core:$exposed_version"
     implementation "org.jetbrains.exposed:exposed-dao:$exposed_version"
     implementation "org.jetbrains.exposed:exposed-jdbc:$exposed_version"
     implementation "org.jetbrains.exposed:exposed-java-time:$exposed_version" // for work with date and time values from db
+    implementation "org.flywaydb:flyway-core:$flyway_version"
 
-    // mysql
-    implementation 'mysql:mysql-connector-java:8.0.11'
-    implementation "org.ktorm:ktorm-core:3.2.0"
-    implementation "org.ktorm:ktorm-support-mysql:3.2.0"
-
-    // JDBC Connection Pool
-    implementation "com.zaxxer:HikariCP:3.4.5"
-
-    // Netty engine, allowing to use server functionality without having to rely on an external app container
+    // Netty engine
     implementation "io.ktor:ktor-server-netty:$ktor_version"
 
     // cio engine
@@ -112,8 +130,6 @@ dependencies {
     // An implementation of SLF4J
     implementation "ch.qos.logback:logback-classic:$logback_version"
     implementation "org.slf4j:jul-to-slf4j:1.7.0"
-//    implementation "org.apache.logging.log4j:log4j-api:$log4j_version"
-//    implementation "org.apache.logging.log4j:log4j-core:$log4j_version"
 
     // client serialization
     implementation "io.ktor:ktor-client-serialization:$ktor_version"
@@ -129,4 +145,10 @@ dependencies {
 
     // allows us to test parts of our Ktor application without having to use the whole HTTP stack in the process
     testImplementation "io.ktor:ktor-server-tests:$ktor_version"
+    testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
+    testImplementation "com.h2database:h2:2.0.204"
+    testImplementation "io.mockk:mockk:1.12.2"
+    testImplementation 'io.kotest:kotest-runner-junit5:5.0.3'
+    testImplementation 'io.kotest:kotest-assertions-core-jvm:5.0.3'
+    testImplementation "org.junit.jupiter:junit-jupiter:5.8.0"
 }

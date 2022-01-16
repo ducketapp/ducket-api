@@ -8,6 +8,5 @@ import io.ducket.api.domain.controller.record.RecordDto
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class TransactionDto(@JsonIgnore val transaction: Transaction): RecordDto(transaction) {
-    val import: ImportDto? = transaction.import?.let { ImportDto(it) }
     val payeeOrPayer: String = transaction.payeeOrPayer
 }

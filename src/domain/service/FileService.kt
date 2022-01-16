@@ -1,13 +1,17 @@
 package io.ducket.api.domain.service
 
+import io.ducket.api.config.DatabaseConfig
 import io.ducket.api.getLogger
 import io.ducket.api.plugins.InvalidDataError
 import io.ktor.http.*
 import io.ktor.http.content.*
+import org.koin.java.KoinJavaComponent
 import java.io.File
+import java.nio.file.Paths
 import java.time.Instant
 
 abstract class FileService {
+    private val dbConfig: DatabaseConfig by KoinJavaComponent.inject(DatabaseConfig::class.java)
     private val logger = getLogger()
 
     protected fun extractImportData(multipartData: List<PartData>): Pair<File, ByteArray> {
@@ -32,7 +36,7 @@ abstract class FileService {
         }
     }
 
-    protected fun pullAttachments(multipartData: List<PartData>): List<Pair<File, ByteArray>> {
+    protected fun extractImagesData(multipartData: List<PartData>): List<Pair<File, ByteArray>> {
         val result = multipartData.mapIndexed { idx, part ->
             if (part is PartData.FileItem) {
                 if (part.name == "file") {
@@ -96,13 +100,16 @@ abstract class FileService {
     }
 
     private fun createLocalFile(dir: String, extension: String, content: ByteArray): File {
-        val fileName = "${Instant.now().toEpochMilli()}_${(1000..9999).random()}.$extension"
-        val file = File("resources/files/$dir/$fileName")
+        val fileName = "${Instant.now().toEpochMilli()}.$extension"
+        val filePath = Paths.get(dbConfig.dataPath, dir, fileName)
+        val localFile = File(filePath.toUri())
 
-        logger.debug("Create local file: ${file.path}")
-        file.writeBytes(content)
+        logger.debug("Create local file: ${localFile.path}")
 
-        return file
+        localFile.parentFile.mkdirs()
+        localFile.writeBytes(content)
+
+        return localFile
     }
 
     private fun bytesToMegabytes(byteArray: ByteArray): Double {

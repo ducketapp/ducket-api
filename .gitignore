@@ -2,8 +2,7 @@
 /.idea
 /out
 /build
-/resources/rates/*
-/resources/uploads/*
+/resources/app/db_data/*
 *.iml
 *.ipr
 *.iws

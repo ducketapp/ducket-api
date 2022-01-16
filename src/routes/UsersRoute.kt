@@ -1,7 +1,12 @@
 package io.ducket.api.routes
 
 import io.ducket.api.domain.controller.user.UserController
+import io.ducket.api.plugins.AuthorizationException
+import io.ducket.api.principalOrThrow
+import io.ktor.application.*
 import io.ktor.auth.*
+import io.ktor.http.*
+import io.ktor.request.*
 import io.ktor.routing.*
 
 fun Route.users(
@@ -39,15 +44,6 @@ fun Route.users(
 
                 route("/followers") {
                     get { userController.getUserFollowers(this.context) }
-                }
-
-                route("/images") {
-                    post { userController.uploadUserImage(this.context) }
-
-                    route("/{imageId}") {
-                        get { userController.downloadUserImage(this.context) }
-                        delete { userController.deleteUserImage(this.context) }
-                    }
                 }
             }
         }

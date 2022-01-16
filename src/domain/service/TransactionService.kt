@@ -72,7 +72,7 @@ class TransactionService(
         transactionRepository.findOne(userId, transactionId) ?: throw NoEntityFoundError("No such transaction was found")
 
         val actualAttachmentsAmount = transactionRepository.getAttachmentsAmount(transactionId)
-        val contentPairList = pullAttachments(multipartData)
+        val contentPairList = extractImagesData(multipartData)
 
         if (contentPairList.size + actualAttachmentsAmount > 3) throw InvalidDataError("Attachments limit exceeded, max 3")
 

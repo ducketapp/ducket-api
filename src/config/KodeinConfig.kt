@@ -18,7 +18,7 @@ import org.kodein.di.generic.singleton
 object KodeinConfig {
 
     private val userModule = Kodein.Module(name = "userModule") {
-        bind() from singleton { UserController(instance(), instance(), instance()) }
+        bind() from singleton { UserController(instance()) }
         bind() from singleton { UserService(instance(), instance(), instance()) }
         bind() from singleton { UserRepository() }
         bind() from singleton { FollowRepository() }

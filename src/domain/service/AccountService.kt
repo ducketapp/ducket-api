@@ -1,6 +1,6 @@
 package io.ducket.api.domain.service
 
-import io.ducket.api.ExchangeRateClient
+import io.ducket.api.CurrencyRatesClient
 import io.ducket.api.domain.controller.account.*
 import io.ducket.api.domain.controller.currency.CurrencyDto
 import io.ducket.api.domain.controller.record.RecordDto
@@ -10,6 +10,7 @@ import io.ducket.api.extension.sumByDecimal
 import io.ducket.api.plugins.DuplicateEntityError
 import io.ducket.api.plugins.InvalidDataError
 import io.ducket.api.plugins.NoEntityFoundError
+import org.koin.java.KoinJavaComponent.inject
 import java.math.BigDecimal
 import java.text.DecimalFormat
 import java.time.Instant
@@ -20,6 +21,7 @@ class AccountService(
     private val transferRepository: TransferRepository,
     private val userRepository: UserRepository,
 ) {
+    private val currencyRatesClient: CurrencyRatesClient by inject(CurrencyRatesClient::class.java)
 
     fun calculateBalance(accountOwnerId: Long, accountId: Long, beforeDate: Instant = Instant.now()): BigDecimal {
         val accountTransactions = transactionRepository.findAllByAccount(accountOwnerId, accountId).map { RecordDto(it) }
@@ -93,7 +95,7 @@ class AccountService(
             if (it.accountCurrency.id != userCurrency.id) {
                 val baseCurrency = it.accountCurrency.isoCode
                 val termCurrency = userCurrency.isoCode
-                rate = ExchangeRateClient.getExchangeRate(baseCurrency, termCurrency)
+                rate = currencyRatesClient.getCurrencyRate(baseCurrency, termCurrency)
 
                 appliedExchangeRates.add(AccountBalanceExchangeRateDto(baseCurrency, termCurrency, rate))
             }

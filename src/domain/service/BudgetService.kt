@@ -1,6 +1,6 @@
 package io.ducket.api.domain.service
 
-import io.ducket.api.ExchangeRateClient
+import io.ducket.api.CurrencyRatesClient
 import io.ducket.api.domain.controller.budget.BudgetCreateDto
 import io.ducket.api.domain.controller.budget.BudgetDto
 import io.ducket.api.domain.controller.budget.BudgetPeriodBoundsDto
@@ -16,6 +16,7 @@ import io.ducket.api.extension.sumByDecimal
 import io.ducket.api.getLogger
 import io.ducket.api.plugins.InvalidDataError
 import io.ducket.api.plugins.NoEntityFoundError
+import org.koin.java.KoinJavaComponent.inject
 import java.math.BigDecimal
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -30,6 +31,7 @@ class BudgetService(
     private val currencyRepository: CurrencyRepository,
 ) {
     private val logger = getLogger()
+    private val currencyRatesClient: CurrencyRatesClient by inject(CurrencyRatesClient::class.java)
 
     fun createBudget(userId: Long, reqObj: BudgetCreateDto): BudgetDto {
         val currencyId = currencyRepository.findOne(reqObj.currencyIsoCode)?.id
@@ -102,9 +104,9 @@ class BudgetService(
 
             if (recordCurrencyIsoCode != currencyIsoCode) {
                 try {
-                    val rate = ExchangeRateClient.getExchangeRate(recordCurrencyIsoCode, currencyIsoCode)
+                    val rate = currencyRatesClient.getCurrencyRate(recordCurrencyIsoCode, currencyIsoCode)
                     return@map it.amount * rate
-                } catch (e: ExchangeRateClient.ExchangeRateClientException) {
+                } catch (e: CurrencyRatesClient.CurrencyRateClientException) {
                     logger.error("Cannot convert record amount: $it")
                     return@map BigDecimal.ZERO
                 }

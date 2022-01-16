@@ -1,21 +1,16 @@
 package io.ducket.api.domain.repository
 
 import domain.model.account.AccountEntity
-import domain.model.transaction.TransactionEntity
-import domain.model.transaction.TransactionsTable
 import domain.model.user.UserEntity
 import io.ducket.api.domain.controller.transfer.TransferCreateDto
 import io.ducket.api.domain.model.attachment.Attachment
 import io.ducket.api.domain.model.attachment.AttachmentEntity
 import io.ducket.api.domain.model.attachment.AttachmentsTable
-import io.ducket.api.domain.model.follow.FollowEntity
-import io.ducket.api.domain.model.follow.FollowsTable
 import io.ducket.api.domain.model.transfer.*
 import io.ducket.api.domain.model.transfer.TransferAttachmentsTable
 import io.ducket.api.domain.model.transfer.TransfersTable
+import io.ducket.api.utils.TransferCodeGenerator
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
 import java.math.BigDecimal
@@ -34,7 +29,7 @@ class TransferRepository(
 
     fun findAllByRelation(userId: Long, relationId: String): List<Transfer> = transaction {
         TransferEntity.find {
-            TransfersTable.userId.eq(userId).and(TransfersTable.relationId.eq(relationId))
+            TransfersTable.userId.eq(userId).and(TransfersTable.relationCode.eq(relationId))
         }.map { it.toModel() }
     }
 
@@ -88,24 +83,30 @@ class TransferRepository(
     }
 
     fun create(userId: Long, senderDto: TransferCreateDto, rate: BigDecimal): List<Transfer> = transaction {
-        val relationId = UUID.randomUUID().toString().substring(0, 8).toUpperCase()
+        val relationCode = TransferCodeGenerator.generate()
 
-        val senderTransfer = createNewTransfer(userId, senderDto, rate, relationId).toModel()
+        val senderTransfer = createNewTransfer(userId, senderDto, rate, relationCode).toModel()
         val recipientDto = senderDto.copy(
             accountId = senderDto.transferAccountId,
             transferAccountId = senderDto.accountId,
             amount = senderDto.amount.abs().multiply(rate),
             date = senderDto.date.plusMillis(1L), // hack to prevent excessive sorting
         )
-        val recipientTransfer = createNewTransfer(userId, recipientDto, rate, relationId).toModel()
+        val recipientTransfer = createNewTransfer(userId, recipientDto, rate, relationCode).toModel()
 
         return@transaction listOf(recipientTransfer, senderTransfer)
     }
 
-    fun delete(userId: Long, relationId: String) = transaction {
+    fun delete(userId: Long, relationCode: String) = transaction {
         TransferEntity.find {
-            TransfersTable.userId.eq(userId).and(TransfersTable.relationId.eq(relationId))
+            TransfersTable.userId.eq(userId).and(TransfersTable.relationCode.eq(relationCode))
         }.toList().forEach { it.delete() }
+    }
+
+    fun delete(userId: Long, transferId: Long) = transaction {
+        TransferEntity.find {
+            TransfersTable.userId.eq(userId).and(TransfersTable.id.eq(transferId))
+        }.firstOrNull()?.delete()
     }
 
     override fun findAttachment(userId: Long, entityId: Long, attachmentId: Long): Attachment? = transaction {
@@ -157,7 +158,7 @@ class TransferRepository(
             account = AccountEntity[dto.accountId]
             transferAccount = AccountEntity[dto.transferAccountId]
             user = UserEntity[userId]
-            relationId = relation
+            relationCode = relation
             amount = dto.amount
             exchangeRate = rate
             date = dto.date

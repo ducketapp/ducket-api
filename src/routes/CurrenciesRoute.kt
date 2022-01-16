@@ -9,7 +9,7 @@ fun Route.currencies(currencyController: CurrencyController) {
         route("/currencies") {
             get { currencyController.getCurrencies(this.context) }
 
-            route("/rates") {
+            route("/app/rates_data") {
                 get { currencyController.getCurrenciesRates(this.context) }
             }
         }

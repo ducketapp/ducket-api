@@ -25,10 +25,11 @@ import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
 
 
-object ExchangeRateClient {
+class CurrencyRatesClient {
     private val logger = getLogger()
-    private const val sourceUrl = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
-    private const val fileNamePrefix = "rates"
+    private val sourceUrl = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
+    private val downloadPath = Paths.get(System.getProperty("java.io.tmpdir"), "ecb")
+    private val fileNamePrefix = "ecb_exr"
 
     private var client: HttpClient = HttpClient(CIO) {
         engine {
@@ -44,8 +45,8 @@ object ExchangeRateClient {
     }
 
     @Throws(InvalidCurrencyException::class)
-    fun getExchangeRate(base: String, term: String): BigDecimal {
-        logger.debug("Getting exchange rate: $base -> $term")
+    fun getCurrencyRate(base: String, term: String): BigDecimal {
+        logger.debug("Getting currency rate: $base -> $term")
 
         val fileWithRates = pullRates()
         val currencyToRateMap = parseXml(fileWithRates)
@@ -62,7 +63,7 @@ object ExchangeRateClient {
         }
     }
 
-    @Throws(ExchangeRateDataParseException::class)
+    @Throws(CurrencyRateParsingException::class)
     fun getRatesMap(): Map<String, BigDecimal> {
         logger.debug("Getting rates map")
 
@@ -70,55 +71,58 @@ object ExchangeRateClient {
         return parseXml(fileWithRates)
     }
 
-    @Throws(ExchangeRateSourcePullException::class)
+    @Throws(CurrencyRatePullException::class)
     fun pullRates(): File {
         logger.debug("Resolving currencies rates file")
 
-        val filesDirPath = "resources/rates"
-        val relevantFileName = "${fileNamePrefix}_${LocalDate.now()}.xml"
-        val allFiles = File(filesDirPath).listFiles()?.filter { it.isFile && it.name.startsWith(fileNamePrefix) }?.sortedByDescending { it.name }
-        var relevantFile = allFiles?.firstOrNull { it.name == relevantFileName }
+        val todayRatesFileName = "${fileNamePrefix}_${LocalDate.now()}.xml"
+        val downloadedRates = File(downloadPath.toUri()).listFiles()
+            ?.filter { it.isFile && it.name.startsWith(fileNamePrefix) }
+            ?.sortedByDescending { it.name }
 
-        if (relevantFile == null) {
-            logger.debug("The file with actual exchange rates was not found at $filesDirPath")
+        var todayRatesFile = downloadedRates?.firstOrNull { it.name == todayRatesFileName }
 
-            relevantFile = File(Paths.get(filesDirPath, relevantFileName).toUri())
+        if (todayRatesFile == null) {
+            logger.debug("The file with actual currency rates was not found at $downloadPath")
+
+            todayRatesFile = File(Paths.get(downloadPath.toString(), todayRatesFileName).toUri())
 
             return runBlocking {
                 try {
-                    logger.info("Pulling an actual exchange rates from $sourceUrl")
+                    logger.info("Pulling an actual currency rates from $sourceUrl")
                     val response: HttpResponse = client.get(sourceUrl)
 
                     if (response.status == HttpStatusCode.OK) {
-                        relevantFile.writeBytes(response.receive())
+                        todayRatesFile.parentFile.mkdirs()
+                        todayRatesFile.writeBytes(response.receive())
 
-                        logger.debug("The file with actual exchange rates was created: ${relevantFile.path}")
-                        return@runBlocking relevantFile
+                        logger.debug("The file with actual currency rates was created: ${todayRatesFile.path}")
+                        return@runBlocking todayRatesFile
                     } else {
                         throw Exception()
                     }
                 } catch (e: Exception) {
-                    logger.error("Error in pulling exchange rates from $sourceUrl: ${e.message}")
+                    logger.error("Error in pulling currency rates from $sourceUrl: ${e.message}")
 
-                    if (allFiles != null && allFiles.isNotEmpty()) {
-                        val lastPulledFile: File =  allFiles[0]
-                        logger.info("Using last file: ${lastPulledFile.path}")
+                    if (downloadedRates != null && downloadedRates.isNotEmpty()) {
+                        val lastDownloadedFile: File =  downloadedRates[0]
+                        logger.info("Using last file: ${lastDownloadedFile.path}")
 
-                        return@runBlocking lastPulledFile
+                        return@runBlocking lastDownloadedFile
                     } else {
-                        throw ExchangeRateSourcePullException(e)
+                        throw CurrencyRatePullException(e)
                     }
                 }
             }
         } else {
-            logger.debug("Using recently pulled file: ${relevantFile.path}")
-            return relevantFile
+            logger.debug("Using recently pulled file: ${todayRatesFile.path}")
+            return todayRatesFile
         }
     }
 
-    @Throws(ExchangeRateDataParseException::class)
+    @Throws(CurrencyRateParsingException::class)
     private fun parseXml(xmlFile: File): Map<String, BigDecimal> {
-        logger.debug("Parsing currencies exchange rates from ${xmlFile.path}")
+        logger.debug("Parsing currencies rates from ${xmlFile.path}")
 
         val currenciesNodeList: NodeList
         val currenciesExpression = "/Envelope/Cube[1]/Cube[1]/Cube"
@@ -131,7 +135,7 @@ object ExchangeRateClient {
             logger.debug("Getting the list of currencies by '$currenciesExpression' xPath")
             currenciesNodeList = xPath.compile(currenciesExpression).evaluate(xmlDoc, XPathConstants.NODESET) as NodeList
         } catch (e: Exception) {
-            throw ExchangeRateDataParseException(e)
+            throw CurrencyRateParsingException(e)
         }
 
         val currenciesMap = getCurrenciesMap(currenciesNodeList)
@@ -164,8 +168,8 @@ object ExchangeRateClient {
         return map
     }
 
-    abstract class ExchangeRateClientException(message: String): Exception(message)
-    class ExchangeRateSourcePullException(cause: Throwable, message: String = "Cannot pull exchange rates data: ${cause.message}") : ExchangeRateClientException(message)
-    class ExchangeRateDataParseException(cause: Throwable, message: String = "Cannot parse exchange rates data: ${cause.message}") : ExchangeRateClientException(message)
-    class InvalidCurrencyException(supported: List<String>, message: String = "Invalid currency, supported: $supported") : ExchangeRateClientException(message)
+    class CurrencyRateClientException(message: String): Exception(message)
+    class CurrencyRatePullException(cause: Throwable, message: String = "Cannot pull rates data: ${cause.message}") : Exception(message)
+    class CurrencyRateParsingException(cause: Throwable, message: String = "Cannot parse rates data: ${cause.message}") : Exception(message)
+    class InvalidCurrencyException(supported: List<String>, message: String = "Invalid currency, supported: $supported") : Exception(message)
 }

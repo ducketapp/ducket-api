@@ -11,5 +11,5 @@ import java.math.BigDecimal
 data class TransferDto(@JsonIgnore val transfer: Transfer): RecordDto(transfer) {
     val transferAccount: AccountDto = AccountDto(transfer.transferAccount)
     val exchangeRate: BigDecimal = transfer.exchangeRate
-    val relationId: String = transfer.relationId
+    val relationCode: String? = transfer.relationCode
 }

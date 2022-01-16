@@ -1,8 +1,9 @@
 package io.ducket.api.domain.controller.transaction
 
-import io.ducket.api.config.JwtConfig
+import io.ducket.api.config.JwtManager
 import io.ducket.api.domain.service.AccountService
 import io.ducket.api.domain.service.TransactionService
+import io.ducket.api.principalOrThrow
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
@@ -17,7 +18,7 @@ class TransactionController(
 ) {
 
     suspend fun getTransaction(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+        val userId = ctx.authentication.principalOrThrow().id
         val transactionId = ctx.parameters.getOrFail("transactionId").toLong()
 
         transactionService.getTransactionDetailsAccessibleToUser(userId, transactionId).apply {
@@ -26,7 +27,7 @@ class TransactionController(
     }
 
     suspend fun addTransaction(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+        val userId = ctx.authentication.principalOrThrow().id
 
         ctx.receive<TransactionCreateDto>().apply {
             transactionService.addTransaction(userId, this.validate()).apply {
@@ -36,7 +37,7 @@ class TransactionController(
     }
 
     suspend fun deleteTransaction(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+        val userId = ctx.authentication.principalOrThrow().id
         val transactionId = ctx.parameters.getOrFail("transactionId").toLong()
 
         transactionService.deleteTransaction(userId, transactionId).apply {
@@ -45,7 +46,7 @@ class TransactionController(
     }
 
     suspend fun deleteTransactions(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+        val userId = ctx.authentication.principalOrThrow().id
 
         ctx.receive<TransactionDeleteDto>().apply {
             transactionService.deleteTransactions(userId, this.validate()).apply {
@@ -55,7 +56,7 @@ class TransactionController(
     }
 
     suspend fun uploadTransactionAttachments(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+        val userId = ctx.authentication.principalOrThrow().id
         val transactionId = ctx.parameters.getOrFail("transactionId").toLong()
 
         transactionService.uploadTransactionAttachments(userId, transactionId, ctx.receiveMultipart().readAllParts()).apply {
@@ -66,7 +67,7 @@ class TransactionController(
     }
 
     suspend fun downloadTransactionAttachment(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+        val userId = ctx.authentication.principalOrThrow().id
         val transactionId = ctx.parameters.getOrFail("transactionId").toLong()
         val attachmentId = ctx.parameters.getOrFail("imageId").toLong()
         val ownerId = ctx.request.queryParameters["ownerId"]?.toLong() ?: userId
@@ -78,7 +79,7 @@ class TransactionController(
     }
 
     suspend fun deleteTransactionAttachment(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+        val userId = ctx.authentication.principalOrThrow().id
         val transactionId = ctx.parameters.getOrFail("transactionId").toLong()
         val attachmentId = ctx.parameters.getOrFail("imageId").toLong()
 

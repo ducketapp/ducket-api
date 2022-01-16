@@ -1,8 +1,5 @@
 package domain.model.category
 
-import io.ducket.api.domain.model.StringIdTable
-import org.jetbrains.exposed.dao.Entity
-import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -33,14 +30,15 @@ class Category(
 )
 
 enum class CategoryGroup {
-    FOOD,
-    INFLOW,
+    FOOD_AND_DRINKS,
     HOUSING,
     SHOPPING,
     TRANSPORT,
     UTILITIES,
     INVESTMENTS,
-    KIDS_AND_PETS,
+    PETS,
+    INFLOW,
+    CHILDREN,
     FINANCIAL_COSTS,
     LIFE_AND_LEISURE,
     UNCATEGORIZED,

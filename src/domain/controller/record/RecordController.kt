@@ -1,10 +1,10 @@
 package io.ducket.api.domain.controller.record
 
-import io.ducket.api.config.JwtConfig
+import io.ducket.api.config.JwtManager
 import io.ducket.api.domain.service.AccountService
 import io.ducket.api.domain.service.TransactionService
 import io.ducket.api.domain.service.TransferService
-import io.ducket.api.domain.service.UserService
+import io.ducket.api.principalOrThrow
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
@@ -17,7 +17,7 @@ class RecordController(
 ) {
 
     suspend fun getRecords(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+        val userId = ctx.authentication.principalOrThrow().id
 
         val allRecords = listOf(
             transactionService.getTransactionsAccessibleToUser(userId),

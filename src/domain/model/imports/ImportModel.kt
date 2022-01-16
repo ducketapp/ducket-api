@@ -10,7 +10,7 @@ import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.`java-time`.timestamp
 import java.time.Instant
 
-internal object ImportsTable : LongIdTable("file_import") {
+internal object ImportsTable : LongIdTable("import") {
     val userId = reference("user_id", UsersTable)
     val filePath = varchar("file_path", 45)
     val importedAt = timestamp("imported_at")

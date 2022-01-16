@@ -1,8 +1,9 @@
 package io.ducket.api.domain.controller.transfer
 
-import io.ducket.api.config.JwtConfig
+import io.ducket.api.config.JwtManager
 import io.ducket.api.domain.service.AccountService
 import io.ducket.api.domain.service.TransferService
+import io.ducket.api.principalOrThrow
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
@@ -17,7 +18,7 @@ class TransferController(
 ) {
 
     suspend fun addTransfer(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+        val userId = ctx.authentication.principalOrThrow().id
 
         ctx.receive<TransferCreateDto>().apply {
             transferService.addTransfer(userId, this.validate()).apply {
@@ -27,7 +28,7 @@ class TransferController(
     }
 
     suspend fun getTransfer(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+        val userId = ctx.authentication.principalOrThrow().id
         val transferId = ctx.parameters.getOrFail("transferId").toLong()
 
         transferService.getTransferDetailsAccessibleToUser(userId, transferId).apply {
@@ -36,7 +37,7 @@ class TransferController(
     }
 
     suspend fun deleteTransfer(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+        val userId = ctx.authentication.principalOrThrow().id
         val transferId = ctx.parameters.getOrFail("transferId").toLong()
 
         transferService.deleteTransfer(userId, transferId).apply {
@@ -45,7 +46,7 @@ class TransferController(
     }
 
     suspend fun uploadTransferAttachments(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+        val userId = ctx.authentication.principalOrThrow().id
         val transferId = ctx.parameters.getOrFail("transferId").toLong()
 
         transferService.uploadTransferAttachments(userId, transferId, ctx.receiveMultipart().readAllParts()).apply {
@@ -56,7 +57,7 @@ class TransferController(
     }
 
     suspend fun downloadTransferAttachment(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+        val userId = ctx.authentication.principalOrThrow().id
         val transferId = ctx.parameters.getOrFail("transferId").toLong()
         val attachmentId = ctx.parameters.getOrFail("imageId").toLong()
 
@@ -67,7 +68,7 @@ class TransferController(
     }
 
     suspend fun deleteTransferAttachment(ctx: ApplicationCall) {
-        val userId = JwtConfig.getPrincipal(ctx.authentication).id
+        val userId = ctx.authentication.principalOrThrow().id
         val transferId = ctx.parameters.getOrFail("transferId").toLong()
         val attachmentId = ctx.parameters.getOrFail("imageId").toLong()
 

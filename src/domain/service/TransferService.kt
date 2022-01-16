@@ -1,6 +1,6 @@
 package io.ducket.api.domain.service
 
-import io.ducket.api.ExchangeRateClient
+import io.ducket.api.CurrencyRatesClient
 import io.ducket.api.domain.controller.transfer.TransferCreateDto
 import io.ducket.api.domain.controller.transfer.TransferDto
 import io.ducket.api.domain.repository.AccountRepository
@@ -8,6 +8,7 @@ import io.ducket.api.domain.repository.TransferRepository
 import io.ducket.api.plugins.InvalidDataError
 import io.ducket.api.plugins.NoEntityFoundError
 import io.ktor.http.content.*
+import org.koin.java.KoinJavaComponent.inject
 import java.io.File
 import java.math.BigDecimal
 
@@ -16,6 +17,7 @@ class TransferService(
     private val accountRepository: AccountRepository,
     private val accountService: AccountService,
 ): FileService() {
+    private val currencyRatesClient: CurrencyRatesClient by inject(CurrencyRatesClient::class.java)
 
     fun getTransferDetailsAccessibleToUser(userId: Long, transferId: Long): TransferDto {
         return getTransfersAccessibleToUser(userId).firstOrNull { it.id == transferId }
@@ -39,7 +41,7 @@ class TransferService(
 
         if (reqObj.exchangeRate == null) {
             if (fromAccount.currency.id != toAccount.currency.id) {
-                exchangeRate = ExchangeRateClient.getExchangeRate(fromAccount.currency.isoCode, toAccount.currency.isoCode)
+                exchangeRate = currencyRatesClient.getCurrencyRate(fromAccount.currency.isoCode, toAccount.currency.isoCode)
             }
         } else {
             if (fromAccount.currency.id == toAccount.currency.id && exchangeRate != BigDecimal.ONE) {
@@ -52,7 +54,9 @@ class TransferService(
 
     fun deleteTransfer(userId: Long, transferId: Long) {
         val transfer = transferRepository.findOne(userId, transferId) ?: throw NoEntityFoundError("No such transfer was found")
-        transferRepository.delete(userId, transfer.relationId)
+
+        if (transfer.relationCode == null) transferRepository.delete(userId, transferId)
+        else transferRepository.delete(userId, transfer.relationCode)
     }
 
     fun downloadTransferAttachment(userId: Long, entityId: Long, attachmentId: Long): File {
@@ -67,11 +71,11 @@ class TransferService(
         transferRepository.findOne(userId, entityId) ?: throw NoEntityFoundError("No such transfer was found")
 
         val actualAttachmentsAmount = transferRepository.getAttachmentsAmount(entityId)
-        val files = pullAttachments(multipartData)
+        val files = extractImagesData(multipartData)
 
         if (files.size + actualAttachmentsAmount > 3) throw InvalidDataError("Attachments limit exceeded, 3 max")
 
-        pullAttachments(multipartData).forEach { pair ->
+        extractImagesData(multipartData).forEach { pair ->
             val newFile = createLocalAttachmentFile(pair.first.extension, pair.second)
             transferRepository.createAttachment(userId, entityId, newFile)
         }

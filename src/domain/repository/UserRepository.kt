@@ -20,13 +20,11 @@ import io.ducket.api.domain.model.follow.FollowsTable
 import io.ducket.api.domain.model.transfer.TransferEntity
 import io.ducket.api.domain.model.transfer.TransfersTable
 
-import io.ducket.api.domain.model.user.UserAttachmentsTable
 import io.ducket.api.getLogger
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
-import java.io.File
 import java.time.Instant
 
 class UserRepository {
@@ -81,38 +79,6 @@ class UserRepository {
 
     fun deleteOne(userId: Long): Boolean = transaction {
         UsersTable.deleteWhere { UsersTable.id.eq(userId) } > 0
-    }
-
-    fun deleteImage(imageId: Long): Boolean = transaction {
-        UserAttachmentsTable.deleteWhere { UserAttachmentsTable.attachmentId.eq(imageId) } > 0
-    }
-
-    fun findImage(userId: Long, imageId: Long): Attachment? = transaction {
-        val query = AttachmentsTable.innerJoin(UserAttachmentsTable).innerJoin(UsersTable)
-            .slice(AttachmentsTable.columns)
-            .select {
-                AttachmentsTable.id.eq(imageId)
-                    .and(UsersTable.id.eq(userId))
-                    .and(UserAttachmentsTable.userId.eq(UsersTable.id))
-            }
-
-        AttachmentEntity.wrapRows(query).firstOrNull()?.toModel()
-    }
-
-    fun createImage(userId: Long, newFile: File): Unit = transaction {
-        val newAttachment = AttachmentEntity.new {
-            filePath = newFile.path
-            createdAt = Instant.now()
-        }.toModel()
-
-        UserAttachmentsTable.insert {
-            it[this.attachmentId] = AttachmentEntity[newAttachment.id].id.value
-            it[this.userId] = UserEntity[userId].id.value
-        }
-
-        UserEntity.findById(userId)?.also {
-            it.modifiedAt = Instant.now()
-        }
     }
 
     /**
