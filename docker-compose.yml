@@ -1,0 +1,56 @@
+version: '2.1'
+
+services:
+  ducket-db-service:
+    image: mysql:5.7
+    restart: always
+    environment:
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - TZ=UTC
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    command: ['mysqld', '--character-set-server=utf8mb4']
+    volumes:
+      - app_database:/var/lib/mysql
+
+  ducket-api-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - ducket-db-service
+    environment:
+      - DB_HOST=ducket-db-service
+      - DB_NAME=${DB_NAME}
+      - DB_PORT=${DB_PORT}
+      - PORT=${PORT}
+    restart: always
+    ports:
+      - "${PORT}:${PORT}"
+    volumes:
+      - app_service:/bin/runner
+
+  prometheus-service:
+    image: prom/prometheus
+    restart: always
+    ports:
+      - "3570:3570"
+    volumes:
+      - ./monitoring:/etc/prometheus/
+    links:
+      - ducket-service
+
+  grafana-service:
+    image: grafana/grafana:5.1.0
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./monitoring/grafana:/var/lib/grafana
+    links:
+      - ducket-api-service
+      - prometheus-service
+
+  volumes:
+    app_database:
+    app_service:

@@ -23,7 +23,7 @@ class UserController(
             userService.createUser(this.validate()).apply {
                 ctx.response.header(
                     name = HttpHeaders.Authorization,
-                    value = "Bearer ${jwtManager.generateToken(UserPrincipal(this.user))}",
+                    value = "Bearer ${jwtManager.generateToken(UserPrincipal(this.id, this.email))}",
                 )
                 ctx.respond(HttpStatusCode.Created, this)
             }
@@ -35,7 +35,7 @@ class UserController(
             userService.getUser(this.validate()).apply {
                 ctx.response.header(
                     name = HttpHeaders.Authorization,
-                    value = "Bearer ${jwtManager.generateToken(UserPrincipal(this.user))}",
+                    value = "Bearer ${jwtManager.generateToken(UserPrincipal(this.id, this.email))}",
                 )
                 ctx.respond(HttpStatusCode.OK, this)
             }

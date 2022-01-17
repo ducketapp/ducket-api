@@ -2,7 +2,7 @@
 /.idea
 /out
 /build
-/resources/app/db_data/*
+/resources/db_data/*
 *.iml
 *.ipr
 *.iws

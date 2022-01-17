@@ -13,7 +13,7 @@ fun withTestServer(
 ) {
     withApplication(
         environment = createTestEnvironment {
-            config = HoconApplicationConfig(ConfigFactory.load("development.conf"))
+            config = HoconApplicationConfig(ConfigFactory.load("application.conf"))
         },
         test = testBlock
     )

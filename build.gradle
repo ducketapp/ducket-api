@@ -73,6 +73,10 @@ dependencies {
 
     implementation "org.kodein.di:kodein-di-generic-jvm:$kodein_version"
 
+    // Metrics
+    implementation "io.ktor:ktor-metrics-micrometer:$ktor_version"
+    implementation "io.micrometer:micrometer-registry-prometheus:1.7.1"
+
     // Koin DI
     implementation "io.insert-koin:koin-ktor:3.1.4"
     implementation "io.insert-koin:koin-logger-slf4j:3.1.4"

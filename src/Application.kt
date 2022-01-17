@@ -29,12 +29,21 @@ import io.ktor.config.*
 import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.jackson.*
+import io.ktor.metrics.micrometer.*
 import io.ktor.request.*
+import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.transactions.transaction
+import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics
+import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics
+import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics
+import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics
+import io.micrometer.core.instrument.binder.system.FileDescriptorMetrics
+import io.micrometer.core.instrument.binder.system.ProcessorMetrics
+import io.micrometer.core.instrument.binder.system.UptimeMetrics
+import io.micrometer.prometheus.PrometheusConfig
+import io.micrometer.prometheus.PrometheusMeterRegistry
 import org.koin.core.module.Module
 import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.inject
@@ -42,8 +51,6 @@ import org.koin.logger.SLF4JLogger
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
-import java.lang.IllegalArgumentException
-import java.net.BindException
 import java.util.*
 
 fun main(args: Array<String>): Unit {
@@ -84,10 +91,23 @@ fun Application.module(
         }
     }
 
+    val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
+
+    install(MicrometerMetrics) {
+        registry = appMicrometerRegistry
+        meterBinders = listOf(
+            ClassLoaderMetrics(),
+            JvmMemoryMetrics(),
+            JvmGcMetrics(),
+            ProcessorMetrics(),
+            JvmThreadMetrics(),
+            FileDescriptorMetrics(),
+            UptimeMetrics()
+        )
+    }
+
     install(Authentication) {
         jwt {
-            realm = appConfig.jwtConfig.realm
-
             verifier(jwtManager.verifier)
             challenge { _, _ -> throw AuthenticationException("Invalid auth token") }
             validate {
@@ -116,7 +136,11 @@ fun Application.module(
     val currencyController: CurrencyController by inject()
 
     install(Routing) {
-        route("/api/v1") {
+        get("/metrics") {
+            call.respond(appMicrometerRegistry.scrape())
+        }
+
+        route("/api") {
             intercept(ApplicationCallPipeline.Call) {
                 if (!call.request.path().contains("auth")) {
                     val currentUserId = call.authentication.principalOrThrow().id
@@ -148,6 +172,13 @@ fun Application.module(
     }
 }
 
+/**
+ * Required environment variables:
+ * JWT_SECRET, DB_ROOT_PASSWORD
+ *
+ * Optional environment variables:
+ * PORT, DB_HOST, DB_PORT, DB_NAME
+ */
 @Suppress("unused")
 private fun Application.setupAppConfig() {
     val appConfig by inject<AppConfig>()
@@ -155,18 +186,19 @@ private fun Application.setupAppConfig() {
     System.setProperty("handlers", "org.slf4j.bridge.SLF4JBridgeHandler")
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 
-    val dbDataPath = System.getProperty("DB_DATA_PATH", "resources/app")
+    val dbDataPath = System.getProperty("DB_DATA_PATH", "resources/db_data")
     val hoconConfig = this.environment.config.config("ktor")
 
     appConfig.apply {
         this.serverConfig = ServerConfig(
-            env = hoconConfig.property("environment").getString(),
             host = hoconConfig.property("deployment.host").getString(),
             port = hoconConfig.property("deployment.port").getString().toInt(),
         )
 
         this.databaseConfig = DatabaseConfig(
-            url = hoconConfig.property("database.url").getString(),
+            host = hoconConfig.property("database.host").getString(),
+            port = hoconConfig.property("database.port").getString().toInt(),
+            db = hoconConfig.property("database.db").getString(),
             driver = hoconConfig.property("database.driver").getString(),
             username = hoconConfig.property("database.username").getString(),
             password = hoconConfig.property("database.password").getString(),
@@ -175,8 +207,7 @@ private fun Application.setupAppConfig() {
 
         this.jwtConfig = JwtConfig(
             secret = hoconConfig.property("jwt.secret").getString(),
-            issuer = hoconConfig.property("jwt.issuer").getString(),
-            realm = hoconConfig.property("jwt.realm").getString(),
+            issuer = "${serverConfig.host}:${serverConfig.port}",
             audience = hoconConfig.property("jwt.audience").getString(),
         )
     }
