@@ -4,7 +4,7 @@ data class DatabaseConfig(
     val host: String,
     val port: Int,
     val name: String,
-    val username: String,
+    val user: String,
     val password: String,
     val driver: String,
     val dataPath: String,

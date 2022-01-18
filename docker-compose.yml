@@ -1,63 +1,81 @@
 version: '3'
 
 services:
-  db:
+  ducket-database:
     image: mysql:8.0.19
     restart: unless-stopped
+    container-name: ducket-database
     environment:
       - MYSQL_DATABASE=${DB_NAME}
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-      - TZ=UTC
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - TZ=${DB_TZ}
     ports:
       - 3310:${DB_PORT}
-    command: ['mysqld', '--character-set-server=utf8mb4']
     volumes:
-      - app_database:/var/lib/mysql
+      - ducket_database_data:/var/lib/mysql
+    networks:
+      - ducket-network
+    command: ['mysqld', '--character-set-server=utf8mb4']
 
-  backend:
+  ducket-backend:
     build:
       context: .
       dockerfile: Dockerfile
     depends_on:
-      - db
+      - ducket-database
+    container-name: ducket-backend
+    restart: unless-stopped
     environment:
-      - DB_HOST=db
+      - DB_HOST=localhost
       - DB_NAME=${DB_NAME}
       - DB_PORT=${DB_PORT}
-      - DB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-      - JWT_SECRET=${JWT_SECRET}
-      - PORT=${PORT}
-    restart: unless-stopped
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - APP_SECRET=${APP_SECRET}
+      - APP_PORT=${APP_PORT}
     ports:
       - 8100:${PORT}
     volumes:
-      - app_service:/bin/runner
+      - ducket_backend_data:/bin/runner
+    networks:
+      - ducket-network
 
-  prometheus:
+  ducket-prometheus:
     image: prom/prometheus:v2.32.0
     restart: unless-stopped
     ports:
-      - 3570:9090
+      - 9090:9090
     volumes:
-      - ./resources/monitoring:/prometheus
+      - ./resources/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ducket_prometheus_data:/prometheus
+    networks:
+      - ducket-network
     command:
-      - "--config.file=/prometheus/prometheus.yml"
-    links:
-      - backend
+      - '--config.file=/etc/prometheus/prometheus.yml'
 
   grafana:
     image: grafana/grafana-oss:8.1.8
     ports:
       - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GR_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GR_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana_data:/var/lib/grafana
     links:
-      - backend
-      - prometheus
+      - ducket-backend
+      - ducket-prometheus
     user: "104"
 
+networks:
+  ducket-network:
+    driver: bridge
+
 volumes:
-  app_database:
-  app_service:
+  ducket_database_data:
+  ducket_backend_data:
+  ducket_prometheus_data:
   grafana_data:
-  prometheus_data:

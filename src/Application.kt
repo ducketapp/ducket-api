@@ -1,12 +1,8 @@
 package io.ducket.api
 
 import com.fasterxml.jackson.databind.SerializationFeature
-import com.typesafe.config.ConfigFactory
-import domain.model.account.AccountsTable
-import domain.model.user.UsersTable
 import io.ducket.api.app.AppModule
 import io.ducket.api.app.database.DatabaseFactory
-import io.ducket.api.app.database.TestingDatabaseFactory
 import io.ducket.api.config.*
 import io.ducket.api.domain.controller.account.AccountController
 import io.ducket.api.domain.controller.budget.BudgetController
@@ -21,11 +17,9 @@ import io.ducket.api.plugins.AuthorizationException
 import io.ducket.api.plugins.applicationStatusPages
 import io.ducket.api.plugins.defaultStatusPages
 import io.ducket.api.routes.*
-import io.ducket.api.utils.TransferCodeGenerator
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
-import io.ktor.config.*
 import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.jackson.*
@@ -174,10 +168,10 @@ fun Application.module(
 
 /**
  * Required environment variables:
- * JWT_SECRET, DB_ROOT_PASSWORD, DB_NAME
+ * APP_SECRET, DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, DB_PORT
  *
  * Optional environment variables:
- * PORT, DB_HOST, DB_PORT
+ * APP_PORT, APP_HOST
  */
 @Suppress("unused")
 private fun Application.setupAppConfig() {
@@ -200,7 +194,7 @@ private fun Application.setupAppConfig() {
             port = hoconConfig.property("database.port").getString().toInt(),
             name = hoconConfig.property("database.name").getString(),
             driver = hoconConfig.property("database.driver").getString(),
-            username = hoconConfig.property("database.username").getString(),
+            user = hoconConfig.property("database.username").getString(),
             password = hoconConfig.property("database.password").getString(),
             dataPath = dbDataPath,
         )

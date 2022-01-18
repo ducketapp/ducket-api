@@ -37,7 +37,7 @@ class AppDatabaseFactory(appConfig: AppConfig): DatabaseFactory {
         return HikariConfig().let { hikariConfig ->
             hikariConfig.driverClassName = config.driver
             hikariConfig.jdbcUrl = config.url
-            hikariConfig.username = config.username
+            hikariConfig.username = config.user
             hikariConfig.password = config.password
             hikariConfig.maximumPoolSize = 3
             hikariConfig.isAutoCommit = false

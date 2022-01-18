@@ -94,10 +94,6 @@ dependencies {
     // Aho-Corasick algorithm
     implementation "org.ahocorasick:ahocorasick:0.4.0"
 
-    // money conversion
-    // implementation "javax.money:money-api:1.1"
-    implementation "org.javamoney.lib:javamoney-exchange-frb:1.1"
-
     // validation
     implementation "io.konform:konform:0.3.0"
     implementation "org.valiktor:valiktor-core:0.12.0"
