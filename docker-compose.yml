@@ -14,7 +14,7 @@ services:
     ports:
       - 3310:${DB_PORT}
     volumes:
-      - ducket_database_data:/var/lib/mysql
+      - database_data:/var/lib/mysql
     networks:
       - ducket-network
     command: ['mysqld', '--character-set-server=utf8mb4']
@@ -39,7 +39,7 @@ services:
     ports:
       - 8100:${APP_PORT}
     volumes:
-      - ducket_backend_data:./resources/db/data
+      - backend_data:/app/resources/db/data
     networks:
       - ducket-network
 
@@ -51,7 +51,7 @@ services:
       - 9090:9090
     volumes:
       - ./resources/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ducket_prometheus_data:/prometheus
+      - prometheus_data:/prometheus
     networks:
       - ducket-network
     command:
@@ -78,7 +78,7 @@ networks:
     driver: bridge
 
 volumes:
-  ducket_database_data:
-  ducket_backend_data:
-  ducket_prometheus_data:
+  database_data:
+  backend_data:
+  prometheus_data:
   grafana_data:
