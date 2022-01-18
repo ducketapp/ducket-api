@@ -194,7 +194,7 @@ private fun Application.setupAppConfig() {
             port = hoconConfig.property("database.port").getString().toInt(),
             name = hoconConfig.property("database.name").getString(),
             driver = hoconConfig.property("database.driver").getString(),
-            user = hoconConfig.property("database.username").getString(),
+            user = hoconConfig.property("database.user").getString(),
             password = hoconConfig.property("database.password").getString(),
             dataPath = dbDataPath,
         )
