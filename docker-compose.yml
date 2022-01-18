@@ -28,6 +28,7 @@ services:
     container_name: ducket-backend
     restart: unless-stopped
     environment:
+      - DB_DATA_PATH=resources/db/data
       - DB_HOST=localhost
       - DB_NAME=${DB_NAME}
       - DB_PORT=${DB_PORT}
@@ -38,7 +39,7 @@ services:
     ports:
       - 8100:${APP_PORT}
     volumes:
-      - ducket_backend_data:/bin/runner
+      - ducket_backend_data:./resources/db/data
     networks:
       - ducket-network
 
