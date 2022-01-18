@@ -7,11 +7,11 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
-CREATE SCHEMA IF NOT EXISTS `ducket` DEFAULT CHARACTER SET utf8 ;
-USE `ducket` ;
+CREATE SCHEMA IF NOT EXISTS `ducket-db` DEFAULT CHARACTER SET utf8 ;
+USE `ducket-db` ;
 
 
-CREATE TABLE IF NOT EXISTS `ducket`.`currency` (
+CREATE TABLE IF NOT EXISTS `ducket-db`.`currency` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `area` VARCHAR(45) NOT NULL,
   `name` VARCHAR(45) NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `ducket`.`currency` (
   UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE);
 
 
-CREATE TABLE IF NOT EXISTS `ducket`.`user` (
+CREATE TABLE IF NOT EXISTS `ducket-db`.`user` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `main_currency_id` BIGINT NOT NULL,
   `phone` VARCHAR(32) NULL,
@@ -39,13 +39,13 @@ CREATE TABLE IF NOT EXISTS `ducket`.`user` (
   UNIQUE INDEX `phone_UNIQUE` (`phone` ASC) VISIBLE,
   CONSTRAINT `user_main_currency_fk`
     FOREIGN KEY (`main_currency_id`)
-    REFERENCES `ducket`.`currency` (`id`)
+    REFERENCES `ducket-db`.`currency` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
-CREATE TABLE IF NOT EXISTS `ducket`.`account` (
+CREATE TABLE IF NOT EXISTS `ducket-db`.`account` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `currency_id` BIGINT NOT NULL,
   `user_id` BIGINT NOT NULL,
@@ -59,18 +59,18 @@ CREATE TABLE IF NOT EXISTS `ducket`.`account` (
   INDEX `account_user_fk_idx` (`user_id` ASC) VISIBLE,
   CONSTRAINT `account_currency_fk`
     FOREIGN KEY (`currency_id`)
-    REFERENCES `ducket`.`currency` (`id`)
+    REFERENCES `ducket-db`.`currency` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `account_user_fk`
     FOREIGN KEY (`user_id`)
-    REFERENCES `ducket`.`user` (`id`)
+    REFERENCES `ducket-db`.`user` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
-CREATE TABLE IF NOT EXISTS `ducket`.`category` (
+CREATE TABLE IF NOT EXISTS `ducket-db`.`category` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `group` ENUM('HOUSING', 'FOOD_AND_DRINKS', 'SHOPPING', 'CHILDREN', 'PETS', 'LIFE_AND_LEISURE', 'TRANSPORT', 'UTILITIES', 'FINANCIAL_COSTS', 'INVESTMENTS', 'INFLOW', 'UNCATEGORIZED') NOT NULL,
   `name` VARCHAR(45) NOT NULL,
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS `ducket`.`category` (
   UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE);
 
 
-CREATE TABLE IF NOT EXISTS `ducket`.`import` (
+CREATE TABLE IF NOT EXISTS `ducket-db`.`import` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `user_id` BIGINT NOT NULL,
   `file_path` VARCHAR(45) NOT NULL,
@@ -87,12 +87,12 @@ CREATE TABLE IF NOT EXISTS `ducket`.`import` (
   INDEX `import_user_fk_idx` (`user_id` ASC) VISIBLE,
   CONSTRAINT `import_user_fk`
     FOREIGN KEY (`user_id`)
-    REFERENCES `ducket`.`user` (`id`)
+    REFERENCES `ducket-db`.`user` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
 
-CREATE TABLE IF NOT EXISTS `ducket`.`transaction` (
+CREATE TABLE IF NOT EXISTS `ducket-db`.`transaction` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `import_id` BIGINT NULL,
   `category_id` BIGINT NULL,
@@ -114,27 +114,27 @@ CREATE TABLE IF NOT EXISTS `ducket`.`transaction` (
   UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,
   CONSTRAINT `transaction_account_fk`
     FOREIGN KEY (`account_id`)
-    REFERENCES `ducket`.`account` (`id`)
+    REFERENCES `ducket-db`.`account` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `transaction_category_fk`
     FOREIGN KEY (`category_id`)
-    REFERENCES `ducket`.`category` (`id`)
+    REFERENCES `ducket-db`.`category` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `transaction_import_fk`
     FOREIGN KEY (`import_id`)
-    REFERENCES `ducket`.`import` (`id`)
+    REFERENCES `ducket-db`.`import` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `transaction_user_fk`
     FOREIGN KEY (`user_id`)
-    REFERENCES `ducket`.`user` (`id`)
+    REFERENCES `ducket-db`.`user` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
 
-CREATE TABLE IF NOT EXISTS `ducket`.`import_rule` (
+CREATE TABLE IF NOT EXISTS `ducket-db`.`import_rule` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `user_id` BIGINT NOT NULL,
   `record_category_id` BIGINT NOT NULL,
@@ -150,17 +150,17 @@ CREATE TABLE IF NOT EXISTS `ducket`.`import_rule` (
   UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,
   CONSTRAINT `rule_record_category_fk`
     FOREIGN KEY (`record_category_id`)
-    REFERENCES `ducket`.`category` (`id`)
+    REFERENCES `ducket-db`.`category` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `rule_user_fk`
     FOREIGN KEY (`user_id`)
-    REFERENCES `ducket`.`user` (`id`)
+    REFERENCES `ducket-db`.`user` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
 
-CREATE TABLE IF NOT EXISTS `ducket`.`budget` (
+CREATE TABLE IF NOT EXISTS `ducket-db`.`budget` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `category_id` BIGINT NOT NULL,
   `user_id` BIGINT NOT NULL,
@@ -179,22 +179,22 @@ CREATE TABLE IF NOT EXISTS `ducket`.`budget` (
   UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,
   CONSTRAINT `budget_currency_fk`
     FOREIGN KEY (`currency_id`)
-    REFERENCES `ducket`.`currency` (`id`)
+    REFERENCES `ducket-db`.`currency` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `budget_category_fk`
     FOREIGN KEY (`category_id`)
-    REFERENCES `ducket`.`category` (`id`)
+    REFERENCES `ducket-db`.`category` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `budget_user_fk`
     FOREIGN KEY (`user_id`)
-    REFERENCES `ducket`.`user` (`id`)
+    REFERENCES `ducket-db`.`user` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
 
-CREATE TABLE IF NOT EXISTS `ducket`.`transfer` (
+CREATE TABLE IF NOT EXISTS `ducket-db`.`transfer` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `import_id` BIGINT NULL,
   `user_id` BIGINT NOT NULL,
@@ -217,27 +217,27 @@ CREATE TABLE IF NOT EXISTS `ducket`.`transfer` (
   INDEX `transfer_import_fk_idx` (`import_id` ASC) VISIBLE,
   CONSTRAINT `transfer_account_fk`
     FOREIGN KEY (`account_id`)
-    REFERENCES `ducket`.`account` (`id`)
+    REFERENCES `ducket-db`.`account` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `transfer_to_account_fk`
     FOREIGN KEY (`transfer_account_id`)
-    REFERENCES `ducket`.`account` (`id`)
+    REFERENCES `ducket-db`.`account` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `transfer_user_fk`
     FOREIGN KEY (`user_id`)
-    REFERENCES `ducket`.`user` (`id`)
+    REFERENCES `ducket-db`.`user` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `transfer_import_fk`
     FOREIGN KEY (`import_id`)
-    REFERENCES `ducket`.`import` (`id`)
+    REFERENCES `ducket-db`.`import` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
 
-CREATE TABLE IF NOT EXISTS `ducket`.`budget_account` (
+CREATE TABLE IF NOT EXISTS `ducket-db`.`budget_account` (
   `budget_id` BIGINT NOT NULL,
   `account_id` BIGINT NOT NULL,
   INDEX `budget_fk_idx` (`budget_id` ASC) VISIBLE,
@@ -245,17 +245,17 @@ CREATE TABLE IF NOT EXISTS `ducket`.`budget_account` (
   PRIMARY KEY (`budget_id`, `account_id`),
   CONSTRAINT `budget_account_budget_fk`
     FOREIGN KEY (`budget_id`)
-    REFERENCES `ducket`.`budget` (`id`)
+    REFERENCES `ducket-db`.`budget` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `budget_account_account_fk`
     FOREIGN KEY (`account_id`)
-    REFERENCES `ducket`.`account` (`id`)
+    REFERENCES `ducket-db`.`account` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
 
-CREATE TABLE IF NOT EXISTS `ducket`.`attachment` (
+CREATE TABLE IF NOT EXISTS `ducket-db`.`attachment` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `file_path` VARCHAR(128) NOT NULL,
   `created_at` TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -263,7 +263,7 @@ CREATE TABLE IF NOT EXISTS `ducket`.`attachment` (
   UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE);
 
 
-CREATE TABLE IF NOT EXISTS `ducket`.`transaction_attachment` (
+CREATE TABLE IF NOT EXISTS `ducket-db`.`transaction_attachment` (
   `transaction_id` BIGINT NOT NULL,
   `attachment_id` BIGINT NOT NULL,
   INDEX `transaction_attachment_transactiont_fk_idx` (`transaction_id` ASC) VISIBLE,
@@ -271,17 +271,17 @@ CREATE TABLE IF NOT EXISTS `ducket`.`transaction_attachment` (
   PRIMARY KEY (`transaction_id`, `attachment_id`),
   CONSTRAINT `transaction_attachment_transactiont_fk`
     FOREIGN KEY (`transaction_id`)
-    REFERENCES `ducket`.`transaction` (`id`)
+    REFERENCES `ducket-db`.`transaction` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `transaction_attachment_attachment_fk`
     FOREIGN KEY (`attachment_id`)
-    REFERENCES `ducket`.`attachment` (`id`)
+    REFERENCES `ducket-db`.`attachment` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
 
-CREATE TABLE IF NOT EXISTS `ducket`.`transfer_attachment` (
+CREATE TABLE IF NOT EXISTS `ducket-db`.`transfer_attachment` (
   `transfer_id` BIGINT NOT NULL,
   `attachment_id` BIGINT NOT NULL,
   INDEX `transaction_attachment_attachment_fk_idx` (`attachment_id` ASC) VISIBLE,
@@ -289,17 +289,17 @@ CREATE TABLE IF NOT EXISTS `ducket`.`transfer_attachment` (
   PRIMARY KEY (`transfer_id`, `attachment_id`),
   CONSTRAINT `transfer_attachment_transfer_fk`
     FOREIGN KEY (`transfer_id`)
-    REFERENCES `ducket`.`transfer` (`id`)
+    REFERENCES `ducket-db`.`transfer` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `transfer_attachment_attachment_fk`
     FOREIGN KEY (`attachment_id`)
-    REFERENCES `ducket`.`attachment` (`id`)
+    REFERENCES `ducket-db`.`attachment` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
 
-CREATE TABLE IF NOT EXISTS `ducket`.`follow` (
+CREATE TABLE IF NOT EXISTS `ducket-db`.`follow` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `follower_id` BIGINT NOT NULL,
   `followed_id` BIGINT NOT NULL,
@@ -310,55 +310,55 @@ CREATE TABLE IF NOT EXISTS `ducket`.`follow` (
   INDEX `followed_user_fk_idx` (`followed_id` ASC) VISIBLE,
   CONSTRAINT `follower_user_fk`
     FOREIGN KEY (`follower_id`)
-    REFERENCES `ducket`.`user` (`id`)
+    REFERENCES `ducket-db`.`user` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `followed_user_fk`
     FOREIGN KEY (`followed_id`)
-    REFERENCES `ducket`.`user` (`id`)
+    REFERENCES `ducket-db`.`user` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
-CREATE TABLE IF NOT EXISTS `ducket`.`account_transaction` (
+CREATE TABLE IF NOT EXISTS `ducket-db`.`account_transaction` (
   `account_id` BIGINT NOT NULL,
   `transaction_id` BIGINT NOT NULL,
   PRIMARY KEY (`account_id`, `transaction_id`),
   INDEX `account_transaction_transaction_fk_idx` (`transaction_id` ASC) VISIBLE,
   CONSTRAINT `account_transaction_account_fk`
     FOREIGN KEY (`account_id`)
-    REFERENCES `ducket`.`account` (`id`)
+    REFERENCES `ducket-db`.`account` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `account_transaction_transaction_fk`
     FOREIGN KEY (`transaction_id`)
-    REFERENCES `ducket`.`transaction` (`id`)
+    REFERENCES `ducket-db`.`transaction` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
 
-CREATE TABLE IF NOT EXISTS `ducket`.`account_transfer` (
+CREATE TABLE IF NOT EXISTS `ducket-db`.`account_transfer` (
   `account_id` BIGINT NOT NULL,
   `transfer_id` BIGINT NOT NULL,
   PRIMARY KEY (`account_id`, `transfer_id`),
   INDEX `account_transfer_transfer_fk_idx` (`transfer_id` ASC) VISIBLE,
   CONSTRAINT `account_transfer_account_fk`
     FOREIGN KEY (`account_id`)
-    REFERENCES `ducket`.`account` (`id`)
+    REFERENCES `ducket-db`.`account` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `account_transfer_transfer_fk`
     FOREIGN KEY (`transfer_id`)
-    REFERENCES `ducket`.`transfer` (`id`)
+    REFERENCES `ducket-db`.`transfer` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
-USE `ducket`;
+USE `ducket-db`;
 
 DELIMITER $$
-USE `ducket`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `ducket`.`account_BEFORE_DELETE` BEFORE DELETE ON `account` FOR EACH ROW
+USE `ducket-db`$$
+CREATE DEFINER = CURRENT_USER TRIGGER `ducket-db`.`account_BEFORE_DELETE` BEFORE DELETE ON `account` FOR EACH ROW
 BEGIN
 	DELETE FROM `account_transaction` WHERE `account_transaction`.`account_id` = OLD.`id`;
 	DELETE FROM `account_transfer` WHERE `account_transfer`.`account_id` = OLD.`id`;
@@ -367,21 +367,21 @@ BEGIN
     DELETE FROM `budget_account` WHERE `budget_account`.`account_id` = OLD.`id`;
 END$$
 
-USE `ducket`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `ducket`.`import_AFTER_DELETE` AFTER DELETE ON `import` FOR EACH ROW
+USE `ducket-db`$$
+CREATE DEFINER = CURRENT_USER TRIGGER `ducket-db`.`import_AFTER_DELETE` AFTER DELETE ON `import` FOR EACH ROW
 BEGIN
 	DELETE FROM `transaction` WHERE `transaction`.`import_id` = OLD.`id`;
 	DELETE FROM `transfer` WHERE `transfer`.`import_id` = OLD.`id`;
 END$$
 
-USE `ducket`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `ducket`.`budget_BEFORE_DELETE` BEFORE DELETE ON `budget` FOR EACH ROW
+USE `ducket-db`$$
+CREATE DEFINER = CURRENT_USER TRIGGER `ducket-db`.`budget_BEFORE_DELETE` BEFORE DELETE ON `budget` FOR EACH ROW
 BEGIN
 	DELETE FROM `budget_account` WHERE `budget_account`.`budget_id` = OLD.`id`;
 END$$
 
-USE `ducket`$$
-CREATE DEFINER = CURRENT_USER TRIGGER `ducket`.`attachment_BEFORE_DELETE` BEFORE DELETE ON `attachment` FOR EACH ROW
+USE `ducket-db`$$
+CREATE DEFINER = CURRENT_USER TRIGGER `ducket-db`.`attachment_BEFORE_DELETE` BEFORE DELETE ON `attachment` FOR EACH ROW
 BEGIN
 	DELETE FROM `transfer_attachment` WHERE `transfer_attachment`.`attachment_id` = OLD.`id`;
     DELETE FROM `transaction_attachment` WHERE `transaction_attachment`.`attachment_id` = OLD.`id`;

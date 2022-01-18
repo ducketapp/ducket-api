@@ -174,10 +174,10 @@ fun Application.module(
 
 /**
  * Required environment variables:
- * JWT_SECRET, DB_ROOT_PASSWORD
+ * JWT_SECRET, DB_ROOT_PASSWORD, DB_NAME
  *
  * Optional environment variables:
- * PORT, DB_HOST, DB_PORT, DB_NAME
+ * PORT, DB_HOST, DB_PORT
  */
 @Suppress("unused")
 private fun Application.setupAppConfig() {
@@ -198,7 +198,7 @@ private fun Application.setupAppConfig() {
         this.databaseConfig = DatabaseConfig(
             host = hoconConfig.property("database.host").getString(),
             port = hoconConfig.property("database.port").getString().toInt(),
-            db = hoconConfig.property("database.db").getString(),
+            name = hoconConfig.property("database.name").getString(),
             driver = hoconConfig.property("database.driver").getString(),
             username = hoconConfig.property("database.username").getString(),
             password = hoconConfig.property("database.password").getString(),

@@ -1,56 +1,63 @@
-version: '2.1'
+version: '3'
 
 services:
-  ducket-db-service:
-    image: mysql:5.7
-    restart: always
+  db:
+    image: mysql:8.0.19
+    restart: unless-stopped
     environment:
       - MYSQL_DATABASE=${DB_NAME}
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
       - TZ=UTC
     ports:
-      - "${DB_PORT}:${DB_PORT}"
+      - 3310:${DB_PORT}
     command: ['mysqld', '--character-set-server=utf8mb4']
     volumes:
       - app_database:/var/lib/mysql
 
-  ducket-api-service:
+  backend:
     build:
       context: .
       dockerfile: Dockerfile
     depends_on:
-      - ducket-db-service
+      - db
     environment:
-      - DB_HOST=ducket-db-service
+      - DB_HOST=db
       - DB_NAME=${DB_NAME}
       - DB_PORT=${DB_PORT}
+      - DB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
       - PORT=${PORT}
-    restart: always
+    restart: unless-stopped
     ports:
-      - "${PORT}:${PORT}"
+      - 8100:${PORT}
     volumes:
       - app_service:/bin/runner
 
-  prometheus-service:
-    image: prom/prometheus
-    restart: always
+  prometheus:
+    image: prom/prometheus:v2.32.0
+    restart: unless-stopped
     ports:
-      - "3570:3570"
+      - 3570:9090
     volumes:
-      - ./monitoring:/etc/prometheus/
+      - ./resources/monitoring:/prometheus
+    command:
+      - "--config.file=/prometheus/prometheus.yml"
     links:
-      - ducket-service
+      - backend
 
-  grafana-service:
-    image: grafana/grafana:5.1.0
+  grafana:
+    image: grafana/grafana-oss:8.1.8
     ports:
-      - "3000:3000"
+      - 3000:3000
     volumes:
-      - ./monitoring/grafana:/var/lib/grafana
+      - grafana_data:/var/lib/grafana
     links:
-      - ducket-api-service
-      - prometheus-service
+      - backend
+      - prometheus
+    user: "104"
 
-  volumes:
-    app_database:
-    app_service:
+volumes:
+  app_database:
+  app_service:
+  grafana_data:
+  prometheus_data:
