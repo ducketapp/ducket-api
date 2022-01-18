@@ -1,17 +1,18 @@
 package io.ducket.api.domain.service
 
+import io.ducket.api.config.AppConfig
 import io.ducket.api.config.DatabaseConfig
 import io.ducket.api.getLogger
 import io.ducket.api.plugins.InvalidDataError
 import io.ktor.http.*
 import io.ktor.http.content.*
-import org.koin.java.KoinJavaComponent
+import org.koin.java.KoinJavaComponent.inject
 import java.io.File
 import java.nio.file.Paths
 import java.time.Instant
 
 abstract class FileService {
-    private val dbConfig: DatabaseConfig by KoinJavaComponent.inject(DatabaseConfig::class.java)
+    private val config: AppConfig by inject(AppConfig::class.java)
     private val logger = getLogger()
 
     protected fun extractImportData(multipartData: List<PartData>): Pair<File, ByteArray> {
@@ -101,7 +102,7 @@ abstract class FileService {
 
     private fun createLocalFile(dir: String, extension: String, content: ByteArray): File {
         val fileName = "${Instant.now().toEpochMilli()}.$extension"
-        val filePath = Paths.get(dbConfig.dataPath, dir, fileName)
+        val filePath = Paths.get(config.databaseConfig.dataPath, dir, fileName)
         val localFile = File(filePath.toUri())
 
         logger.debug("Create local file: ${localFile.path}")

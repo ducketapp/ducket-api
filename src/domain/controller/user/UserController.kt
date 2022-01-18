@@ -7,7 +7,6 @@ import io.ducket.api.principalOrThrow
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
-import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.util.*
