@@ -1,7 +1,6 @@
 package io.ducket.api.domain.service
 
 import io.ducket.api.config.AppConfig
-import io.ducket.api.config.DatabaseConfig
 import io.ducket.api.getLogger
 import io.ducket.api.plugins.InvalidDataError
 import io.ktor.http.*

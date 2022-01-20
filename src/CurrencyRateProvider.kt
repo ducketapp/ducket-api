@@ -3,6 +3,7 @@ package io.ducket.api
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
+import io.ducket.api.plugins.BusinessException
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
@@ -25,7 +26,7 @@ import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
 
 
-class CurrencyRatesClient {
+class CurrencyRateProvider {
     private val logger = getLogger()
     private val sourceUrl = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
     private val downloadPath = Paths.get(System.getProperty("java.io.tmpdir"), "ecb")
@@ -75,17 +76,17 @@ class CurrencyRatesClient {
     fun pullRates(): File {
         logger.debug("Resolving currencies rates file")
 
-        val todayRatesFileName = "${fileNamePrefix}_${LocalDate.now()}.xml"
-        val downloadedRates = File(downloadPath.toUri()).listFiles()
+        val latestFileName = "${fileNamePrefix}_${LocalDate.now()}.xml"
+        val storedRates = File(downloadPath.toUri()).listFiles()
             ?.filter { it.isFile && it.name.startsWith(fileNamePrefix) }
             ?.sortedByDescending { it.name }
 
-        var todayRatesFile = downloadedRates?.firstOrNull { it.name == todayRatesFileName }
+        var latestFile = storedRates?.firstOrNull { it.name == latestFileName }
 
-        if (todayRatesFile == null) {
+        if (latestFile == null) {
             logger.debug("The file with actual currency rates was not found at $downloadPath")
 
-            todayRatesFile = File(Paths.get(downloadPath.toString(), todayRatesFileName).toUri())
+            latestFile = File(Paths.get(downloadPath.toString(), latestFileName).toUri())
 
             return runBlocking {
                 try {
@@ -93,30 +94,30 @@ class CurrencyRatesClient {
                     val response: HttpResponse = client.get(sourceUrl)
 
                     if (response.status == HttpStatusCode.OK) {
-                        todayRatesFile.parentFile.mkdirs()
-                        todayRatesFile.writeBytes(response.receive())
+                        latestFile.parentFile.mkdirs()
+                        latestFile.writeBytes(response.receive())
+                        logger.debug("The file with latest currency rates was created: ${latestFile.path}")
 
-                        logger.debug("The file with actual currency rates was created: ${todayRatesFile.path}")
-                        return@runBlocking todayRatesFile
+                        return@runBlocking latestFile
                     } else {
-                        throw Exception()
+                        throw Exception("${response.status} - ${response.receive<String>()}")
                     }
                 } catch (e: Exception) {
                     logger.error("Error in pulling currency rates from $sourceUrl: ${e.message}")
 
-                    if (downloadedRates != null && downloadedRates.isNotEmpty()) {
-                        val lastDownloadedFile: File =  downloadedRates[0]
-                        logger.info("Using last file: ${lastDownloadedFile.path}")
+                    if (storedRates != null && storedRates.isNotEmpty()) {
+                        val lastStoredFile = storedRates[0]
+                        logger.info("Using last stored file: ${lastStoredFile.path}")
 
-                        return@runBlocking lastDownloadedFile
+                        return@runBlocking lastStoredFile
                     } else {
                         throw CurrencyRatePullException(e)
                     }
                 }
             }
         } else {
-            logger.debug("Using recently pulled file: ${todayRatesFile.path}")
-            return todayRatesFile
+            logger.debug("Using actual file: ${latestFile.path}")
+            return latestFile
         }
     }
 

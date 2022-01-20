@@ -1,6 +1,6 @@
 package io.ducket.api.domain.service
 
-import io.ducket.api.CurrencyRatesClient
+import io.ducket.api.CurrencyRateProvider
 import io.ducket.api.domain.controller.currency.CurrencyDto
 import io.ducket.api.domain.controller.currency.CurrencyRateDto
 import io.ducket.api.domain.repository.CurrencyRepository
@@ -11,10 +11,10 @@ import org.koin.java.KoinJavaComponent.inject
 class CurrencyService(
     private val currencyRepository: CurrencyRepository,
 ) {
-    private val currencyRatesClient: CurrencyRatesClient by inject(CurrencyRatesClient::class.java)
+    private val currencyRateProvider: CurrencyRateProvider by inject(CurrencyRateProvider::class.java)
 
     fun getCurrenciesRates(): List<CurrencyRateDto> {
-        val currenciesRatesMap = currencyRatesClient.getRatesMap()
+        val currenciesRatesMap = currencyRateProvider.getRatesMap()
 
         return getCurrencies().map {
             val currencyIsoCode = it.isoCode

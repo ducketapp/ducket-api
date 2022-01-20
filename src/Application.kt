@@ -67,7 +67,7 @@ fun Application.module(
     val appConfig by inject<AppConfig>()
     val database by inject<DatabaseFactory>()
     val jwtManager by inject<JwtManager>()
-    val ratesClient by inject<CurrencyRatesClient>()
+    val ratesClient by inject<CurrencyRateProvider>()
 
     database.connect()
     ratesClient.pullRates()

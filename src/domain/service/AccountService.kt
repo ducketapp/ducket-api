@@ -1,6 +1,6 @@
 package io.ducket.api.domain.service
 
-import io.ducket.api.CurrencyRatesClient
+import io.ducket.api.CurrencyRateProvider
 import io.ducket.api.domain.controller.account.*
 import io.ducket.api.domain.controller.currency.CurrencyDto
 import io.ducket.api.domain.controller.record.RecordDto
@@ -21,7 +21,7 @@ class AccountService(
     private val transferRepository: TransferRepository,
     private val userRepository: UserRepository,
 ) {
-    private val currencyRatesClient: CurrencyRatesClient by inject(CurrencyRatesClient::class.java)
+    private val currencyRateProvider: CurrencyRateProvider by inject(CurrencyRateProvider::class.java)
 
     fun calculateBalance(accountOwnerId: Long, accountId: Long, beforeDate: Instant = Instant.now()): BigDecimal {
         val accountTransactions = transactionRepository.findAllByAccount(accountOwnerId, accountId).map { RecordDto(it) }
@@ -95,7 +95,7 @@ class AccountService(
             if (it.accountCurrency.id != userCurrency.id) {
                 val baseCurrency = it.accountCurrency.isoCode
                 val termCurrency = userCurrency.isoCode
-                rate = currencyRatesClient.getCurrencyRate(baseCurrency, termCurrency)
+                rate = currencyRateProvider.getCurrencyRate(baseCurrency, termCurrency)
 
                 appliedExchangeRates.add(AccountBalanceExchangeRateDto(baseCurrency, termCurrency, rate))
             }

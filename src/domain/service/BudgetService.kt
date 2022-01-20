@@ -1,6 +1,6 @@
 package io.ducket.api.domain.service
 
-import io.ducket.api.CurrencyRatesClient
+import io.ducket.api.CurrencyRateProvider
 import io.ducket.api.domain.controller.budget.BudgetCreateDto
 import io.ducket.api.domain.controller.budget.BudgetDto
 import io.ducket.api.domain.controller.budget.BudgetPeriodBoundsDto
@@ -31,7 +31,7 @@ class BudgetService(
     private val currencyRepository: CurrencyRepository,
 ) {
     private val logger = getLogger()
-    private val currencyRatesClient: CurrencyRatesClient by inject(CurrencyRatesClient::class.java)
+    private val currencyRateProvider: CurrencyRateProvider by inject(CurrencyRateProvider::class.java)
 
     fun createBudget(userId: Long, reqObj: BudgetCreateDto): BudgetDto {
         val currencyId = currencyRepository.findOne(reqObj.currencyIsoCode)?.id
@@ -104,9 +104,9 @@ class BudgetService(
 
             if (recordCurrencyIsoCode != currencyIsoCode) {
                 try {
-                    val rate = currencyRatesClient.getCurrencyRate(recordCurrencyIsoCode, currencyIsoCode)
+                    val rate = currencyRateProvider.getCurrencyRate(recordCurrencyIsoCode, currencyIsoCode)
                     return@map it.amount * rate
-                } catch (e: CurrencyRatesClient.CurrencyRateClientException) {
+                } catch (e: CurrencyRateProvider.CurrencyRateClientException) {
                     logger.error("Cannot convert record amount: $it")
                     return@map BigDecimal.ZERO
                 }

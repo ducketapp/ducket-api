@@ -1,6 +1,6 @@
 package io.ducket.api.domain.service
 
-import io.ducket.api.CurrencyRatesClient
+import io.ducket.api.CurrencyRateProvider
 import io.ducket.api.domain.controller.transfer.TransferCreateDto
 import io.ducket.api.domain.controller.transfer.TransferDto
 import io.ducket.api.domain.repository.AccountRepository
@@ -17,7 +17,7 @@ class TransferService(
     private val accountRepository: AccountRepository,
     private val accountService: AccountService,
 ): FileService() {
-    private val currencyRatesClient: CurrencyRatesClient by inject(CurrencyRatesClient::class.java)
+    private val currencyRateProvider: CurrencyRateProvider by inject(CurrencyRateProvider::class.java)
 
     fun getTransferDetailsAccessibleToUser(userId: Long, transferId: Long): TransferDto {
         return getTransfersAccessibleToUser(userId).firstOrNull { it.id == transferId }
@@ -41,7 +41,7 @@ class TransferService(
 
         if (reqObj.exchangeRate == null) {
             if (fromAccount.currency.id != toAccount.currency.id) {
-                exchangeRate = currencyRatesClient.getCurrencyRate(fromAccount.currency.isoCode, toAccount.currency.isoCode)
+                exchangeRate = currencyRateProvider.getCurrencyRate(fromAccount.currency.isoCode, toAccount.currency.isoCode)
             }
         } else {
             if (fromAccount.currency.id == toAccount.currency.id && exchangeRate != BigDecimal.ONE) {

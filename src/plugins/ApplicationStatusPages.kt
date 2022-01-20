@@ -123,6 +123,7 @@ class AuthorizationException(message: String = "Access denied") : Exception(mess
 class NoEntityFoundError(message: String = "No such entity was found") : Exception(message)
 class DuplicateEntityError(message: String = "Such an entity already exists") : Exception(message)
 class InvalidDataError(message: String = "Invalid data") : Exception(message)
+class BusinessException(message: String = "Exception in business logic") : Exception(message)
 
 data class ErrorResponse(
     val status: HttpStatusCode,

@@ -1,9 +1,8 @@
 package io.ducket.api.app
 
-import io.ducket.api.CurrencyRatesClient
+import io.ducket.api.CurrencyRateProvider
 import io.ducket.api.app.database.AppDatabaseFactory
 import io.ducket.api.app.database.DatabaseFactory
-import io.ducket.api.app.database.TestingDatabaseFactory
 import io.ducket.api.config.AppConfig
 import io.ducket.api.config.JwtManager
 import io.ducket.api.domain.controller.account.AccountController
@@ -26,7 +25,7 @@ object AppModule {
          * Application
          */
         single<AppConfig>()
-        single<CurrencyRatesClient>()
+        single<CurrencyRateProvider>()
         single<DatabaseFactory> { AppDatabaseFactory(get()) }
         single { JwtManager(get()) }
 
