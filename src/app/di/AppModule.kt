@@ -1,4 +1,4 @@
-package io.ducket.api.app
+package io.ducket.api.app.di
 
 import io.ducket.api.CurrencyRateProvider
 import io.ducket.api.app.database.AppDatabaseFactory
@@ -44,7 +44,7 @@ object AppModule {
         /**
          * Services
          */
-        single { UserService(get(), get(), get()) }
+        single { UserService(get(), get(), get(), get(), get(), get(), get(), get()) }
         single { AccountService(get(), get(), get(), get()) }
         single { CategoryService(get()) }
         single { TransferService(get(), get(), get()) }

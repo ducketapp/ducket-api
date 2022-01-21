@@ -4,7 +4,7 @@ import io.ducket.api.CurrencyRateProvider
 import io.ducket.api.domain.controller.currency.CurrencyDto
 import io.ducket.api.domain.controller.currency.CurrencyRateDto
 import io.ducket.api.domain.repository.CurrencyRepository
-import io.ducket.api.plugins.InvalidDataError
+import io.ducket.api.plugins.InvalidDataException
 import org.koin.java.KoinJavaComponent.inject
 
 
@@ -22,7 +22,7 @@ class CurrencyService(
             if (currenciesRatesMap.containsKey(currencyIsoCode)) {
                 CurrencyRateDto(currency = it, rate = currenciesRatesMap[currencyIsoCode]!!)
             } else {
-                throw InvalidDataError("Cannot find a rate for $currencyIsoCode currency")
+                throw InvalidDataException("Cannot find a rate for $currencyIsoCode currency")
             }
         }
     }

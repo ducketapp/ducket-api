@@ -2,7 +2,7 @@ package io.ducket.api.domain.service
 
 import io.ducket.api.config.AppConfig
 import io.ducket.api.getLogger
-import io.ducket.api.plugins.InvalidDataError
+import io.ducket.api.plugins.InvalidDataException
 import io.ktor.http.*
 import io.ktor.http.content.*
 import org.koin.java.KoinJavaComponent.inject
@@ -24,15 +24,15 @@ abstract class FileService {
                 val fileBytes = partData.streamProvider().readBytes()
 
                 if (fileName == null || fileExtension == null || fileExtension != "csv") {
-                    throw InvalidDataError("Unsupported file, expected *.csv")
+                    throw InvalidDataException("Unsupported file, expected *.csv")
                 }
 
                 return Pair(File(fileName), fileBytes)
             } else {
-                throw InvalidDataError("Unsupported part data, expected a file")
+                throw InvalidDataException("Unsupported part data, expected a file")
             }
         } else {
-            throw InvalidDataError("Unsupported amount of files, expected 1")
+            throw InvalidDataException("Unsupported amount of files, expected 1")
         }
     }
 
@@ -47,28 +47,28 @@ abstract class FileService {
                     val fileSize = bytesToMegabytes(fileBytes)
 
                     if (contentType?.startsWith("image/") == false) {
-                        throw InvalidDataError("Unsupported mime type: $contentType")
+                        throw InvalidDataException("Unsupported mime type: $contentType")
                     }
 
                     if (fileName == null || fileExtension == null) {
-                        throw InvalidDataError("Invalid '$fileName' file name at index: $idx")
+                        throw InvalidDataException("Invalid '$fileName' file name at index: $idx")
                     }
 
                     if (fileSize == 0.0 || fileSize > 1.0) {
-                        throw InvalidDataError("Unsupported file size, limit is 1MB")
+                        throw InvalidDataException("Unsupported file size, limit is 1MB")
                     }
 
                     return@mapIndexed Pair(File(fileName), fileBytes)
                 } else {
-                    throw InvalidDataError("Invalid multipart key name at index: $idx")
+                    throw InvalidDataException("Invalid multipart key name at index: $idx")
                 }
             } else {
-                throw InvalidDataError("Unsupported part data at index: $idx")
+                throw InvalidDataException("Unsupported part data at index: $idx")
             }
         }
 
         if (result.isEmpty()) {
-            throw InvalidDataError("At least one attachment required!")
+            throw InvalidDataException("At least one attachment required!")
         }
 
         return result

@@ -2,7 +2,7 @@ package io.ducket.api.domain.controller.transfer
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.ducket.api.InstantDeserializer
-import io.ducket.api.plugins.InvalidDataError
+import io.ducket.api.plugins.InvalidDataException
 import org.valiktor.functions.*
 import java.math.BigDecimal
 import java.time.Instant
@@ -29,11 +29,11 @@ data class TransferCreateDto(
             validate(TransferCreateDto::amount).isLessThan(BigDecimal.ZERO)
 
             if (amount.scale() !in 0..2) {
-                throw InvalidDataError("Transfer amount scale should not be greater than 2")
+                throw InvalidDataException("Transfer amount scale should not be greater than 2")
             }
 
             if (accountId == transferAccountId) {
-                throw InvalidDataError("Origin and target transfer accounts should differ")
+                throw InvalidDataException("Origin and target transfer accounts should differ")
             }
         }
         return this

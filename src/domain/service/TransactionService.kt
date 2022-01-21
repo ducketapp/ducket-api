@@ -4,8 +4,8 @@ import io.ducket.api.domain.controller.transaction.TransactionCreateDto
 import io.ducket.api.domain.controller.transaction.TransactionDeleteDto
 import io.ducket.api.domain.controller.transaction.TransactionDto
 import io.ducket.api.domain.repository.TransactionRepository
-import io.ducket.api.plugins.InvalidDataError
-import io.ducket.api.plugins.NoEntityFoundError
+import io.ducket.api.plugins.InvalidDataException
+import io.ducket.api.plugins.NoEntityFoundException
 import io.ktor.http.content.*
 import java.io.File
 
@@ -19,7 +19,7 @@ class TransactionService(
      */
     fun getTransactionDetailsAccessibleToUser(userId: Long, transactionId: Long): TransactionDto {
         return getTransactionsAccessibleToUser(userId).firstOrNull { it.id == transactionId }
-            ?: throw NoEntityFoundError("No such transaction was found")
+            ?: throw NoEntityFoundException("No such transaction was found")
     }
 
     /**
@@ -60,21 +60,21 @@ class TransactionService(
     fun downloadTransactionAttachment(userId: Long, transactionId: Long, attachmentId: Long): File {
         val transaction = getTransactionDetailsAccessibleToUser(userId, transactionId)
         val attachment = transactionRepository.findAttachment(transaction.owner.id, transactionId, attachmentId)
-            ?: throw NoEntityFoundError("No such attachment was found")
+            ?: throw NoEntityFoundException("No such attachment was found")
 
-        return getLocalFile(attachment.filePath) ?: throw NoEntityFoundError("No such file was found")
+        return getLocalFile(attachment.filePath) ?: throw NoEntityFoundException("No such file was found")
     }
 
     /**
      * Upload transaction attachment file
      */
     fun uploadTransactionAttachments(userId: Long, transactionId: Long, multipartData: List<PartData>) {
-        transactionRepository.findOne(userId, transactionId) ?: throw NoEntityFoundError("No such transaction was found")
+        transactionRepository.findOne(userId, transactionId) ?: throw NoEntityFoundException("No such transaction was found")
 
         val actualAttachmentsAmount = transactionRepository.getAttachmentsAmount(transactionId)
         val contentPairList = extractImagesData(multipartData)
 
-        if (contentPairList.size + actualAttachmentsAmount > 3) throw InvalidDataError("Attachments limit exceeded, max 3")
+        if (contentPairList.size + actualAttachmentsAmount > 3) throw InvalidDataException("Attachments limit exceeded, max 3")
 
         contentPairList.forEach { pair ->
             val newFile = createLocalAttachmentFile(pair.first.extension, pair.second)
@@ -90,6 +90,6 @@ class TransactionService(
             transactionRepository.deleteAttachment(userId, transactionId, attachmentId).takeIf {
                 deleteLocalFile(attachment.filePath)
             }
-        } ?: throw NoEntityFoundError("No such attachment was found")
+        } ?: throw NoEntityFoundException("No such attachment was found")
     }
 }

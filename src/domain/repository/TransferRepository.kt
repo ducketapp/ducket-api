@@ -1,6 +1,8 @@
 package io.ducket.api.domain.repository
 
 import domain.model.account.AccountEntity
+import domain.model.transaction.TransactionEntity
+import domain.model.transaction.TransactionsTable
 import domain.model.user.UserEntity
 import io.ducket.api.domain.controller.transfer.TransferCreateDto
 import io.ducket.api.domain.model.attachment.Attachment
@@ -11,6 +13,7 @@ import io.ducket.api.domain.model.transfer.TransferAttachmentsTable
 import io.ducket.api.domain.model.transfer.TransfersTable
 import io.ducket.api.utils.TransferCodeGenerator
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
 import java.math.BigDecimal
@@ -90,7 +93,7 @@ class TransferRepository(
             accountId = senderDto.transferAccountId,
             transferAccountId = senderDto.accountId,
             amount = senderDto.amount.abs().multiply(rate),
-            date = senderDto.date.plusMillis(1L), // hack to prevent excessive sorting
+            date = senderDto.date.plusMillis(1L), // workaround to prevent excessive sorting
         )
         val recipientTransfer = createNewTransfer(userId, recipientDto, rate, relationCode).toModel()
 
@@ -100,13 +103,28 @@ class TransferRepository(
     fun delete(userId: Long, relationCode: String) = transaction {
         TransferEntity.find {
             TransfersTable.userId.eq(userId).and(TransfersTable.relationCode.eq(relationCode))
-        }.toList().forEach { it.delete() }
+        }.forEach { transfer ->
+            transfer.attachments.forEach { it.delete() }
+            transfer.delete()
+        }
     }
 
-    fun delete(userId: Long, transferId: Long) = transaction {
+    fun delete(userId: Long, vararg transferIds: Long) = transaction {
         TransferEntity.find {
-            TransfersTable.userId.eq(userId).and(TransfersTable.id.eq(transferId))
-        }.firstOrNull()?.delete()
+            TransfersTable.id.inList(transferIds.asList()).and(TransfersTable.userId.eq(userId))
+        }.forEach { transfer ->
+            transfer.attachments.forEach { it.delete() }
+            transfer.delete()
+        }
+    }
+
+    fun deleteAll(userId: Long): Unit = transaction {
+        TransferEntity.find {
+            TransfersTable.userId.eq(userId)
+        }.forEach { transfer ->
+            transfer.attachments.forEach { it.delete() }
+            transfer.delete()
+        }
     }
 
     override fun findAttachment(userId: Long, entityId: Long, attachmentId: Long): Attachment? = transaction {

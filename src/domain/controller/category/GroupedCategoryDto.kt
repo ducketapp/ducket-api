@@ -1,9 +1,8 @@
 package io.ducket.api.domain.controller.category
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonUnwrapped
 import domain.model.category.Category
-import domain.model.category.CategoryGroup
+import io.ducket.api.app.CategoryGroup
 
 data class GroupedCategoryDto(
     val group: CategoryGroup,

@@ -7,9 +7,9 @@ import io.ducket.api.domain.controller.record.RecordDto
 import io.ducket.api.domain.repository.*
 import io.ducket.api.extension.isBeforeInclusive
 import io.ducket.api.extension.sumByDecimal
-import io.ducket.api.plugins.DuplicateEntityError
-import io.ducket.api.plugins.InvalidDataError
-import io.ducket.api.plugins.NoEntityFoundError
+import io.ducket.api.plugins.DuplicateEntityException
+import io.ducket.api.plugins.InvalidDataException
+import io.ducket.api.plugins.NoEntityFoundException
 import org.koin.java.KoinJavaComponent.inject
 import java.math.BigDecimal
 import java.text.DecimalFormat
@@ -55,23 +55,23 @@ class AccountService(
      */
     fun getAccountDetailsAccessibleToUser(userId: Long, accountId: Long): AccountDto {
         return getAccountsAccessibleToUser(userId).firstOrNull { it.id == accountId }
-            ?: throw NoEntityFoundError("No such account was found")
+            ?: throw NoEntityFoundException("No such account was found")
     }
 
     fun createAccount(userId: Long, reqObj: AccountCreateDto): AccountDto {
         accountRepository.findOneByName(userId, reqObj.name)?.let {
-            throw DuplicateEntityError("'${reqObj.name}' account already exists")
+            throw DuplicateEntityException("'${reqObj.name}' account already exists")
         }
 
         return AccountDto(accountRepository.create(userId, reqObj))
     }
 
     fun updateAccount(userId: Long, accountId: Long, reqObj: AccountUpdateDto): AccountDto {
-        accountRepository.findOne(userId, accountId) ?: throw NoEntityFoundError("No such account was found")
+        accountRepository.findOne(userId, accountId) ?: throw NoEntityFoundException("No such account was found")
 
         reqObj.name?.let {
             accountRepository.findOneByName(userId, it)?.let { found ->
-                if (found.id != accountId) throw InvalidDataError("'${reqObj.name}' account already exists")
+                if (found.id != accountId) throw InvalidDataException("'${reqObj.name}' account already exists")
             }
         }
 
@@ -80,13 +80,13 @@ class AccountService(
     }
 
     fun deleteAccount(userId: Long, accountId: Long): Boolean {
-        return accountRepository.deleteOne(userId, accountId)
+        return accountRepository.delete(userId, accountId)
     }
 
     fun getAccountsBalance(userId: Long): AccountsBalanceDto {
         val accounts = getAccountsAccessibleToUser(userId)
         val userCurrency = userRepository.findOne(userId)?.mainCurrency
-            ?: throw NoEntityFoundError("No such user was found")
+            ?: throw NoEntityFoundException("No such user was found")
 
         val appliedExchangeRates = mutableListOf<AccountBalanceExchangeRateDto>()
 

@@ -1,6 +1,5 @@
 package io.ducket.api.domain.controller.user
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import io.ducket.api.domain.controller.currency.CurrencyDto
 import domain.model.user.User

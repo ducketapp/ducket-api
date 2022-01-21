@@ -3,7 +3,7 @@ package io.ducket.api.domain.service
 import io.ducket.api.domain.controller.category.TypedCategoryDto
 import io.ducket.api.domain.controller.category.GroupedCategoryDto
 import io.ducket.api.domain.repository.CategoryRepository
-import io.ducket.api.plugins.NoEntityFoundError
+import io.ducket.api.plugins.NoEntityFoundException
 
 class CategoryService(private val categoryRepository: CategoryRepository) {
 
@@ -15,6 +15,6 @@ class CategoryService(private val categoryRepository: CategoryRepository) {
 
     fun getCategory(id: Long): TypedCategoryDto {
         return categoryRepository.findById(id)?.let { TypedCategoryDto(it) }
-            ?: throw NoEntityFoundError("No such category was found")
+            ?: throw NoEntityFoundException("No such category was found")
     }
 }

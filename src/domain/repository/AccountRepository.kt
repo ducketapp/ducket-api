@@ -2,16 +2,11 @@ package io.ducket.api.domain.repository
 
 import domain.model.account.*
 import domain.model.account.AccountsTable
+import domain.model.currency.CurrenciesTable
 import io.ducket.api.domain.controller.account.AccountCreateDto
 import io.ducket.api.domain.controller.account.AccountUpdateDto
 import domain.model.currency.CurrencyEntity
-import domain.model.transaction.TransactionEntity
-import domain.model.transaction.TransactionsTable
 import domain.model.user.UserEntity
-import io.ducket.api.domain.model.follow.FollowEntity
-import io.ducket.api.domain.model.follow.FollowsTable
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.or
@@ -24,11 +19,13 @@ class AccountRepository(
 ) {
 
     fun create(userId: Long, dto: AccountCreateDto): Account = transaction {
+        val currencyId = CurrencyEntity.find { CurrenciesTable.isoCode.eq(dto.currencyIsoCode) }.first().id
+
         AccountEntity.new {
             name = dto.name
             notes = dto.notes
             user = UserEntity[userId]
-            currency = CurrencyEntity[dto.currencyId]
+            currency = CurrencyEntity[currencyId]
             accountType = dto.accountType
             createdAt = Instant.now()
             modifiedAt = Instant.now()
@@ -75,9 +72,15 @@ class AccountRepository(
         }?.toModel()
     }
 
-    fun deleteOne(userId: Long, accountId: Long): Boolean = transaction {
+    fun delete(userId: Long, vararg accountIds: Long): Boolean = transaction {
         AccountsTable.deleteWhere {
-            AccountsTable.id.eq(accountId).and(AccountsTable.userId.eq(userId))
+            AccountsTable.id.inList(accountIds.asList()).and(AccountsTable.userId.eq(userId))
         } > 0
+    }
+
+    fun deleteAll(userId: Long): Unit = transaction {
+        AccountsTable.deleteWhere {
+            AccountsTable.userId.eq(userId)
+        }
     }
 }

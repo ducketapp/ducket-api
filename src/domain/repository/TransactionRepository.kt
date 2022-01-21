@@ -82,10 +82,20 @@ class TransactionRepository(
     }
 
     fun delete(userId: Long, vararg transactionIds: Long): Unit = transaction {
-        transactionIds.forEach { id ->
-            TransactionEntity.find {
-                TransactionsTable.id.eq(id).and(TransactionsTable.userId.eq(userId))
-            }.firstOrNull()?.delete()
+        TransactionEntity.find {
+            TransactionsTable.id.inList(transactionIds.asList()).and(TransactionsTable.userId.eq(userId))
+        }.forEach { transaction ->
+            transaction.attachments.forEach { it.delete() }
+            transaction.delete()
+        }
+    }
+
+    fun deleteAll(userId: Long): Unit = transaction {
+        TransactionEntity.find {
+            TransactionsTable.userId.eq(userId)
+        }.forEach { transaction ->
+            transaction.attachments.forEach { it.delete() }
+            transaction.delete()
         }
     }
 

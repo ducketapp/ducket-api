@@ -4,8 +4,10 @@ import domain.model.category.CategoryEntity
 import domain.model.imports.ImportRule
 import domain.model.imports.ImportRuleEntity
 import domain.model.imports.ImportRulesTable
+import domain.model.imports.ImportsTable
 import domain.model.user.UserEntity
 import io.ducket.api.domain.controller.rule.ImportRuleCreateDto
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -42,9 +44,15 @@ class ImportRuleRepository {
         }.firstOrNull()?.toModel()
     }
 
-    fun deleteOne(userId: Long, ruleId: Long): Boolean = transaction {
+    fun delete(userId: Long, vararg ruleIds: Long): Boolean = transaction {
         ImportRulesTable.deleteWhere {
-            ImportRulesTable.userId.eq(userId).and(ImportRulesTable.id.eq(ruleId))
+            ImportRulesTable.id.inList(ruleIds.asList()).and(ImportRulesTable.userId.eq(userId))
         } > 0
+    }
+
+    fun deleteAll(userId: Long): Unit = transaction {
+        ImportRulesTable.deleteWhere {
+            ImportRulesTable.userId.eq(userId)
+        }
     }
 }

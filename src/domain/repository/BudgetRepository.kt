@@ -7,10 +7,8 @@ import domain.model.user.UserEntity
 import io.ducket.api.domain.controller.budget.BudgetCreateDto
 import io.ducket.api.domain.model.budget.*
 import io.ducket.api.domain.model.budget.BudgetsTable
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.or
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Instant
 
@@ -69,10 +67,14 @@ class BudgetRepository(
     }
 
     fun delete(userId: Long, vararg budgetIds: Long): Unit = transaction {
-        budgetIds.forEach { id ->
-            BudgetEntity.find {
-                BudgetsTable.id.eq(id).and(BudgetsTable.userId.eq(userId))
-            }.firstOrNull()?.delete()
+        BudgetsTable.deleteWhere {
+            BudgetsTable.id.inList(budgetIds.asList()).and(BudgetsTable.userId.eq(userId))
+        }
+    }
+
+    fun deleteAll(userId: Long): Unit = transaction {
+        BudgetsTable.deleteWhere {
+            BudgetsTable.userId.eq(userId)
         }
     }
 }

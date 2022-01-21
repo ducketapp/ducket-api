@@ -9,8 +9,8 @@ import io.ducket.api.domain.repository.ImportRepository
 import io.ducket.api.domain.repository.ImportRuleRepository
 import io.ducket.api.extension.trimWhitespaces
 import io.ducket.api.getLogger
-import io.ducket.api.plugins.InvalidDataError
-import io.ducket.api.plugins.NoEntityFoundError
+import io.ducket.api.plugins.InvalidDataException
+import io.ducket.api.plugins.NoEntityFoundException
 import io.ktor.http.content.*
 import org.ahocorasick.trie.Trie
 import org.apache.commons.csv.CSVFormat
@@ -33,7 +33,7 @@ class ImportService(
     }
 
     fun importAccountTransactions(userId: Long, accountId: Long, multipartData: List<PartData>): List<TransactionDto> {
-        accountRepository.findOne(userId, accountId) ?: throw NoEntityFoundError("No such account was found")
+        accountRepository.findOne(userId, accountId) ?: throw NoEntityFoundException("No such account was found")
 
         val importDataPair = extractImportData(multipartData)
         val reader = BufferedReader(InputStreamReader(importDataPair.second.inputStream()))
@@ -45,10 +45,10 @@ class ImportService(
 
         val headers = listOf("date", "category", "beneficiary_or_sender", "description", "amount")
         csvParser.headerMap.takeIf { it.keys.containsAll(headers) && it.size == headers.size }
-            ?: throw InvalidDataError("Invalid header set")
+            ?: throw InvalidDataException("Invalid header set")
 
         val csvRecords = csvParser.records.takeIf { it.size > 0 }
-            ?: throw InvalidDataError("Invalid records amount: 0")
+            ?: throw InvalidDataException("Invalid records amount: 0")
 
         var csvTransactions = csvRecords.stream().map {
             try {
@@ -60,7 +60,7 @@ class ImportService(
 
                 return@map CsvTransactionDto(date, category, beneficiaryOrSender, description, amount)
             } catch (e: Exception) {
-                throw InvalidDataError("Invalid value, row #${it.recordNumber}: ${e.message}")
+                throw InvalidDataException("Invalid value, row #${it.recordNumber}: ${e.message}")
             }
         }.toList()
 

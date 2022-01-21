@@ -1,11 +1,11 @@
 package io.ducket.api.domain.controller.budget
 
-import io.ducket.api.domain.model.budget.BudgetPeriodType
+import io.ducket.api.app.BudgetPeriodType
 import org.valiktor.functions.*
 import java.math.BigDecimal
 
 
-class BudgetCreateDto(
+data class BudgetCreateDto(
     val limit: BigDecimal,
     val name: String,
     val currencyIsoCode: String,

@@ -3,14 +3,11 @@ package io.ducket.api.domain.model.follow
 import domain.model.user.User
 import domain.model.user.UserEntity
 import domain.model.user.UsersTable
-import io.ducket.api.domain.model.StringIdTable
-import org.jetbrains.exposed.dao.Entity
-import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
-import org.jetbrains.exposed.sql.`java-time`.timestamp
+import org.jetbrains.exposed.sql.javatime.timestamp
 import java.time.Instant
 
 internal object FollowsTable : LongIdTable("follow") {

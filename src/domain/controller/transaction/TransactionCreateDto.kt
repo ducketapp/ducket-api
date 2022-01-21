@@ -2,7 +2,7 @@ package io.ducket.api.domain.controller.transaction
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.ducket.api.InstantDeserializer
-import io.ducket.api.plugins.InvalidDataError
+import io.ducket.api.plugins.InvalidDataException
 import org.valiktor.functions.*
 import java.math.BigDecimal
 import java.time.Instant
@@ -17,6 +17,7 @@ data class TransactionCreateDto(
     val latitude: String?,
     @JsonDeserialize(using = InstantDeserializer::class) val date: Instant,
 ) {
+
     fun validate(): TransactionCreateDto {
         org.valiktor.validate(this) {
             validate(TransactionCreateDto::payee).isNotEmpty()
@@ -29,7 +30,7 @@ data class TransactionCreateDto(
             validate(TransactionCreateDto::amount).isNotEqualTo(BigDecimal.ZERO)
 
             if (amount.scale() !in 0..2) {
-                throw InvalidDataError("Transaction amount scale should not be greater than 2")
+                throw InvalidDataException("Transaction amount scale should not be greater than 2")
             }
         }
         return this

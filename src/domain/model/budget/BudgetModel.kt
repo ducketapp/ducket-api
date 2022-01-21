@@ -11,11 +11,11 @@ import domain.model.currency.CurrencyEntity
 import domain.model.user.User
 import domain.model.user.UserEntity
 import domain.model.user.UsersTable
-import io.ducket.api.domain.model.StringIdTable
+import io.ducket.api.app.BudgetPeriodType
 import org.jetbrains.exposed.dao.*
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
-import org.jetbrains.exposed.sql.`java-time`.timestamp
+import org.jetbrains.exposed.sql.javatime.timestamp
 import java.math.BigDecimal
 import java.time.Instant
 
@@ -79,7 +79,3 @@ data class Budget(
     val createdAt: Instant,
     val modifiedAt: Instant,
 )
-
-enum class BudgetPeriodType {
-    WEEKLY, MONTHLY, ANNUAL
-}

@@ -18,7 +18,7 @@ data class AccountDto(
     val name: String = account.name
     val owner: UserDto = UserDto(account.user)
     val accountType: String = account.type.name
-    val numOfRecords: Int = account.numOfRecords
+    val recordsCount: Int = account.recordsCount
     val accountCurrency: CurrencyDto = CurrencyDto(account.currency)
     val notes: String? = account.notes
 }

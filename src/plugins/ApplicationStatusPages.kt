@@ -60,7 +60,7 @@ fun StatusPages.Configuration.applicationStatusPages() {
     /**
      * HttpStatusCode.BadRequest
      */
-    exception<InvalidDataError> { cause ->
+    exception<InvalidDataException> { cause ->
         logger.error(cause.stackTraceToString())
 
         HttpStatusCode.BadRequest.apply {
@@ -71,7 +71,7 @@ fun StatusPages.Configuration.applicationStatusPages() {
     /**
      * HttpStatusCode.BadRequest
      */
-    exception<DuplicateEntityError> { cause ->
+    exception<DuplicateEntityException> { cause ->
         logger.error(cause.stackTraceToString())
 
         HttpStatusCode.BadRequest.apply {
@@ -87,6 +87,17 @@ fun StatusPages.Configuration.applicationStatusPages() {
 
         HttpStatusCode.InternalServerError.apply {
             call.respond(this, ErrorResponse(this, "Oops, something went wrong!"))
+        }
+    }
+
+    /**
+     * HttpStatusCode.InternalServerError
+     */
+    exception<BusinessException> { cause ->
+        logger.error(cause.stackTraceToString())
+
+        HttpStatusCode.InternalServerError.apply {
+            call.respond(this, ErrorResponse(this, cause.localizedMessage))
         }
     }
 
@@ -111,7 +122,7 @@ fun StatusPages.Configuration.applicationStatusPages() {
     /**
      * HttpStatusCode.NotFound
      */
-    exception<NoEntityFoundError> { cause ->
+    exception<NoEntityFoundException> { cause ->
         HttpStatusCode.NotFound.apply {
             call.respond(this, ErrorResponse(this, cause.localizedMessage))
         }
@@ -120,9 +131,9 @@ fun StatusPages.Configuration.applicationStatusPages() {
 
 class AuthenticationException(message: String = "Authentication failure") : Exception(message)
 class AuthorizationException(message: String = "Access denied") : Exception(message)
-class NoEntityFoundError(message: String = "No such entity was found") : Exception(message)
-class DuplicateEntityError(message: String = "Such an entity already exists") : Exception(message)
-class InvalidDataError(message: String = "Invalid data") : Exception(message)
+class NoEntityFoundException(message: String = "No such entity was found") : Exception(message)
+class DuplicateEntityException(message: String = "Such an entity already exists") : Exception(message)
+class InvalidDataException(message: String = "Invalid data") : Exception(message)
 class BusinessException(message: String = "Exception in business logic") : Exception(message)
 
 data class ErrorResponse(

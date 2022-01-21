@@ -18,8 +18,8 @@ class UserController(
     private val jwtManager: JwtManager by inject(JwtManager::class.java)
 
     suspend fun signUp(ctx: ApplicationCall) {
-        ctx.receive<UserSignUpDto>().apply {
-            userService.createUser(this.validate()).apply {
+        ctx.receive<UserCreateDto>().apply {
+            userService.setupNewUser(this.validate()).apply {
                 ctx.response.header(
                     name = HttpHeaders.Authorization,
                     value = "Bearer ${jwtManager.generateToken(UserPrincipal(this.id, this.email))}",
@@ -30,8 +30,8 @@ class UserController(
     }
 
     suspend fun signIn(ctx: ApplicationCall) {
-        ctx.receive<UserSignInDto>().apply {
-            userService.getUser(this.validate()).apply {
+        ctx.receive<UserAuthDto>().apply {
+            userService.authenticateUser(this.validate()).apply {
                 ctx.response.header(
                     name = HttpHeaders.Authorization,
                     value = "Bearer ${jwtManager.generateToken(UserPrincipal(this.id, this.email))}",

@@ -1,7 +1,7 @@
 package io.ducket.api
 
 import com.fasterxml.jackson.databind.SerializationFeature
-import io.ducket.api.app.AppModule
+import io.ducket.api.app.di.AppModule
 import io.ducket.api.app.database.DatabaseFactory
 import io.ducket.api.config.*
 import io.ducket.api.domain.controller.account.AccountController

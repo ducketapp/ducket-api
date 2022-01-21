@@ -1,6 +1,7 @@
 package io.ducket.api.domain.service
 
 import io.ducket.api.CurrencyRateProvider
+import io.ducket.api.app.BudgetPeriodType
 import io.ducket.api.domain.controller.budget.BudgetCreateDto
 import io.ducket.api.domain.controller.budget.BudgetDto
 import io.ducket.api.domain.controller.budget.BudgetPeriodBoundsDto
@@ -8,14 +9,13 @@ import io.ducket.api.domain.controller.budget.BudgetProgressDto
 import io.ducket.api.domain.controller.record.RecordDto
 import io.ducket.api.domain.controller.transaction.TransactionDto
 import io.ducket.api.domain.model.budget.Budget
-import io.ducket.api.domain.model.budget.BudgetPeriodType
 import io.ducket.api.domain.repository.*
 import io.ducket.api.extension.isAfterInclusive
 import io.ducket.api.extension.isBeforeInclusive
 import io.ducket.api.extension.sumByDecimal
 import io.ducket.api.getLogger
-import io.ducket.api.plugins.InvalidDataError
-import io.ducket.api.plugins.NoEntityFoundError
+import io.ducket.api.plugins.InvalidDataException
+import io.ducket.api.plugins.NoEntityFoundException
 import org.koin.java.KoinJavaComponent.inject
 import java.math.BigDecimal
 import java.time.DayOfWeek
@@ -35,16 +35,16 @@ class BudgetService(
 
     fun createBudget(userId: Long, reqObj: BudgetCreateDto): BudgetDto {
         val currencyId = currencyRepository.findOne(reqObj.currencyIsoCode)?.id
-            ?: throw InvalidDataError("Unsupported '${reqObj.currencyIsoCode}' currency code")
+            ?: throw InvalidDataException("Unsupported '${reqObj.currencyIsoCode}' currency code")
 
         accountRepository.findAll(userId).map { it.id }.takeIf { it.containsAll(reqObj.accountIds) }
-            ?: throw InvalidDataError("No such account(s) found")
+            ?: throw InvalidDataException("No such account(s) found")
 
         categoryRepository.findById(reqObj.categoryId)
-            ?: throw InvalidDataError("No such category found")
+            ?: throw InvalidDataException("No such category found")
 
         budgetRepository.findOneByName(userId, reqObj.name)?.let {
-            if (!it.isClosed) throw InvalidDataError("'${reqObj.name}' budget already exists")
+            if (!it.isClosed) throw InvalidDataException("'${reqObj.name}' budget already exists")
         }
 
         val budget = budgetRepository.create(userId, currencyId, reqObj)
@@ -54,7 +54,7 @@ class BudgetService(
 
     fun getBudgetDetailsAccessibleToUser(userId: Long, budgetId: Long): BudgetDto {
         return getBudgetsAccessibleToUser(userId).firstOrNull { it.id == budgetId }
-            ?: throw NoEntityFoundError("No such budget was found")
+            ?: throw NoEntityFoundException("No such budget was found")
     }
 
     fun getBudgetsAccessibleToUser(userId: Long): List<BudgetDto> {

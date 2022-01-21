@@ -7,12 +7,13 @@ import domain.model.transaction.TransactionsTable
 import domain.model.user.User
 import domain.model.user.UserEntity
 import domain.model.user.UsersTable
+import io.ducket.api.app.AccountType
 import io.ducket.api.domain.model.transfer.TransfersTable
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
-import org.jetbrains.exposed.sql.`java-time`.timestamp
+import org.jetbrains.exposed.sql.javatime.timestamp
 import java.time.Instant
 
 internal object AccountsTable : LongIdTable("account") {
@@ -59,11 +60,7 @@ data class Account(
     val user: User,
     val currency: Currency,
     val type: AccountType,
-    val numOfRecords: Int,
+    val recordsCount: Int,
     val createdAt: Instant,
     val modifiedAt: Instant,
 )
-
-enum class AccountType {
-    GENERAL, DEBIT_CARD, CREDIT_CARD, CASH, BANK_ACCOUNT, SAVINGS
-}

@@ -5,8 +5,8 @@ import io.ducket.api.domain.controller.transfer.TransferCreateDto
 import io.ducket.api.domain.controller.transfer.TransferDto
 import io.ducket.api.domain.repository.AccountRepository
 import io.ducket.api.domain.repository.TransferRepository
-import io.ducket.api.plugins.InvalidDataError
-import io.ducket.api.plugins.NoEntityFoundError
+import io.ducket.api.plugins.InvalidDataException
+import io.ducket.api.plugins.NoEntityFoundException
 import io.ktor.http.content.*
 import org.koin.java.KoinJavaComponent.inject
 import java.io.File
@@ -21,7 +21,7 @@ class TransferService(
 
     fun getTransferDetailsAccessibleToUser(userId: Long, transferId: Long): TransferDto {
         return getTransfersAccessibleToUser(userId).firstOrNull { it.id == transferId }
-            ?: throw NoEntityFoundError("No such transfer was found")
+            ?: throw NoEntityFoundException("No such transfer was found")
     }
 
     fun getTransfersAccessibleToUser(userId: Long): List<TransferDto> {
@@ -34,8 +34,8 @@ class TransferService(
     }
 
     fun addTransfer(userId: Long, reqObj: TransferCreateDto): List<TransferDto> {
-        val fromAccount = accountRepository.findOne(userId, reqObj.accountId) ?: throw NoEntityFoundError("Origin account was not found")
-        val toAccount = accountRepository.findOne(userId, reqObj.transferAccountId) ?: throw NoEntityFoundError("Target account was not found")
+        val fromAccount = accountRepository.findOne(userId, reqObj.accountId) ?: throw NoEntityFoundException("Origin account was not found")
+        val toAccount = accountRepository.findOne(userId, reqObj.transferAccountId) ?: throw NoEntityFoundException("Target account was not found")
 
         var exchangeRate = BigDecimal.ONE
 
@@ -45,7 +45,7 @@ class TransferService(
             }
         } else {
             if (fromAccount.currency.id == toAccount.currency.id && exchangeRate != BigDecimal.ONE) {
-                throw InvalidDataError("Invalid exchange rate, should be 1.0")
+                throw InvalidDataException("Invalid exchange rate, should be 1.0")
             }
         }
 
@@ -53,7 +53,7 @@ class TransferService(
     }
 
     fun deleteTransfer(userId: Long, transferId: Long) {
-        val transfer = transferRepository.findOne(userId, transferId) ?: throw NoEntityFoundError("No such transfer was found")
+        val transfer = transferRepository.findOne(userId, transferId) ?: throw NoEntityFoundException("No such transfer was found")
 
         if (transfer.relationCode == null) transferRepository.delete(userId, transferId)
         else transferRepository.delete(userId, transfer.relationCode)
@@ -62,18 +62,18 @@ class TransferService(
     fun downloadTransferAttachment(userId: Long, entityId: Long, attachmentId: Long): File {
         val transfer = getTransferDetailsAccessibleToUser(userId, entityId)
         val attachment = transferRepository.findAttachment(transfer.owner.id, entityId, attachmentId)
-            ?: throw NoEntityFoundError("No such attachment was found")
+            ?: throw NoEntityFoundException("No such attachment was found")
 
-        return getLocalFile(attachment.filePath) ?: throw NoEntityFoundError("No such file was found")
+        return getLocalFile(attachment.filePath) ?: throw NoEntityFoundException("No such file was found")
     }
 
     fun uploadTransferAttachments(userId: Long, entityId: Long, multipartData: List<PartData>) {
-        transferRepository.findOne(userId, entityId) ?: throw NoEntityFoundError("No such transfer was found")
+        transferRepository.findOne(userId, entityId) ?: throw NoEntityFoundException("No such transfer was found")
 
         val actualAttachmentsAmount = transferRepository.getAttachmentsAmount(entityId)
         val files = extractImagesData(multipartData)
 
-        if (files.size + actualAttachmentsAmount > 3) throw InvalidDataError("Attachments limit exceeded, 3 max")
+        if (files.size + actualAttachmentsAmount > 3) throw InvalidDataException("Attachments limit exceeded, 3 max")
 
         extractImagesData(multipartData).forEach { pair ->
             val newFile = createLocalAttachmentFile(pair.first.extension, pair.second)
@@ -86,6 +86,6 @@ class TransferService(
             transferRepository.deleteAttachment(userId, entityId, attachmentId).takeIf {
                 deleteLocalFile(attachment.filePath)
             }
-        } ?: throw NoEntityFoundError("No such attachment was found")
+        } ?: throw NoEntityFoundException("No such attachment was found")
     }
 }

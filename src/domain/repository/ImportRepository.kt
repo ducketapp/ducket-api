@@ -10,6 +10,10 @@ import domain.model.transaction.Transaction
 import domain.model.transaction.TransactionEntity
 import domain.model.user.UserEntity
 import io.ducket.api.domain.controller.imports.CsvTransactionDto
+import io.ducket.api.domain.model.budget.BudgetsTable
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
 import java.time.Instant
@@ -53,6 +57,18 @@ class ImportRepository {
                 createdAt = Instant.now()
                 modifiedAt = Instant.now()
             }.toModel()
+        }
+    }
+
+    fun delete(userId: Long, vararg importIds: Long): Boolean = transaction {
+        ImportsTable.deleteWhere {
+            ImportsTable.id.inList(importIds.asList()).and(ImportsTable.userId.eq(userId))
+        } > 0
+    }
+
+    fun deleteAll(userId: Long): Unit = transaction {
+        ImportsTable.deleteWhere {
+            ImportsTable.userId.eq(userId)
         }
     }
 }
