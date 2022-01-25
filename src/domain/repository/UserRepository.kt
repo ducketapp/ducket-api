@@ -7,6 +7,7 @@ import domain.model.user.UserEntity
 import domain.model.user.UsersTable
 import domain.model.currency.CurrencyEntity
 import domain.model.user.User
+import io.ducket.api.BCRYPT_HASH_ROUNDS
 import io.ducket.api.domain.model.follow.FollowEntity
 import io.ducket.api.domain.model.follow.FollowsTable
 
@@ -27,7 +28,7 @@ class UserRepository {
             phone = dto.phone
             email = dto.email
             mainCurrency = CurrencyEntity[currencyId]
-            passwordHash = BCrypt.hashpw(dto.password, BCrypt.gensalt(10))
+            passwordHash = BCrypt.hashpw(dto.password, BCrypt.gensalt(BCRYPT_HASH_ROUNDS))
             createdAt = Instant.now()
             modifiedAt = Instant.now()
         }.toModel()
@@ -62,7 +63,7 @@ class UserRepository {
             }
 
             dto.password?.let {
-                found.passwordHash = BCrypt.hashpw(it, BCrypt.gensalt(10))
+                found.passwordHash = BCrypt.hashpw(it, BCrypt.gensalt(BCRYPT_HASH_ROUNDS))
                 found.modifiedAt = Instant.now()
             }
         }?.toModel()

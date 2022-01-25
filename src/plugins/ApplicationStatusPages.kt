@@ -93,7 +93,18 @@ fun StatusPages.Configuration.applicationStatusPages() {
     /**
      * HttpStatusCode.InternalServerError
      */
-    exception<BusinessException> { cause ->
+    exception<BusinessLogicException> { cause ->
+        logger.error(cause.stackTraceToString())
+
+        HttpStatusCode.InternalServerError.apply {
+            call.respond(this, ErrorResponse(this, cause.localizedMessage))
+        }
+    }
+
+    /**
+     * HttpStatusCode.InternalServerError
+     */
+    exception<UnexpectedException> { cause ->
         logger.error(cause.stackTraceToString())
 
         HttpStatusCode.InternalServerError.apply {
@@ -134,7 +145,8 @@ class AuthorizationException(message: String = "Access denied") : Exception(mess
 class NoEntityFoundException(message: String = "No such entity was found") : Exception(message)
 class DuplicateEntityException(message: String = "Such an entity already exists") : Exception(message)
 class InvalidDataException(message: String = "Invalid data") : Exception(message)
-class BusinessException(message: String = "Exception in business logic") : Exception(message)
+class UnexpectedException(message: String = "Unexpected exception occurred") : Exception(message)
+class BusinessLogicException(message: String = "Exception in business logic") : Exception(message)
 
 data class ErrorResponse(
     val status: HttpStatusCode,

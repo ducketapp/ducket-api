@@ -1,6 +1,5 @@
 package io.ducket.api.domain.service
 
-import io.ducket.api.*
 import io.ducket.api.app.AccountType
 import io.ducket.api.app.UserFollowAction
 import io.ducket.api.domain.controller.account.AccountCreateDto
@@ -65,7 +64,7 @@ class UserService(
 
     fun updateUser(userId: Long, reqObj: UserUpdateDto): UserDto {
         return userRepository.updateOne(userId, reqObj)?.let { UserDto(it) }
-            ?: throw Exception("Cannot update user entity")
+            ?: throw NoEntityFoundException("Cannot update the user")
     }
 
     fun deleteUser(userId: Long): Boolean {
@@ -112,14 +111,14 @@ class UserService(
                 if (follow.followed.id == userId) {
                     followRepository.approveFollow(userId, follow.id)?.let { FollowerDto(it) }
                 } else {
-                    throw BusinessException("Cannot approve a follow request which doesn't belong to the user")
+                    throw BusinessLogicException("Cannot approve a follow request which doesn't belong to the user")
                 }
             }
             UserFollowAction.DELETE -> {
                 if (userId in listOf(follow.followed.id, follow.follower.id)) {
                     followRepository.deleteFollow(userId, follow.id)
                 } else {
-                    throw BusinessException("Cannot delete a follow which doesn't belong to the user")
+                    throw BusinessLogicException("Cannot delete a follow which doesn't belong to the user")
                 }
             }
         } ?: throw Exception("Cannot apply an action to the user's follow: $action")

@@ -6,9 +6,9 @@ import org.valiktor.functions.isNotEmpty
 import org.valiktor.functions.startsWith
 
 data class UserUpdateDto(
-    val name: String?,
-    val phone: String?,
-    val password: String?,
+    val name: String? = null,
+    val phone: String? = null,
+    val password: String? = null,
 ) {
 
     fun validate() : UserUpdateDto {

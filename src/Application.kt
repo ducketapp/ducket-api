@@ -47,6 +47,8 @@ import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 import java.util.*
 
+const val BCRYPT_HASH_ROUNDS = 12
+
 fun main(args: Array<String>): Unit {
     embeddedServer(Netty, commandLineEnvironment(args)).start(wait = true)
 }

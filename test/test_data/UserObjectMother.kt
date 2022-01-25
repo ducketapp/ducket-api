@@ -3,6 +3,7 @@ package io.ducket.api.test_data
 import domain.model.user.User
 import io.ducket.api.domain.controller.user.UserAuthDto
 import io.ducket.api.domain.controller.user.UserCreateDto
+import io.ducket.api.domain.controller.user.UserUpdateDto
 import org.mindrot.jbcrypt.BCrypt
 import java.time.Instant
 
@@ -40,6 +41,18 @@ class UserObjectMother {
 
         fun authJohnWick(): UserAuthDto = UserAuthDto(
             email = "johnwick@test.com",
+            password = "1234",
+        )
+
+        fun updateJohnWickAll(): UserUpdateDto = UserUpdateDto(
+            name = "John Quick",
+            phone = "+15236112350",
+            password = "4321",
+        )
+
+        fun updateJohnWick(): UserUpdateDto = UserUpdateDto(
+            name = "John Wick",
+            phone = "+12025550115",
             password = "1234",
         )
     }

@@ -1,7 +1,9 @@
 package io.ducket.api
 
+import domain.model.user.User
 import io.ducket.api.domain.controller.account.AccountCreateDto
 import io.ducket.api.domain.controller.user.UserDto
+import io.ducket.api.domain.controller.user.UserUpdateDto
 import io.ducket.api.domain.repository.*
 import io.ducket.api.domain.service.UserService
 import io.ducket.api.plugins.AuthenticationException
@@ -9,14 +11,16 @@ import io.ducket.api.plugins.DuplicateEntityException
 import io.ducket.api.plugins.NoEntityFoundException
 import io.ducket.api.test_data.AccountObjectMother
 import io.ducket.api.test_data.UserObjectMother
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.assertions.throwables.shouldThrowExactly
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mockk.*
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mindrot.jbcrypt.BCrypt
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 
 internal class UserServiceTest {
 
@@ -67,8 +71,8 @@ internal class UserServiceTest {
         val actual = cut.setupNewUser(newUserDto)
 
         // then
-        assertEquals(expected, actual)
-        assertEquals(AccountObjectMother.newCashUsd(), accountSlot.captured)
+        actual shouldBe expected
+        accountSlot.captured shouldBe AccountObjectMother.newCashUsd()
     }
 
     @Test
@@ -82,7 +86,9 @@ internal class UserServiceTest {
         val executable: () -> Unit = { cut.setupNewUser(newUserDto) }
 
         // then
-        assertFailsWith(DuplicateEntityException::class, executable)
+        shouldThrowExactly<DuplicateEntityException>(executable).also {
+            it.message shouldBe "Such email has already been taken"
+        }
         verify { userRepositoryMock.create(any()) wasNot Called }
         verify { accountRepositoryMock.create(any(), any()) wasNot Called }
     }
@@ -97,7 +103,9 @@ internal class UserServiceTest {
         val executable: () -> Unit = { cut.getUser(nonRegisteredUserId) }
 
         // then
-        assertFailsWith(NoEntityFoundException::class, executable)
+        shouldThrowExactly<NoEntityFoundException>(executable).also {
+            it.message shouldBe "No such user was found"
+        }
     }
 
     @Test
@@ -111,7 +119,7 @@ internal class UserServiceTest {
         val actual = cut.getUser(user.id)
 
         // then
-        assertEquals(expected, actual)
+        actual shouldBe expected
     }
 
     @Test
@@ -124,7 +132,9 @@ internal class UserServiceTest {
         val executable: () -> Unit = { cut.authenticateUser(authUserDto) }
 
         // then
-        assertFailsWith(AuthenticationException::class, executable)
+        shouldThrowExactly<AuthenticationException>(executable).also {
+            it.message shouldBe "The user doesn't exist"
+        }
     }
 
     @Test
@@ -142,7 +152,7 @@ internal class UserServiceTest {
         val actual = cut.authenticateUser(authUserDto)
 
         // then
-        assertEquals(expected, actual)
+        actual shouldBe expected
     }
 
     @Test
@@ -159,6 +169,40 @@ internal class UserServiceTest {
         val executable: () -> Unit = { cut.authenticateUser(authUserDto) }
 
         // then
-        assertFailsWith(AuthenticationException::class, executable)
+        shouldThrowExactly<AuthenticationException>(executable).also {
+            it.message shouldBe "The password is incorrect"
+        }
+    }
+
+    @Test
+    fun should_ReturnUpdatedUser_When_UpdateUser() {
+        // given
+        val userUpdateDto = UserObjectMother.updateJohnWick()
+        val updatedUser = UserObjectMother.johnWick()
+        val expected = UserDto(updatedUser)
+
+        every { userRepositoryMock.updateOne(updatedUser.id, userUpdateDto) } returns updatedUser
+
+        // when
+        val actual = cut.updateUser(updatedUser.id, userUpdateDto)
+
+        // then
+        actual shouldBe expected
+    }
+
+    @Test
+    fun should_ReturnNoEntityFoundException_When_UpdateNonRegisteredUser() {
+        // given
+        val userUpdateDto = UserObjectMother.updateJohnWick()
+
+        every { userRepositoryMock.updateOne(1L, userUpdateDto) } returns null
+
+        // when
+        val executable: () -> Unit = { cut.updateUser(1L, userUpdateDto) }
+
+        // then
+        shouldThrowExactly<NoEntityFoundException>(executable).also {
+            it.message shouldBe "Cannot update the user"
+        }
     }
 }

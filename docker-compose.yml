@@ -2,20 +2,21 @@ version: '3'
 
 services:
   ducket-database:
-    image: mysql:8.0.19
+    image: mysql/mysql-server:8.0.23
     restart: unless-stopped
     container_name: ducket-database
     environment:
-      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_ROOT_USER=${DB_ROOT_USER}
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
       - MYSQL_USER=${DB_USER}
       - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
       - TZ=${DB_TZ}
     ports:
       - 3310:${DB_PORT}
     volumes:
       - database_data:/var/lib/mysql
-    command: ['mysqld', '--character-set-server=utf8mb4']
+    command: ['mysqld', '--character-set-server=utf8mb4', '--log_bin_trust_function_creators=1']
 
   ducket-backend:
     build:
@@ -27,7 +28,7 @@ services:
     restart: unless-stopped
     environment:
       - DB_DATA_PATH=resources/db/data
-      - DB_HOST=ducket-database
+      - DB_HOST=${DB_HOST}
       - DB_NAME=${DB_NAME}
       - DB_PORT=${DB_PORT}
       - DB_USER=${DB_USER}
