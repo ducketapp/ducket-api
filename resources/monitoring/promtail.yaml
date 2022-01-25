@@ -1,5 +1,5 @@
 server:
-  http_listen_port: 8100
+  http_listen_port: 9080
   grpc_listen_port: 0
 
 positions:
@@ -7,3 +7,12 @@ positions:
 
 clients:
   - url: http://ducket-loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: varlogs
+          __path__: /var/log/*log
