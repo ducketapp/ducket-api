@@ -6,12 +6,13 @@ services:
     restart: unless-stopped
     container_name: ducket-database
     environment:
+      - TZ=${DB_TZ}
       - MYSQL_ROOT_USER=${DB_ROOT_USER}
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
       - MYSQL_USER=${DB_USER}
       - MYSQL_PASSWORD=${DB_PASSWORD}
-      - MYSQL_DATABASE=${DB_NAME}
-      - TZ=${DB_TZ}
+      - MYSQL_DATABASE=ducket-db
+      - MYSQL_TCP_PORT=3310
     ports:
       - 3310:3310
     volumes:
@@ -35,7 +36,7 @@ services:
       - DB_DATA_PATH=resources/db/data
       - DB_HOST=ducket-database
       - DB_PORT=3310
-      - DB_NAME=${DB_NAME}
+      - DB_NAME=ducket-db
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - APP_SECRET=${APP_SECRET}
@@ -60,6 +61,7 @@ services:
 
   ducket-loki:
     image: grafana/loki:2.4.1
+    container_name: ducket-loki
     depends_on:
       - ducket-backend
     ports:
@@ -71,6 +73,7 @@ services:
 
   ducket-promtail:
     image: grafana/promtail:2.4.1
+    container_name: ducket-promtail
     depends_on:
       - ducket-backend
     volumes:
@@ -81,7 +84,7 @@ services:
 
   ducket-grafana:
     image: grafana/grafana-oss:8.1.8
-    container_name: grafana
+    container_name: ducket-grafana
     depends_on:
       - ducket-backend
       - ducket-prometheus

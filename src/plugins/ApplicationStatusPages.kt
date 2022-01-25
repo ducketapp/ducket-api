@@ -33,7 +33,7 @@ fun StatusPages.Configuration.applicationStatusPages() {
         HttpStatusCode.PreconditionFailed.apply {
             val errors = cause.constraintViolations
                 .mapToMessage("messages", Locale.ENGLISH)
-                .map { "The '${it.property}' field ${it.message.toLowerCase()}" }
+                .map { "The '${it.property}' field ${it.message.lowercase()}" }
 
             call.respond(this, ErrorResponse(this, errors[0]))
         }

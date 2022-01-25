@@ -11,7 +11,6 @@ fun Route.records(
     recordController: RecordController,
     transactionController: TransactionController,
     transferController: TransferController,
-    userController: UserController,
 ) {
     authenticate {
         route("records") {

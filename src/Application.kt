@@ -156,7 +156,7 @@ fun Application.module(
             users(userController)
             accounts(accountController)
             categories(categoryController)
-            records(recordController, transactionController, transferController, userController)
+            records(recordController, transactionController, transferController)
             budgets(budgetController)
             currencies(currencyController)
         }
