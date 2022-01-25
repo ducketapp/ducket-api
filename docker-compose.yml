@@ -68,8 +68,6 @@ services:
       - ./resources/monitoring/loki.yaml:/etc/loki/config.yaml
       - loki_data:/data/loki
     command: ['-config.file=/etc/loki/local-config.yaml']
-    networks:
-      - loki
 
   ducket-promtail:
     image: grafana/promtail:2.4.1
@@ -80,8 +78,6 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers
       - ./resources/monitoring/promtail.yaml:/etc/promtail/config.yaml
     command: ['-config.file=/etc/promtail/config.yaml']
-    networks:
-      - loki
 
   ducket-grafana:
     image: grafana/grafana-oss:8.1.8
