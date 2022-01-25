@@ -78,9 +78,9 @@ services:
     depends_on:
       - ducket-backend
     volumes:
-      - /var/log:/var/log
       - /var/lib/docker/containers:/var/lib/docker/containers
-      - ./logs:/var/log
+      - /var/log:/var/log
+      - ./logs:/var/log/ducket
       - ./resources/monitoring/promtail.yaml:/etc/promtail/config.yaml
     command: ['-config.file=/etc/promtail/config.yaml']
 
