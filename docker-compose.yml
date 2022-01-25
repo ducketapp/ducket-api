@@ -50,8 +50,7 @@ services:
     container_name: ducket-prometheus
     restart: unless-stopped
     environment:
-      - PROMETHEUS_TARGET_HOST=ducket-backend
-      - PROMETHEUS_TARGET_PORT=${APP_PORT}
+      - PROMETHEUS_TARGET=ducket-backend:${APP_PORT}
     ports:
       - 9090:9090
     volumes:

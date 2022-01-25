@@ -1,6 +1,12 @@
+global:
+  external_labels:
+    target_host: ${PROMETHEUS_TARGET}
+
 scrape_configs:
   - job_name: 'ducket-prometheus'
     metrics_path: /metrics
     scrape_interval: 5s
     static_configs:
-      - targets: ["${PROMETHEUS_TARGET_HOST}:${PROMETHEUS_TARGET_PORT}"]
+      - targets:
+          - ${PROMETHEUS_TARGET}
+          - target_host
