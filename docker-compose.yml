@@ -13,7 +13,7 @@ services:
       - MYSQL_DATABASE=${DB_NAME}
       - TZ=${DB_TZ}
     ports:
-      - 3310:${DB_PORT}
+      - 3310:3310
     volumes:
       - database_data:/var/lib/mysql
     healthcheck:
@@ -27,42 +27,68 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: ducket-backend
     depends_on:
       - ducket-database
-    container_name: ducket-backend
     restart: unless-stopped
     environment:
       - DB_DATA_PATH=resources/db/data
-      - DB_HOST=${DB_HOST}
+      - DB_HOST=ducket-database
+      - DB_PORT=3310
       - DB_NAME=${DB_NAME}
-      - DB_PORT=${DB_PORT}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - APP_SECRET=${APP_SECRET}
-      - APP_PORT=${APP_PORT}
+      - APP_PORT=8100
     ports:
-      - 8100:${APP_PORT}
+      - 8100:8100
     volumes:
       - backend_data:/app/resources/db/data
 
   ducket-prometheus:
     image: prom/prometheus:v2.32.0
     container_name: ducket-prometheus
+    depends_on:
+      - ducket-backend
     restart: unless-stopped
-    environment:
-      - PROMETHEUS_TARGET=ducket-backend:${APP_PORT}
     ports:
       - 9090:9090
     volumes:
       - ./resources/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
-    links:
-      - ducket-backend
-    command: ['--config.file=/etc/prometheus/prometheus.yml', '--enable-feature=expand-external-labels']
+    command: [ '--config.file=/etc/prometheus/prometheus.yml' ]
 
-  grafana:
+  ducket-loki:
+    image: grafana/loki:2.4.1
+    depends_on:
+      - ducket-backend
+    ports:
+      - 3100:3100
+    volumes:
+      - ./resources/monitoring/loki.yaml:/etc/loki/config.yaml
+      - loki_data:/data/loki
+    command: ['-config.file=/etc/loki/local-config.yaml']
+    networks:
+      - loki
+
+  ducket-promtail:
+    image: grafana/promtail:2.4.1
+    depends_on:
+      - ducket-backend
+    volumes:
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - ./resources/monitoring/promtail.yaml:/etc/promtail/config.yaml
+    command: ['-config.file=/etc/promtail/config.yaml']
+    networks:
+      - loki
+
+  ducket-grafana:
     image: grafana/grafana-oss:8.1.8
     container_name: grafana
+    depends_on:
+      - ducket-backend
+      - ducket-prometheus
     ports:
       - 3000:3000
     environment:
@@ -71,13 +97,11 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana_data:/var/lib/grafana
-    links:
-      - ducket-backend
-      - ducket-prometheus
     user: "104"
 
 volumes:
   database_data:
   backend_data:
+  loki_data:
   prometheus_data:
   grafana_data:
