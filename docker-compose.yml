@@ -45,6 +45,7 @@ services:
       - 8100:8100
     volumes:
       - backend_data:/app/resources/db/data
+      - backend_logs:/app/logs
 
   ducket-prometheus:
     image: prom/prometheus:v2.32.0
@@ -79,6 +80,7 @@ services:
     volumes:
       - /var/log:/var/log
       - /var/lib/docker/containers:/var/lib/docker/containers
+      - ./logs:/var/log
       - ./resources/monitoring/promtail.yaml:/etc/promtail/config.yaml
     command: ['-config.file=/etc/promtail/config.yaml']
 
@@ -101,6 +103,7 @@ services:
 volumes:
   database_data:
   backend_data:
+  backend_logs:
   loki_data:
   prometheus_data:
   grafana_data:
