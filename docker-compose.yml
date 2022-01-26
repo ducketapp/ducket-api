@@ -44,7 +44,7 @@ services:
       - 8100:8100
     volumes:
       - backend_data:/bin/runner
-      - backend_logs:/var/log/ducket
+      - /var/log/ducket:/logs
 
   prometheus:
     image: prom/prometheus:v2.32.0
@@ -100,7 +100,6 @@ services:
     user: "104"
 
 volumes:
-  backend_logs:
   backend_data:
   database_data:
   loki_data:
