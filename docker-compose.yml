@@ -40,11 +40,14 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - APP_SECRET=${APP_SECRET}
       - APP_PORT=8100
+      - APP_DATA_PATH=/app_data
+      - APP_LOGS_PATH=/app_logs
     ports:
       - 8100:8100
     volumes:
-      - backend_data:/bin/runner
-      - /var/log/ducket:/logs
+      - backend_build:/bin/runner
+      - backend_data:${APP_DATA_PATH}
+      - /var/log/ducket:${APP_LOGS_PATH}
 
   prometheus:
     image: prom/prometheus:v2.32.0
@@ -100,6 +103,7 @@ services:
     user: "104"
 
 volumes:
+  backend_build:
   backend_data:
   database_data:
   loki_data:

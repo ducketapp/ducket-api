@@ -11,7 +11,7 @@
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/ducket-api.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${APP_LOGS_PATH:-logs}/ducket-api.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>25MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>

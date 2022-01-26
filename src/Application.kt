@@ -182,7 +182,7 @@ private fun Application.setupAppConfig() {
     System.setProperty("handlers", "org.slf4j.bridge.SLF4JBridgeHandler")
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 
-    val dbDataPath = System.getProperty("DB_DATA_PATH", "resources/db/data")
+    val dbDataPath = System.getProperty("APP_DATA_PATH", "resources/db/data")
     val hoconConfig = this.environment.config.config("ktor")
 
     appConfig.apply {
