@@ -33,7 +33,6 @@ services:
       - ducket-database
     restart: unless-stopped
     environment:
-      - DB_DATA_PATH=resources/db/data
       - DB_HOST=ducket-database
       - DB_PORT=3310
       - DB_NAME=ducket-db
@@ -44,12 +43,11 @@ services:
     ports:
       - 8100:8100
     volumes:
-      - backend_data:/app/resources/db/data
-      - backend_logs:/app/logs
+      - backend_data:/app
 
-  ducket-prometheus:
+  prometheus:
     image: prom/prometheus:v2.32.0
-    container_name: ducket-prometheus
+    container_name: prometheus
     depends_on:
       - ducket-backend
     restart: unless-stopped
@@ -60,9 +58,9 @@ services:
       - prometheus_data:/prometheus
     command: [ '--config.file=/etc/prometheus/prometheus.yml' ]
 
-  ducket-loki:
+  loki:
     image: grafana/loki:2.4.1
-    container_name: ducket-loki
+    container_name: loki
     depends_on:
       - ducket-backend
     ports:
@@ -72,24 +70,24 @@ services:
       - loki_data:/data/loki
     command: ['-config.file=/etc/loki/local-config.yaml']
 
-  ducket-promtail:
+  promtail:
     image: grafana/promtail:2.4.1
-    container_name: ducket-promtail
+    container_name: promtail
     depends_on:
       - ducket-backend
     volumes:
-      - /var/lib/docker/containers:/var/lib/docker/containers
       - /var/log:/var/log
-      - ./logs:/var/log/ducket
+      - /var/log/ducket:/var/log/ducket
+      - /var/lib/docker/containers:/var/lib/docker/containers
       - ./resources/monitoring/promtail.yaml:/etc/promtail/config.yaml
     command: ['-config.file=/etc/promtail/config.yaml']
 
-  ducket-grafana:
+  grafana:
     image: grafana/grafana-oss:8.1.8
-    container_name: ducket-grafana
+    container_name: grafana
     depends_on:
       - ducket-backend
-      - ducket-prometheus
+      - prometheus
     ports:
       - 3000:3000
     environment:
@@ -103,7 +101,6 @@ services:
 volumes:
   database_data:
   backend_data:
-  backend_logs:
   loki_data:
   prometheus_data:
   grafana_data:
