@@ -101,7 +101,7 @@ abstract class FileService {
 
     private fun createLocalFile(dir: String, extension: String, content: ByteArray): File {
         val fileName = "${Instant.now().toEpochMilli()}.$extension"
-        val filePath = Paths.get(config.databaseConfig.dataPath, dir, fileName)
+        val filePath = Paths.get(config.localDataConfig.dbDataPath, dir, fileName)
         val localFile = File(filePath.toUri())
 
         logger.debug("Create local file: ${localFile.path}")

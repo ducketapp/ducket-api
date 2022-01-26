@@ -45,6 +45,7 @@ import org.koin.logger.SLF4JLogger
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
+import java.nio.file.Paths
 import java.util.*
 
 const val BCRYPT_HASH_ROUNDS = 12
@@ -182,7 +183,8 @@ private fun Application.setupAppConfig() {
     System.setProperty("handlers", "org.slf4j.bridge.SLF4JBridgeHandler")
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 
-    val dbDataPath = System.getenv()["APP_DATA_PATH"] ?: "resources/db/data"
+    val dbDataPath = System.getenv()["APP_DATA_PATH"] ?: "./resources/db/data"
+    val ecbDataPath = System.getenv()["ECB_DATA_PATH"] ?: Paths.get(System.getProperty("java.io.tmpdir"), "ecb").toString()
     val hoconConfig = this.environment.config.config("ktor")
 
     appConfig.apply {
@@ -198,13 +200,17 @@ private fun Application.setupAppConfig() {
             driver = hoconConfig.property("database.driver").getString(),
             user = hoconConfig.property("database.user").getString(),
             password = hoconConfig.property("database.password").getString(),
-            dataPath = dbDataPath,
         )
 
         this.jwtConfig = JwtConfig(
             secret = hoconConfig.property("jwt.secret").getString(),
             issuer = "${serverConfig.host}:${serverConfig.port}",
             audience = hoconConfig.property("jwt.audience").getString(),
+        )
+
+        this.localDataConfig = LocalDataConfig(
+            ecbDataPath = ecbDataPath,
+            dbDataPath = dbDataPath,
         )
     }
 }

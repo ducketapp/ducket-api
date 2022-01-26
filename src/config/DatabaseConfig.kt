@@ -7,7 +7,6 @@ data class DatabaseConfig(
     val user: String,
     val password: String,
     val driver: String,
-    val dataPath: String,
 ) {
     val url = "jdbc:mysql://$host:$port/$name?useUnicode=true&serverTimezone=UTC&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true"
 }

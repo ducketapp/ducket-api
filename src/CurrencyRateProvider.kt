@@ -3,6 +3,7 @@ package io.ducket.api
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
+import io.ducket.api.config.AppConfig
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
@@ -10,6 +11,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
+import org.koin.java.KoinJavaComponent
 import org.w3c.dom.Document
 import org.w3c.dom.NodeList
 import java.io.File
@@ -27,8 +29,9 @@ import javax.xml.xpath.XPathFactory
 
 class CurrencyRateProvider {
     private val logger = getLogger()
+    private val config: AppConfig by KoinJavaComponent.inject(AppConfig::class.java)
+    private val downloadPath = config.localDataConfig.ecbDataPath
     private val sourceUrl = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
-    private val downloadPath = Paths.get(System.getProperty("java.io.tmpdir"), "ecb")
     private val fileNamePrefix = "ecb_exr"
 
     private var client: HttpClient = HttpClient(CIO) {
@@ -76,7 +79,7 @@ class CurrencyRateProvider {
         logger.debug("Resolving currencies rates file")
 
         val latestFileName = "${fileNamePrefix}_${LocalDate.now()}.xml"
-        val storedRates = File(downloadPath.toUri()).listFiles()
+        val storedRates = File(downloadPath).listFiles()
             ?.filter { it.isFile && it.name.startsWith(fileNamePrefix) }
             ?.sortedByDescending { it.name }
 
@@ -85,7 +88,7 @@ class CurrencyRateProvider {
         if (latestFile == null) {
             logger.debug("The file with actual currency rates was not found at $downloadPath")
 
-            latestFile = File(Paths.get(downloadPath.toString(), latestFileName).toUri())
+            latestFile = File(Paths.get(downloadPath, latestFileName).toUri())
 
             return runBlocking {
                 try {
