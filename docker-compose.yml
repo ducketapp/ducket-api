@@ -100,8 +100,9 @@ services:
     user: "104"
 
 volumes:
-  database_data:
+  backend_logs:
   backend_data:
+  database_data:
   loki_data:
   prometheus_data:
   grafana_data:
