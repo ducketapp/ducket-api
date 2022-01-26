@@ -43,11 +43,10 @@ services:
     ports:
       - 8100:8100
     volumes:
-      - backend_build:/bin/runner
-      - backend_data:/app_data
-      - /var/log/ducket:/app_logs
+      - backend_build:/app/build
+      - backend_data:/app/data
+      - /var/log/ducket:/app/logs
       - /tmp/ecb:/tmp/ecb
-    command: [ '-Dlog.path=/app_logs', '-Ddata.path=/app_data', '-Decb.path=/tmp/ecb' ]
 
   prometheus:
     image: prom/prometheus:v2.32.0

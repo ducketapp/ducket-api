@@ -8,5 +8,5 @@ RUN chmod +x gradlew
 RUN ./gradlew --no-daemon shadowJar
 
 FROM openjdk:${VERSION}-jre
-COPY --from=build /app/build/libs/ducket-api*all.jar /bin/runner/ducket-api.jar
-ENTRYPOINT ["java", "-jar", "/bin/runner/ducket-api.jar", "-Dio.netty.native.workdir=/tmp"]
+COPY --from=build /app/build/libs/ducket-api*all.jar /app/build/ducket-api.jar
+ENTRYPOINT ['java', '-Dlog.path=/app/logs', '-Ddata.path=/app/data', '-Decb.path=/tmp/ecb', '-Dio.netty.native.workdir=/tmp', '-jar', '/app/build/ducket-api.jar']
