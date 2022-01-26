@@ -7,5 +7,5 @@ class TransactionImageDto(
     @JsonIgnore val transactionId: Long,
     attachment: Attachment,
 ): RecordImageDto(attachment) {
-    val imageUrlPath: String = "transactions/$transactionId/images/${super.id}"
+    val imageUrlPath: String = "/transactions/$transactionId/images/${super.id}"
 }
