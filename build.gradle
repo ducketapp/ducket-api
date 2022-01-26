@@ -60,13 +60,13 @@ repositories {
     mavenCentral()
 }
 
-tasks.named("shadowJar") {
-    dependsOn tasks.named("test")
-}
-
-test {
+tasks.withType(Test).configureEach {
     useJUnitPlatform()
     systemProperty("junit.jupiter.testinstance.lifecycle.default", "per_class")
+}
+
+tasks.named("shadowJar") {
+    dependsOn tasks.named("test")
 }
 
 dependencies {

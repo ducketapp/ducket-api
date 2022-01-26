@@ -5,7 +5,7 @@ RUN mkdir /app
 COPY . /app
 WORKDIR /app
 RUN chmod +x gradlew
-RUN ./gradlew --no-daemon shadowJar
+RUN ./gradlew shadowJar --console=verbose --no-daemon
 
 FROM openjdk:${VERSION}-jre
 COPY --from=build /app/build/libs/ducket-api*all.jar /app/build/ducket-api.jar
