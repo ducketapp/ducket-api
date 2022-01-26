@@ -40,9 +40,6 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - APP_SECRET=${APP_SECRET}
       - APP_PORT=8100
-      - APP_DATA_PATH=/app_data
-      - APP_LOGS_PATH=/app_logs
-      - ECB_DATA_PATH=/tmp/ecb
     ports:
       - 8100:8100
     volumes:
@@ -50,6 +47,7 @@ services:
       - backend_data:/app_data
       - /var/log/ducket:/app_logs
       - /tmp/ecb:/tmp/ecb
+    command: [ '-Dlog.path=/app_logs', '-Ddata.path=/app_data', '-Decb.path=/tmp/ecb' ]
 
   prometheus:
     image: prom/prometheus:v2.32.0
