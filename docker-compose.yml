@@ -43,7 +43,8 @@ services:
     ports:
       - 8100:8100
     volumes:
-      - backend_data:/app
+      - backend_data:/bin/runner
+      - backend_logs:/var/log/ducket
 
   prometheus:
     image: prom/prometheus:v2.32.0
