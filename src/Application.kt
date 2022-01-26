@@ -171,10 +171,7 @@ fun Application.module(
 
 /**
  * Required environment variables:
- * APP_SECRET, DB_USER, DB_PASSWORD, DB_NAME, DB_HOST, DB_PORT
- *
- * Optional environment variables:
- * APP_PORT, APP_HOST
+ * APP_SECRET, DB_USER, DB_PASSWORD
  */
 @Suppress("unused")
 private fun Application.setupAppConfig() {
@@ -183,8 +180,8 @@ private fun Application.setupAppConfig() {
     System.setProperty("handlers", "org.slf4j.bridge.SLF4JBridgeHandler")
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 
-    val dbDataPath = System.getenv()["APP_DATA_PATH"] ?: "resources/db/data"
-    val ecbDataPath = System.getenv()["ECB_DATA_PATH"] ?: Paths.get(System.getProperty("java.io.tmpdir"), "ecb").toString()
+    val dbDataPath = System.getProperty("data.path", "resources/db/data")
+    val ecbDataPath = System.getProperty("ecb.path", Paths.get(System.getProperty("java.io.tmpdir"), "ecb").toString())
     val hoconConfig = this.environment.config.config("ktor")
 
     appConfig.apply {
