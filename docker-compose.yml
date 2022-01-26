@@ -46,8 +46,8 @@ services:
       - 8100:8100
     volumes:
       - backend_build:/bin/runner
-      - backend_data:${APP_DATA_PATH}
-      - /var/log/ducket:${APP_LOGS_PATH}
+      - backend_data:/app_data
+      - /var/log/ducket:/app_logs
 
   prometheus:
     image: prom/prometheus:v2.32.0
