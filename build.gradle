@@ -147,7 +147,7 @@ dependencies {
     // allows us to test parts of our Ktor application without having to use the whole HTTP stack in the process
     testImplementation "io.ktor:ktor-server-tests:$ktor_version"
     testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
-    testImplementation "com.h2database:h2:2.0.204"
+    testImplementation "com.h2database:h2:2.0.202"
     testImplementation "io.mockk:mockk:1.12.2"
     testImplementation 'io.kotest:kotest-runner-junit5:5.0.3'
     testImplementation 'io.kotest:kotest-assertions-core-jvm:5.0.3'

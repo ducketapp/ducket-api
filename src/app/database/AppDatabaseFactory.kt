@@ -6,19 +6,22 @@ import io.ducket.api.config.AppConfig
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.exception.FlywayValidateException
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.DatabaseConfig
 
 class AppDatabaseFactory(appConfig: AppConfig): DatabaseFactory {
     private val config = appConfig.databaseConfig
 
     override fun connect() {
         val hikari = getSource()
-        Database.connect(hikari).apply { useNestedTransactions = true }
 
-        val flyway = Flyway.configure()
-            .baselineOnMigrate(true)
-            .dataSource(hikari)
-            .load()
+        Database.connect(
+            datasource = hikari,
+            databaseConfig = DatabaseConfig.invoke {
+                useNestedTransactions = true
+            }
+        )
 
+        val flyway = Flyway.configure().baselineOnMigrate(true).dataSource(hikari).load()
         flyway.info()
 
         try {

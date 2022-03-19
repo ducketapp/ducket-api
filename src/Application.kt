@@ -139,7 +139,8 @@ fun Application.module(
 
         route("/api") {
             intercept(ApplicationCallPipeline.Call) {
-                if (!call.request.path().contains("auth")) {
+                // TODO refactor
+                if (!call.request.path().contains("auth") && !call.request.path().contains("currencies")) {
                     val currentUserId = call.authentication.principalOrThrow().id
 
                     call.parameters["userId"]?.toLong()?.let { requestedUserId ->
@@ -154,12 +155,12 @@ fun Application.module(
             }
 
             root()
+            currencies(currencyController)
             users(userController)
             accounts(accountController)
             categories(categoryController)
             records(recordController, transactionController, transferController)
             budgets(budgetController)
-            currencies(currencyController)
         }
     }
 
