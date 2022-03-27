@@ -82,39 +82,4 @@ class UserController(
             else ctx.respond(HttpStatusCode.UnprocessableEntity)
         }
     }
-
-    suspend fun getUserFollowing(ctx: ApplicationCall) {
-        val userId = ctx.authentication.principalOrThrow().id
-
-        userService.getUserFollowing(userId).apply {
-            ctx.respond(HttpStatusCode.OK, this)
-        }
-    }
-
-    suspend fun getUserFollowers(ctx: ApplicationCall) {
-        val userId = ctx.authentication.principalOrThrow().id
-
-        userService.getUserFollowers(userId).apply {
-            ctx.respond(HttpStatusCode.OK, this)
-        }
-    }
-
-    suspend fun followUser(ctx: ApplicationCall) {
-        val userId = ctx.authentication.principalOrThrow().id
-        val userToFollowId = ctx.request.queryParameters.getOrFail("targetUserId").toLong()
-
-        userService.createUserFollowRequest(userId, userToFollowId).apply {
-            ctx.respond(HttpStatusCode.OK, this)
-        }
-    }
-
-    suspend fun updateFollow(ctx: ApplicationCall) {
-        val userId = ctx.authentication.principalOrThrow().id
-        val followRequestId = ctx.parameters.getOrFail("followId").toLong()
-        val action = ctx.request.queryParameters.getOrFail("action")
-
-        userService.updateUserFollow(userId, followRequestId, action).apply {
-            ctx.respond(HttpStatusCode.OK, this)
-        }
-    }
 }

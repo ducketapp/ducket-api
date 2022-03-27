@@ -1,14 +1,12 @@
 package io.ducket.api.domain.repository
 
-import domain.model.account.AccountEntity
-import domain.model.category.CategoryEntity
+import domain.model.currency.CurrenciesTable
 import domain.model.currency.CurrencyEntity
 import domain.model.user.UserEntity
 import io.ducket.api.domain.controller.budget.BudgetCreateDto
 import io.ducket.api.domain.model.budget.*
 import io.ducket.api.domain.model.budget.BudgetsTable
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Instant
 
@@ -16,27 +14,19 @@ class BudgetRepository(
     private val userRepository: UserRepository,
 ) {
 
-    fun create(userId: Long, currencyId: Long, dto: BudgetCreateDto): Budget = transaction {
-        val newBudget = BudgetEntity.new {
+    fun create(userId: Long, dto: BudgetCreateDto): Budget = transaction {
+        BudgetEntity.new {
             name = dto.name
-            category = CategoryEntity[dto.categoryId]
-            currency = CurrencyEntity[currencyId]
-            periodType = dto.budgetPeriod
-            limit = dto.limit
+            // category = CategoryEntity[dto.categoryId]
+            currency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(dto.currencyIsoCode) }.first()
+            fromDate = dto.fromDate
+            toDate = dto.toDate
+            limit = dto.thresholdAmount
             user = UserEntity[userId]
             isClosed = false
             createdAt = Instant.now()
             modifiedAt = Instant.now()
         }.toModel()
-
-        dto.accountIds.forEach { accountId ->
-            BudgetAccountsTable.insert {
-                it[this.budgetId] = BudgetEntity[newBudget.id].id.value
-                it[this.accountId] = AccountEntity[accountId].id.value
-            }
-        }
-
-        return@transaction newBudget
     }
 
     fun findOne(userId: Long, budgetId: Long): Budget? = transaction {
@@ -51,8 +41,10 @@ class BudgetRepository(
         }.firstOrNull()?.toModel()
     }
 
-    fun findAll(userId: Long): List<Budget> = transaction {
-        BudgetEntity.find { BudgetsTable.userId.eq(userId) }.map { it.toModel() }
+    fun findAll(vararg userIds: Long): List<Budget> = transaction {
+        BudgetEntity.find {
+            BudgetsTable.userId.inList(userIds.asList())
+        }.toList().map { it.toModel() }
     }
 
     fun findAllIncludingObserved(userId: Long): List<Budget> = transaction {
@@ -66,13 +58,13 @@ class BudgetRepository(
         ).toList().map { it.toModel() }
     }
 
-    fun delete(userId: Long, vararg budgetIds: Long): Unit = transaction {
+    fun delete(userId: Long, vararg budgetIds: Long) = transaction {
         BudgetsTable.deleteWhere {
             BudgetsTable.id.inList(budgetIds.asList()).and(BudgetsTable.userId.eq(userId))
         }
     }
 
-    fun deleteAll(userId: Long): Unit = transaction {
+    fun deleteAll(userId: Long) = transaction {
         BudgetsTable.deleteWhere {
             BudgetsTable.userId.eq(userId)
         }

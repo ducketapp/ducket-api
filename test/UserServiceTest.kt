@@ -5,6 +5,7 @@ import io.ducket.api.domain.controller.account.AccountCreateDto
 import io.ducket.api.domain.controller.user.UserDto
 import io.ducket.api.domain.controller.user.UserUpdateDto
 import io.ducket.api.domain.repository.*
+import io.ducket.api.domain.service.AccountService
 import io.ducket.api.domain.service.UserService
 import io.ducket.api.plugins.AuthenticationException
 import io.ducket.api.plugins.DuplicateEntityException
@@ -26,22 +27,22 @@ internal class UserServiceTest {
 
     private val userRepositoryMock: UserRepository = mockk()
     private val accountRepositoryMock: AccountRepository = mockk()
-    private val followRepositoryMock: FollowRepository = mockk()
     private val transactionRepository: TransactionRepository = mockk()
     private val transferRepository: TransferRepository = mockk()
     private val budgetRepository: BudgetRepository = mockk()
     private val importRuleRepository: ImportRuleRepository = mockk()
     private val importRepository: ImportRepository = mockk()
+    private val accountService: AccountService = mockk()
 
     private val cut = UserService(
         userRepositoryMock,
         accountRepositoryMock,
-        followRepositoryMock,
         transactionRepository,
         transferRepository,
         budgetRepository,
         importRuleRepository,
         importRepository,
+        accountService,
     )
 
     @BeforeEach
@@ -133,7 +134,7 @@ internal class UserServiceTest {
 
         // then
         shouldThrowExactly<AuthenticationException>(executable).also {
-            it.message shouldBe "The user doesn't exist"
+            it.message shouldBe "No such user was found"
         }
     }
 

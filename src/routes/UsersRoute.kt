@@ -29,22 +29,6 @@ fun Route.users(
                 route("/data") {
                     delete { userController.deleteUserData(this.context) }
                 }
-
-                route("/follow") {
-                    post { userController.followUser(this.context) }
-
-                    route("/{followId}") {
-                        post { userController.updateFollow(this.context) }
-                    }
-                }
-
-                route("/following") {
-                    get { userController.getUserFollowing(this.context) }
-                }
-
-                route("/followers") {
-                    get { userController.getUserFollowers(this.context) }
-                }
             }
         }
     }

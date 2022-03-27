@@ -22,7 +22,7 @@ class CurrencyService(
             if (currenciesRatesMap.containsKey(currencyIsoCode)) {
                 CurrencyRateDto(currency = it, rate = currenciesRatesMap[currencyIsoCode]!!)
             } else {
-                throw InvalidDataException("Cannot find a rate for $currencyIsoCode currency")
+                throw InvalidDataException("Cannot find a rate for '$currencyIsoCode' currency")
             }
         }
     }

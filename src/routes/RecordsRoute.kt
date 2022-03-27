@@ -3,7 +3,6 @@ package io.ducket.api.routes
 import io.ducket.api.domain.controller.record.RecordController
 import io.ducket.api.domain.controller.transaction.TransactionController
 import io.ducket.api.domain.controller.transfer.TransferController
-import io.ducket.api.domain.controller.user.UserController
 import io.ktor.auth.*
 import io.ktor.routing.*
 
@@ -17,8 +16,8 @@ fun Route.records(
             get { recordController.getRecords(this.context) }
 
             route("transactions") {
-                post { transactionController.addTransaction(this.context) }
-                patch { transactionController.deleteTransactions(this.context) }
+                post { transactionController.createTransaction(this.context) }
+                delete { transactionController.deleteTransactions(this.context) }
 
                 route("{transactionId}") {
                     get { transactionController.getTransaction(this.context) }
@@ -36,7 +35,8 @@ fun Route.records(
             }
 
             route("transfers") {
-                post { transferController.addTransfer(this.context) }
+                post { transferController.createTransfer(this.context) }
+                // delete { transferController.deleteTransfers(this.context) }
 
                 route("{transferId}") {
                     delete { transferController.getTransfer(this.context) }

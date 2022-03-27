@@ -19,17 +19,27 @@ class AccountRepository(
 ) {
 
     fun create(userId: Long, dto: AccountCreateDto): Account = transaction {
-        val currencyId = CurrencyEntity.find { CurrenciesTable.isoCode.eq(dto.currencyIsoCode) }.first().id
-
         AccountEntity.new {
             name = dto.name
             notes = dto.notes
             user = UserEntity[userId]
-            currency = CurrencyEntity[currencyId]
+            currency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(dto.currencyIsoCode) }.first()
             accountType = dto.accountType
             createdAt = Instant.now()
             modifiedAt = Instant.now()
         }.toModel()
+    }
+
+    fun findOne(userId: Long): Account? = transaction {
+        AccountEntity.find {
+            AccountsTable.userId.eq(userId)
+        }.firstOrNull()?.toModel()
+    }
+
+    fun findAll(vararg userIds: Long): List<Account> = transaction {
+        AccountEntity.find {
+            AccountsTable.userId.inList(userIds.asList())
+        }.toList().map { it.toModel() }
     }
 
     fun findAllIncludingObserved(userId: Long): List<Account> = transaction {
@@ -43,11 +53,11 @@ class AccountRepository(
         ).toList().map { it.toModel() }
     }
 
-    fun findAll(userId: Long): List<Account> = transaction {
-        AccountEntity.find {
-            AccountsTable.userId.eq(userId)
-        }.sortedByDescending { it.createdAt }.toList().map { it.toModel() }
-    }
+//    fun findAll(userId: Long): List<Account> = transaction {
+//        AccountEntity.find {
+//            AccountsTable.userId.eq(userId)
+//        }.sortedByDescending { it.createdAt }.toList().map { it.toModel() }
+//    }
 
     fun findOne(userId: Long, accountId: Long): Account? = transaction {
         AccountEntity.find {
@@ -72,10 +82,10 @@ class AccountRepository(
         }?.toModel()
     }
 
-    fun delete(userId: Long, vararg accountIds: Long): Boolean = transaction {
+    fun delete(userId: Long, vararg accountIds: Long) = transaction {
         AccountsTable.deleteWhere {
             AccountsTable.id.inList(accountIds.asList()).and(AccountsTable.userId.eq(userId))
-        } > 0
+        }
     }
 
     fun deleteAll(userId: Long): Unit = transaction {

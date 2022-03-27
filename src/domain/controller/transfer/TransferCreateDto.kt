@@ -29,7 +29,7 @@ data class TransferCreateDto(
             validate(TransferCreateDto::amount).isLessThan(BigDecimal.ZERO)
 
             if (amount.scale() !in 0..2) {
-                throw InvalidDataException("Transfer amount scale should not be greater than 2")
+                throw InvalidDataException("Amount scale should not be greater than 2")
             }
 
             if (accountId == transferAccountId) {

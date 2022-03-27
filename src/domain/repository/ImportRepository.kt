@@ -25,10 +25,6 @@ class ImportRepository {
         ImportEntity.find { ImportsTable.userId.eq(userId) }.map { it.toModel() }
     }
 
-    fun getOneByUserId(userId: Long): Import? = transaction {
-        ImportEntity.find { ImportsTable.userId.eq(userId) }.firstOrNull()?.toModel()
-    }
-
     fun importTransactions(
         userId: Long,
         accountId: Long,
@@ -45,7 +41,7 @@ class ImportRepository {
         return@transaction csvTransactions.map { csvTransaction ->
             TransactionEntity.new {
                 account = AccountEntity[accountId]
-                category = CategoryEntity.find { CategoriesTable.name.eq(csvTransaction.category) }.firstOrNull()
+                category = CategoryEntity.find { CategoriesTable.name.eq(csvTransaction.category) }.first()
                 user = UserEntity[userId]
                 import = importEntity
                 amount = csvTransaction.amount

@@ -3,6 +3,9 @@ package io.ducket.api.domain.model.transfer
 import domain.model.account.Account
 import domain.model.account.AccountEntity
 import domain.model.account.AccountsTable
+import domain.model.category.CategoriesTable
+import domain.model.category.Category
+import domain.model.category.CategoryEntity
 import domain.model.imports.Import
 import domain.model.imports.ImportEntity
 import domain.model.imports.ImportsTable
@@ -21,6 +24,7 @@ import java.time.Instant
 
 internal object TransfersTable : LongIdTable("transfer") {
     val userId = reference("user_id", UsersTable)
+    val categoryId = reference("category_id", CategoriesTable)
     val accountId = reference("account_id", AccountsTable)
     val transferAccountId = reference("transfer_account_id", AccountsTable)
     val importId = reference("import_id", ImportsTable).nullable()
@@ -38,6 +42,7 @@ internal object TransfersTable : LongIdTable("transfer") {
 class TransferEntity(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<TransferEntity>(TransfersTable)
 
+    var category by CategoryEntity referencedOn TransfersTable.categoryId
     var transferAccount by AccountEntity referencedOn TransfersTable.transferAccountId
     var account by AccountEntity referencedOn TransfersTable.accountId
     var user by UserEntity referencedOn TransfersTable.userId
@@ -56,6 +61,7 @@ class TransferEntity(id: EntityID<Long>) : LongEntity(id) {
 
     fun toModel() = Transfer(
         id.value,
+        category.toModel(),
         transferAccount.toModel(),
         account.toModel(),
         user.toModel(),
@@ -75,6 +81,7 @@ class TransferEntity(id: EntityID<Long>) : LongEntity(id) {
 
 class Transfer(
     val id: Long,
+    val category: Category,
     val transferAccount: Account,
     val account: Account,
     val user: User,

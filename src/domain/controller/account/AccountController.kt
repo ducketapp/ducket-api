@@ -1,6 +1,6 @@
 package io.ducket.api.domain.controller.account
 
-import io.ducket.api.config.JwtManager
+import io.ducket.api.domain.controller.BulkDeleteDto
 import io.ducket.api.domain.service.AccountService
 import io.ducket.api.domain.service.ImportService
 import io.ducket.api.principalOrThrow
@@ -17,11 +17,11 @@ class AccountController(
     private val importService: ImportService,
 ) {
 
-    suspend fun getAccountDetails(ctx: ApplicationCall) {
+    suspend fun getAccount(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
         val accountId = ctx.parameters.getOrFail("accountId").toLong()
 
-        val account = accountService.getAccountDetailsAccessibleToUser(userId, accountId)
+        val account = accountService.getAccountAccessibleToUser(userId, accountId)
         ctx.respond(HttpStatusCode.OK, account)
     }
 
@@ -53,12 +53,22 @@ class AccountController(
         }
     }
 
+    suspend fun deleteAccounts(ctx: ApplicationCall) {
+        val userId = ctx.authentication.principalOrThrow().id
+
+        ctx.receive<BulkDeleteDto>().apply {
+            accountService.deleteAccounts(userId, this.validate()).apply {
+                ctx.respond(HttpStatusCode.NoContent)
+            }
+        }
+    }
+
     suspend fun deleteAccount(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
         val accountId = ctx.parameters.getOrFail("accountId").toLong()
 
-        if (accountService.deleteAccount(userId, accountId)) ctx.respond(HttpStatusCode.NoContent)
-        else ctx.respond(HttpStatusCode.UnprocessableEntity)
+        accountService.deleteAccount(userId, accountId)
+        ctx.respond(HttpStatusCode.NoContent)
     }
 
     suspend fun importAccountTransactions(ctx: ApplicationCall) {

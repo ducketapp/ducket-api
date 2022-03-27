@@ -1,6 +1,6 @@
 package io.ducket.api.domain.controller.budget
 
-import io.ducket.api.config.JwtManager
+import io.ducket.api.domain.controller.BulkDeleteDto
 import io.ducket.api.domain.service.BudgetService
 import io.ducket.api.principalOrThrow
 import io.ktor.application.*
@@ -33,12 +33,22 @@ class BudgetController(
         }
     }
 
-    suspend fun getBudgetDetails(ctx: ApplicationCall) {
+    suspend fun getBudget(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
         val budgetId = ctx.parameters.getOrFail("budgetId").toLong()
 
-        budgetService.getBudgetDetailsAccessibleToUser(userId, budgetId).apply {
+        budgetService.getBudgetAccessibleToUser(userId, budgetId).apply {
             ctx.respond(HttpStatusCode.OK, this)
+        }
+    }
+
+    suspend fun deleteBudgets(ctx: ApplicationCall) {
+        val userId = ctx.authentication.principalOrThrow().id
+
+        ctx.receive<BulkDeleteDto>().apply {
+            budgetService.deleteBudgets(userId, this.validate()).apply {
+                ctx.respond(HttpStatusCode.NoContent)
+            }
         }
     }
 

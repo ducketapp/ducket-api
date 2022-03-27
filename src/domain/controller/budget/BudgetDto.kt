@@ -1,9 +1,9 @@
 package io.ducket.api.domain.controller.budget
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import io.ducket.api.InstantSerializer
+import io.ducket.api.LocalDateSerializer
 import io.ducket.api.domain.controller.account.AccountDto
 import io.ducket.api.domain.controller.currency.CurrencyDto
 import io.ducket.api.domain.controller.category.TypelessCategoryDto
@@ -11,24 +11,41 @@ import io.ducket.api.domain.controller.user.UserDto
 import io.ducket.api.domain.model.budget.Budget
 import java.math.BigDecimal
 import java.time.Instant
+import java.time.LocalDate
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class BudgetDto(
-    @JsonIgnore val budget: Budget,
-    @JsonIgnore val progressDto: BudgetProgressDto,
-    @JsonIgnore val periodDto: BudgetPeriodBoundsDto? = null,
+    val id: Long,
+    val name: String,
+    val notes: String?,
+    val isClosed: Boolean,
+    var percentage: BigDecimal = BigDecimal.ZERO,
+    var currentAmount: BigDecimal = BigDecimal.ZERO,
+    val thresholdAmount: BigDecimal,
+    val owner: UserDto,
+    val currency: CurrencyDto,
+    val accounts: List<AccountDto>,
+    val categories: List<TypelessCategoryDto>,
+    @JsonSerialize(using = LocalDateSerializer::class) val fromDate: LocalDate,
+    @JsonSerialize(using = LocalDateSerializer::class) val toDate: LocalDate,
+    @JsonSerialize(using = InstantSerializer::class) val createdAt: Instant,
+    @JsonSerialize(using = InstantSerializer::class) val modifiedAt: Instant,
 ) {
-    val id: Long = budget.id
-    val isClosed: Boolean = budget.isClosed
-    val period: BudgetPeriodBoundsDto? = periodDto
-    val name: String = budget.name
-    val amount: BigDecimal = budget.limit
-    val owner: UserDto = UserDto(budget.user)
-    val currency: CurrencyDto = CurrencyDto(budget.currency)
-    val progress: BudgetProgressDto = progressDto
-    val account: List<AccountDto> = budget.accounts.map { AccountDto(it) }
-    val category: TypelessCategoryDto = TypelessCategoryDto(budget.category)
-    val notes: String? = budget.notes
-    @JsonSerialize(using = InstantSerializer::class) val createdAt: Instant = budget.createdAt
-    @JsonSerialize(using = InstantSerializer::class) val modifiedAt: Instant = budget.modifiedAt
+    constructor(budget: Budget, progress: BudgetProgressDto): this(
+        id = budget.id,
+        name = budget.name,
+        isClosed = budget.isClosed,
+        fromDate = budget.fromDate,
+        toDate = budget.toDate,
+        percentage = progress.percentage,
+        currentAmount = progress.amount,
+        thresholdAmount = budget.limit,
+        owner = UserDto(budget.user),
+        currency = CurrencyDto(budget.currency),
+        accounts = budget.accounts.map { AccountDto(it) },
+        categories = budget.categories.map { TypelessCategoryDto(it) },
+        notes = budget.notes,
+        createdAt = budget.createdAt,
+        modifiedAt = budget.modifiedAt,
+    )
 }

@@ -25,11 +25,11 @@ import java.time.Instant
 internal object TransactionsTable : LongIdTable("transaction") {
     val userId = reference("user_id", UsersTable)
     val accountId = reference("account_id", AccountsTable)
-    val categoryId = optReference("category_id", CategoriesTable)
+    val categoryId = reference("category_id", CategoriesTable)
     val importId = optReference("import_id", ImportsTable)
     val date = timestamp("date")
     val amount = decimal("amount", 10, 2)
-    val payeeOrPayer = varchar("payee_or_payer", 128)
+    val payeeOrPayer = varchar("payee_or_payer", 128).nullable()
     val notes = varchar("notes", 128).nullable()
     val longitude = varchar("longitude", 45).nullable()
     val latitude = varchar("latitude", 45).nullable()
@@ -42,7 +42,7 @@ class TransactionEntity(id: EntityID<Long>) : LongEntity(id) {
 
     var account by AccountEntity referencedOn TransactionsTable.accountId
     var user by UserEntity referencedOn TransactionsTable.userId
-    var category by CategoryEntity optionalReferencedOn TransactionsTable.categoryId
+    var category by CategoryEntity referencedOn TransactionsTable.categoryId
     var import by ImportEntity optionalReferencedOn TransactionsTable.importId
     var amount by TransactionsTable.amount
     var date by TransactionsTable.date
@@ -58,7 +58,7 @@ class TransactionEntity(id: EntityID<Long>) : LongEntity(id) {
     fun toModel() = Transaction(
         id.value,
         account.toModel(),
-        category?.toModel(),
+        category.toModel(),
         user.toModel(),
         import?.toModel(),
         amount,
@@ -76,12 +76,12 @@ class TransactionEntity(id: EntityID<Long>) : LongEntity(id) {
 class Transaction(
     val id: Long,
     val account: Account,
-    val category: Category?,
+    val category: Category,
     val user: User,
     val import: Import?,
     val amount: BigDecimal,
     val date: Instant,
-    val payeeOrPayer: String,
+    val payeeOrPayer: String?,
     val notes: String?,
     val longitude: String?,
     val latitude: String?,

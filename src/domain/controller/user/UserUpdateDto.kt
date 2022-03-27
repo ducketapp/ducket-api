@@ -1,5 +1,6 @@
 package io.ducket.api.domain.controller.user
 
+import io.ducket.api.extension.declaredMemberPropertiesNull
 import io.ducket.api.plugins.InvalidDataException
 import org.valiktor.functions.hasSize
 import org.valiktor.functions.isNotEmpty
@@ -17,9 +18,7 @@ data class UserUpdateDto(
             validate(UserUpdateDto::phone).isNotEmpty().startsWith("+").hasSize(11)
             validate(UserUpdateDto::password).isNotEmpty().hasSize(8, 14)
 
-            if (name == null && phone == null && password == null) {
-                throw InvalidDataException("No one field is specified for updating")
-            }
+            if (this@UserUpdateDto.declaredMemberPropertiesNull()) throw InvalidDataException()
         }
         return this
     }

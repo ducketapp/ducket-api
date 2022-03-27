@@ -1,6 +1,6 @@
 package io.ducket.api.domain.controller.transaction
 
-import io.ducket.api.config.JwtManager
+import io.ducket.api.domain.controller.BulkDeleteDto
 import io.ducket.api.domain.service.AccountService
 import io.ducket.api.domain.service.TransactionService
 import io.ducket.api.principalOrThrow
@@ -21,16 +21,16 @@ class TransactionController(
         val userId = ctx.authentication.principalOrThrow().id
         val transactionId = ctx.parameters.getOrFail("transactionId").toLong()
 
-        transactionService.getTransactionDetailsAccessibleToUser(userId, transactionId).apply {
+        transactionService.getTransactionAccessibleToUser(userId, transactionId).apply {
             ctx.respond(HttpStatusCode.OK, this)
         }
     }
 
-    suspend fun addTransaction(ctx: ApplicationCall) {
+    suspend fun createTransaction(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
 
         ctx.receive<TransactionCreateDto>().apply {
-            transactionService.addTransaction(userId, this.validate()).apply {
+            transactionService.createTransaction(userId, this.validate()).apply {
                 ctx.respond(HttpStatusCode.Created, this)
             }
         }
@@ -48,7 +48,7 @@ class TransactionController(
     suspend fun deleteTransactions(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
 
-        ctx.receive<TransactionDeleteDto>().apply {
+        ctx.receive<BulkDeleteDto>().apply {
             transactionService.deleteTransactions(userId, this.validate()).apply {
                 ctx.respond(HttpStatusCode.NoContent)
             }
@@ -60,7 +60,7 @@ class TransactionController(
         val transactionId = ctx.parameters.getOrFail("transactionId").toLong()
 
         transactionService.uploadTransactionAttachments(userId, transactionId, ctx.receiveMultipart().readAllParts()).apply {
-            transactionService.getTransactionDetailsAccessibleToUser(userId, transactionId).apply {
+            transactionService.getTransactionAccessibleToUser(userId, transactionId).apply {
                 ctx.respond(HttpStatusCode.OK, this)
             }
         }

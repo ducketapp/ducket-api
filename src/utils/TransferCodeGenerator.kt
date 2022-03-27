@@ -12,6 +12,6 @@ object TransferCodeGenerator {
             out += Integer.valueOf(ts.toString().cut(startIndex = i, cutLength = 2)).toString(radix = 36)
         }
 
-        return "TRF-${out.uppercase()}"
+        return "TRANSFER_${out.uppercase()}"
     }
 }

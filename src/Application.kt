@@ -8,6 +8,7 @@ import io.ducket.api.domain.controller.account.AccountController
 import io.ducket.api.domain.controller.budget.BudgetController
 import io.ducket.api.domain.controller.category.CategoryController
 import io.ducket.api.domain.controller.currency.CurrencyController
+import io.ducket.api.domain.controller.group.GroupController
 import io.ducket.api.domain.controller.record.RecordController
 import io.ducket.api.domain.controller.transaction.TransactionController
 import io.ducket.api.domain.controller.transfer.TransferController
@@ -131,6 +132,7 @@ fun Application.module(
     val transactionController: TransactionController by inject()
     val transferController: TransferController by inject()
     val currencyController: CurrencyController by inject()
+    val groupController: GroupController by inject()
 
     install(Routing) {
         get("/metrics") {
@@ -161,6 +163,7 @@ fun Application.module(
             categories(categoryController)
             records(recordController, transactionController, transferController)
             budgets(budgetController)
+            groups(groupController)
         }
     }
 

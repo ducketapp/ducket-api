@@ -21,13 +21,11 @@ class UserRepository {
     private val logger = getLogger()
 
     fun create(dto: UserCreateDto): User = transaction {
-        val currencyId = CurrencyEntity.find { CurrenciesTable.isoCode.eq(dto.currencyIsoCode) }.first().id
-
         UserEntity.new {
             name = dto.name
             phone = dto.phone
             email = dto.email
-            mainCurrency = CurrencyEntity[currencyId]
+            mainCurrency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(dto.currencyIsoCode) }.first()
             passwordHash = BCrypt.hashpw(dto.password, BCrypt.gensalt(BCRYPT_HASH_ROUNDS))
             createdAt = Instant.now()
             modifiedAt = Instant.now()

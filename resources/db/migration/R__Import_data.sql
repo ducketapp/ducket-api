@@ -70,7 +70,6 @@ INSERT IGNORE INTO `ducket-db`.`category` (`id`, `group`, `name`) VALUES (DEFAUL
 INSERT IGNORE INTO `ducket-db`.`category` (`id`, `group`, `name`) VALUES (DEFAULT, 'FINANCIAL_COSTS', 'MOBILE_PHONE');
 INSERT IGNORE INTO `ducket-db`.`category` (`id`, `group`, `name`) VALUES (DEFAULT, 'FINANCIAL_COSTS', 'INTERNET');
 INSERT IGNORE INTO `ducket-db`.`category` (`id`, `group`, `name`) VALUES (DEFAULT, 'FINANCIAL_COSTS', 'SERVICES');
-INSERT IGNORE INTO `ducket-db`.`category` (`id`, `group`, `name`) VALUES (DEFAULT, 'FINANCIAL_COSTS', 'FAMILY_SUPPORT');
 INSERT IGNORE INTO `ducket-db`.`category` (`id`, `group`, `name`) VALUES (DEFAULT, 'FINANCIAL_COSTS', 'PARKING_LOT');
 INSERT IGNORE INTO `ducket-db`.`category` (`id`, `group`, `name`) VALUES (DEFAULT, 'INVESTMENTS', 'INVESTMENTS');
 INSERT IGNORE INTO `ducket-db`.`category` (`id`, `group`, `name`) VALUES (DEFAULT, 'INVESTMENTS', 'STOCKS_AND_SHARES');
@@ -85,5 +84,6 @@ INSERT IGNORE INTO `ducket-db`.`category` (`id`, `group`, `name`) VALUES (DEFAUL
 INSERT IGNORE INTO `ducket-db`.`category` (`id`, `group`, `name`) VALUES (DEFAULT, 'OTHER', 'OTHER');
 INSERT IGNORE INTO `ducket-db`.`category` (`id`, `group`, `name`) VALUES (DEFAULT, 'OTHER', 'WITHDRAWAL');
 INSERT IGNORE INTO `ducket-db`.`category` (`id`, `group`, `name`) VALUES (DEFAULT, 'OTHER', 'TRANSFER');
+INSERT IGNORE INTO `ducket-db`.`category` (`id`, `group`, `name`) VALUES (DEFAULT, 'OTHER', 'UNCATEGORIZED');
 
 COMMIT;

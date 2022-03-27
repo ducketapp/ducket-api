@@ -5,6 +5,7 @@ import domain.model.transaction.Transaction
 import io.ducket.api.InstantSerializer
 import io.ducket.api.domain.controller.account.AccountDto
 import io.ducket.api.domain.controller.category.TypedCategoryDto
+import io.ducket.api.domain.controller.category.TypelessCategoryDto
 import io.ducket.api.domain.controller.imports.ImportDto
 import io.ducket.api.domain.controller.user.UserDto
 import io.ducket.api.domain.model.transfer.Transfer
@@ -17,7 +18,7 @@ open class RecordDto {
     val isExpense: Boolean
     val isTransfer: Boolean
     val account: AccountDto
-    val category: TypedCategoryDto?
+    val category: TypedCategoryDto
     val import: ImportDto?
     val owner: UserDto
     val notes: String?
@@ -32,7 +33,7 @@ open class RecordDto {
         this.isExpense = transfer.amount < BigDecimal.ZERO
         this.amount = transfer.amount
         this.account = AccountDto(transfer.account)
-        this.category = null
+        this.category = TypedCategoryDto(transfer.category)
         this.import = transfer.import?.let { ImportDto(it) }
         this.owner = UserDto(transfer.user)
         this.date = transfer.date
@@ -48,7 +49,7 @@ open class RecordDto {
         this.isExpense = transaction.amount < BigDecimal.ZERO
         this.amount = transaction.amount
         this.account = AccountDto(transaction.account)
-        this.category = transaction.category?.let { TypedCategoryDto(it) }
+        this.category = TypedCategoryDto(transaction.category)
         this.import = transaction.import?.let { ImportDto(it) }
         this.owner = UserDto(transaction.user)
         this.date = transaction.date

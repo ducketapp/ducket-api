@@ -16,16 +16,18 @@ class TransferService(
     private val transferRepository: TransferRepository,
     private val accountRepository: AccountRepository,
     private val accountService: AccountService,
+    private val groupService: GroupService,
 ): FileService() {
     private val currencyRateProvider: CurrencyRateProvider by inject(CurrencyRateProvider::class.java)
 
-    fun getTransferDetailsAccessibleToUser(userId: Long, transferId: Long): TransferDto {
-        return getTransfersAccessibleToUser(userId).firstOrNull { it.id == transferId }
-            ?: throw NoEntityFoundException("No such transfer was found")
+    fun getTransferAccessibleToUser(userId: Long, transferId: Long): TransferDto {
+        return getTransfersAccessibleToUser(userId).firstOrNull { it.id == transferId } ?: throw NoEntityFoundException()
     }
 
     fun getTransfersAccessibleToUser(userId: Long): List<TransferDto> {
-        return transferRepository.findAllIncludingObserved(userId)
+        val userIds = groupService.getDistinctUsersWithMutualGroupMemberships(userId).map { it.id } + userId
+
+        return transferRepository.findAll(*userIds.toLongArray())
             .map { TransferDto(it) }
             .onEach {
                 it.account.balance = accountService.calculateBalance(it.account.owner.id, it.account.id, it.date)
@@ -33,13 +35,13 @@ class TransferService(
             }
     }
 
-    fun addTransfer(userId: Long, reqObj: TransferCreateDto): List<TransferDto> {
-        val fromAccount = accountRepository.findOne(userId, reqObj.accountId) ?: throw NoEntityFoundException("Origin account was not found")
-        val toAccount = accountRepository.findOne(userId, reqObj.transferAccountId) ?: throw NoEntityFoundException("Target account was not found")
+    fun createTransfer(userId: Long, payload: TransferCreateDto): List<TransferDto> {
+        val fromAccount = accountRepository.findOne(userId, payload.accountId) ?: throw NoEntityFoundException("Origin account was not found")
+        val toAccount = accountRepository.findOne(userId, payload.transferAccountId) ?: throw NoEntityFoundException("Target account was not found")
 
         var exchangeRate = BigDecimal.ONE
 
-        if (reqObj.exchangeRate == null) {
+        if (payload.exchangeRate == null) {
             if (fromAccount.currency.id != toAccount.currency.id) {
                 exchangeRate = currencyRateProvider.getCurrencyRate(fromAccount.currency.isoCode, toAccount.currency.isoCode)
             }
@@ -49,18 +51,18 @@ class TransferService(
             }
         }
 
-        return transferRepository.create(userId, reqObj, exchangeRate).map { TransferDto(it) }
+        return transferRepository.create(userId, payload, exchangeRate).map { TransferDto(it) }
     }
 
     fun deleteTransfer(userId: Long, transferId: Long) {
-        val transfer = transferRepository.findOne(userId, transferId) ?: throw NoEntityFoundException("No such transfer was found")
+        val transfer = transferRepository.findOne(userId, transferId) ?: throw NoEntityFoundException()
 
         if (transfer.relationCode == null) transferRepository.delete(userId, transferId)
         else transferRepository.delete(userId, transfer.relationCode)
     }
 
     fun downloadTransferAttachment(userId: Long, entityId: Long, attachmentId: Long): File {
-        val transfer = getTransferDetailsAccessibleToUser(userId, entityId)
+        val transfer = getTransferAccessibleToUser(userId, entityId)
         val attachment = transferRepository.findAttachment(transfer.owner.id, entityId, attachmentId)
             ?: throw NoEntityFoundException("No such attachment was found")
 

@@ -3,6 +3,8 @@ package io.ducket.api.domain.controller.user
 import com.fasterxml.jackson.annotation.JsonInclude
 import io.ducket.api.domain.controller.currency.CurrencyDto
 import domain.model.user.User
+import io.ducket.api.app.MembershipStatus
+import io.ducket.api.domain.controller.group.GroupMembershipDto
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class UserDto(

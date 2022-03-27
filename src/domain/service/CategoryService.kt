@@ -14,7 +14,6 @@ class CategoryService(private val categoryRepository: CategoryRepository) {
     }
 
     fun getCategory(id: Long): TypedCategoryDto {
-        return categoryRepository.findById(id)?.let { TypedCategoryDto(it) }
-            ?: throw NoEntityFoundException("No such category was found")
+        return categoryRepository.findById(id)?.let { TypedCategoryDto(it) } ?: throw NoEntityFoundException()
     }
 }

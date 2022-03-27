@@ -1,6 +1,5 @@
 package io.ducket.api.domain.controller.transfer
 
-import io.ducket.api.config.JwtManager
 import io.ducket.api.domain.service.AccountService
 import io.ducket.api.domain.service.TransferService
 import io.ducket.api.principalOrThrow
@@ -17,11 +16,11 @@ class TransferController(
     val accountService: AccountService,
 ) {
 
-    suspend fun addTransfer(ctx: ApplicationCall) {
+    suspend fun createTransfer(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
 
         ctx.receive<TransferCreateDto>().apply {
-            transferService.addTransfer(userId, this.validate()).apply {
+            transferService.createTransfer(userId, this.validate()).apply {
                 ctx.respond(HttpStatusCode.Created, this)
             }
         }
@@ -31,7 +30,7 @@ class TransferController(
         val userId = ctx.authentication.principalOrThrow().id
         val transferId = ctx.parameters.getOrFail("transferId").toLong()
 
-        transferService.getTransferDetailsAccessibleToUser(userId, transferId).apply {
+        transferService.getTransferAccessibleToUser(userId, transferId).apply {
             ctx.respond(HttpStatusCode.OK, this)
         }
     }
@@ -50,7 +49,7 @@ class TransferController(
         val transferId = ctx.parameters.getOrFail("transferId").toLong()
 
         transferService.uploadTransferAttachments(userId, transferId, ctx.receiveMultipart().readAllParts()).apply {
-            transferService.getTransferDetailsAccessibleToUser(userId, transferId).apply {
+            transferService.getTransferAccessibleToUser(userId, transferId).apply {
                 ctx.respond(HttpStatusCode.OK, this)
             }
         }

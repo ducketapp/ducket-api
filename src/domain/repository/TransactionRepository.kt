@@ -10,15 +10,12 @@ import io.ducket.api.domain.controller.transaction.TransactionCreateDto
 import io.ducket.api.domain.model.attachment.Attachment
 import io.ducket.api.domain.model.attachment.AttachmentEntity
 import io.ducket.api.domain.model.attachment.AttachmentsTable
-import io.ducket.api.domain.model.follow.FollowEntity
-import io.ducket.api.domain.model.follow.FollowsTable
 import io.ducket.api.domain.model.transaction.TransactionAttachmentsTable
 import org.jetbrains.exposed.sql.*
 
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
 import java.time.Instant
-import java.util.*
 
 class TransactionRepository(
     private val userRepository: UserRepository,
@@ -31,28 +28,11 @@ class TransactionRepository(
         }.firstOrNull()?.toModel()
     }
 
-    fun findAll(userId: Long): List<Transaction> = transaction {
+    fun findAll(vararg userIds: Long): List<Transaction> = transaction {
         TransactionEntity.find {
-            TransactionsTable.userId.eq(userId)
-        }.sortedByDescending { it.date }.map { it.toModel() }
+            TransactionsTable.userId.inList(userIds.asList())
+        }.toList().map { it.toModel() }
     }
-
-    fun findAllIncludingObserved(userId: Long): List<Transaction> = transaction {
-        val followedUsers = userRepository.findUsersFollowingByUser(userId)
-
-        TransactionEntity.wrapRows(
-            TransactionsTable.select {
-                TransactionsTable.userId.eq(userId)
-                    .or(TransactionsTable.userId.inList(followedUsers.map { it.id }))
-            }
-        ).toList().map { it.toModel() }
-    }
-
-/*    fun findAllByCategories(userId: Int, categoryIds: List<Int>): List<Transaction> = transaction {
-        TransactionEntity.find {
-            TransactionsTable.userId.eq(userId).and(TransactionsTable.categoryId.inList(categoryIds))
-        }.map { it.toModel() }
-    }*/
 
     fun findAllByAccount(userId: Long, accountId: Long): List<Transaction> = transaction {
         TransactionEntity.find {
@@ -68,17 +48,13 @@ class TransactionRepository(
             import = null
             amount = dto.amount
             date = dto.date
-            payeeOrPayer = dto.payee
+            payeeOrPayer = dto.payeeOrPayer
             notes = dto.notes
             longitude = dto.longitude
             latitude = dto.latitude
             createdAt = Instant.now()
             modifiedAt = Instant.now()
         }.toModel()
-    }
-
-    fun getTotalByAccount(userId: Long, accountId: Long): Int = transaction {
-        findAllByAccount(userId, accountId).size
     }
 
     fun delete(userId: Long, vararg transactionIds: Long): Unit = transaction {

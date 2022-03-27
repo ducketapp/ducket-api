@@ -1,6 +1,7 @@
 package io.ducket.api.domain.repository
 
 import domain.model.account.AccountEntity
+import domain.model.transaction.Transaction
 import domain.model.transaction.TransactionEntity
 import domain.model.transaction.TransactionsTable
 import domain.model.user.UserEntity
@@ -75,10 +76,10 @@ class TransferRepository(
         }.sortedByDescending { it.date }.map { it.toModel() }
     }
 
-    fun findAll(userId: Long): List<Transfer> = transaction {
+    fun findAll(vararg userIds: Long): List<Transfer> = transaction {
         TransferEntity.find {
-            TransfersTable.userId.eq(userId)
-        }.sortedByDescending { it.date }.map { it.toModel() }
+            TransfersTable.userId.inList(userIds.asList())
+        }.toList().map { it.toModel() }
     }
 
     fun getTotalByAccount(userId: Long, accountId: Long): Int = transaction {

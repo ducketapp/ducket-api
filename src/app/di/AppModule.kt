@@ -9,6 +9,7 @@ import io.ducket.api.domain.controller.account.AccountController
 import io.ducket.api.domain.controller.budget.BudgetController
 import io.ducket.api.domain.controller.category.CategoryController
 import io.ducket.api.domain.controller.currency.CurrencyController
+import io.ducket.api.domain.controller.group.GroupController
 import io.ducket.api.domain.controller.record.RecordController
 import io.ducket.api.domain.controller.transaction.TransactionController
 import io.ducket.api.domain.controller.transfer.TransferController
@@ -40,19 +41,21 @@ object AppModule {
         single { TransferController(get(), get()) }
         single { BudgetController(get()) }
         single { CurrencyController(get()) }
+        single { GroupController(get()) }
 
         /**
          * Services
          */
         single { UserService(get(), get(), get(), get(), get(), get(), get(), get()) }
-        single { AccountService(get(), get(), get(), get()) }
+        single { AccountService(get(), get(), get(), get(), get()) }
         single { CategoryService(get()) }
-        single { TransferService(get(), get(), get()) }
-        single { TransactionService(get(), get()) }
-        single { BudgetService(get(), get(), get(), get(), get(), get()) }
+        single { TransferService(get(), get(), get(), get()) }
+        single { TransactionService(get(), get(), get()) }
+        single { BudgetService(get(), get(), get()) }
         single { CurrencyService(get()) }
         single { ImportRuleService(get()) }
         single { ImportService(get(), get(), get(), get()) }
+        single { GroupService(get(), get(), get()) }
 
         /**
          * Repositories
@@ -60,12 +63,13 @@ object AppModule {
         single { UserRepository() }
         single { CategoryRepository() }
         single { CurrencyRepository() }
-        single { FollowRepository() }
         single { ImportRepository() }
         single { ImportRuleRepository() }
         single { AccountRepository(get()) }
         single { BudgetRepository(get()) }
         single { TransactionRepository(get()) }
         single { TransferRepository(get()) }
+        single { GroupRepository() }
+        single { GroupMembershipRepository() }
     }
 }

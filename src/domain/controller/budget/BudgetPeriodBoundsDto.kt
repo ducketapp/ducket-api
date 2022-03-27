@@ -1,11 +1,10 @@
 package io.ducket.api.domain.controller.budget
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import io.ducket.api.LocalDateSerializer
 import java.time.LocalDate
 
-class BudgetPeriodBoundsDto(
-    val type: String,
-    bounds: Pair<LocalDate, LocalDate>,
-) {
-    val lowerBound: String = bounds.first.toString()
-    val upperBound: String = bounds.second.toString()
-}
+data class BudgetPeriodBoundsDto(
+    @JsonSerialize(using = LocalDateSerializer::class) val lowerBound: LocalDate,
+    @JsonSerialize(using = LocalDateSerializer::class) val upperBound: LocalDate,
+)
