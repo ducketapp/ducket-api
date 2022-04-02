@@ -1,13 +1,11 @@
 package io.ducket.api.domain.repository
 
 import domain.model.category.CategoryEntity
-import domain.model.imports.ImportRule
-import domain.model.imports.ImportRuleEntity
+import domain.model.imports.*
 import domain.model.imports.ImportRulesTable
-import domain.model.imports.ImportsTable
 import domain.model.user.UserEntity
 import io.ducket.api.domain.controller.rule.ImportRuleCreateDto
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import io.ducket.api.domain.controller.rule.ImportRuleUpdateDto
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -20,9 +18,9 @@ class ImportRuleRepository {
             name = dto.name
             recordCategory = CategoryEntity[dto.categoryId]
             user = UserEntity[userId]
-            isExpense = dto.expense
-            isIncome = dto.income
-            keywords = dto.keywords
+            expense = dto.expense
+            income = dto.income
+            keywords = dto.keywords.joinToString(KEYWORDS_DELIMITER)
             createdAt = Instant.now()
             modifiedAt = Instant.now()
         }.toModel()
@@ -44,13 +42,26 @@ class ImportRuleRepository {
         }.firstOrNull()?.toModel()
     }
 
-    fun delete(userId: Long, vararg ruleIds: Long): Boolean = transaction {
-        ImportRulesTable.deleteWhere {
-            ImportRulesTable.id.inList(ruleIds.asList()).and(ImportRulesTable.userId.eq(userId))
-        } > 0
+    fun updateOne(userId: Long, ruleId: Long, dto: ImportRuleUpdateDto): ImportRule? = transaction {
+        ImportRuleEntity.find {
+            ImportRulesTable.id.eq(ruleId).and(ImportRulesTable.userId.eq(userId))
+        }.firstOrNull()?.also { found ->
+            dto.name?.let { found.name = it }
+            dto.expense?.let { found.expense = it }
+            dto.income?.let { found.income = it }
+            dto.keywords?.let { found.keywords = it.joinToString(KEYWORDS_DELIMITER) }
+            dto.categoryId?.let { found.recordCategory = CategoryEntity[it] }
+            found.modifiedAt = Instant.now()
+        }?.toModel()
     }
 
-    fun deleteAll(userId: Long): Unit = transaction {
+    fun delete(userId: Long, vararg ruleIds: Long) = transaction {
+        ImportRulesTable.deleteWhere {
+            ImportRulesTable.id.inList(ruleIds.asList()).and(ImportRulesTable.userId.eq(userId))
+        }
+    }
+
+    fun deleteAll(userId: Long) = transaction {
         ImportRulesTable.deleteWhere {
             ImportRulesTable.userId.eq(userId)
         }

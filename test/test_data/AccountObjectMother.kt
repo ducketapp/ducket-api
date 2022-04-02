@@ -3,6 +3,7 @@ package io.ducket.api.test_data
 import domain.model.account.Account
 import io.ducket.api.app.AccountType
 import io.ducket.api.domain.controller.account.AccountCreateDto
+import java.math.BigDecimal
 import java.time.Instant
 
 class AccountObjectMother {
@@ -47,6 +48,7 @@ class AccountObjectMother {
             name = "Cash USD",
             notes = "Account in United States dollar",
             currencyIsoCode = "USD",
+            startBalance = BigDecimal.ZERO,
             accountType = AccountType.CASH,
         )
     }

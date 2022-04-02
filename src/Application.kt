@@ -10,6 +10,7 @@ import io.ducket.api.domain.controller.category.CategoryController
 import io.ducket.api.domain.controller.currency.CurrencyController
 import io.ducket.api.domain.controller.group.GroupController
 import io.ducket.api.domain.controller.record.RecordController
+import io.ducket.api.domain.controller.rule.ImportRuleController
 import io.ducket.api.domain.controller.transaction.TransactionController
 import io.ducket.api.domain.controller.transfer.TransferController
 import io.ducket.api.domain.controller.user.UserController
@@ -59,7 +60,7 @@ fun main(args: Array<String>): Unit {
 @kotlin.jvm.JvmOverloads
 fun Application.module(
     testing: Boolean = false,
-    diModules: MutableList<Module> = mutableListOf(AppModule.module),
+    diModules: MutableList<Module> = mutableListOf(AppModule.configModule, AppModule.appModule),
 ) {
     install(Koin) {
         SLF4JLogger()
@@ -133,6 +134,7 @@ fun Application.module(
     val transferController: TransferController by inject()
     val currencyController: CurrencyController by inject()
     val groupController: GroupController by inject()
+    val importRuleController: ImportRuleController by inject()
 
     install(Routing) {
         get("/metrics") {
@@ -164,6 +166,7 @@ fun Application.module(
             records(recordController, transactionController, transferController)
             budgets(budgetController)
             groups(groupController)
+            importRules(importRuleController)
         }
     }
 
@@ -195,10 +198,10 @@ private fun Application.setupAppConfig() {
         )
 
         this.databaseConfig = DatabaseConfig(
+            driver = hoconConfig.property("database.driver").getString(),
+            database = hoconConfig.property("database.name").getString(),
             host = hoconConfig.property("database.host").getString(),
             port = hoconConfig.property("database.port").getString().toInt(),
-            name = hoconConfig.property("database.name").getString(),
-            driver = hoconConfig.property("database.driver").getString(),
             user = hoconConfig.property("database.user").getString(),
             password = hoconConfig.property("database.password").getString(),
         )

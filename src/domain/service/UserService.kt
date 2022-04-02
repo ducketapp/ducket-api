@@ -23,10 +23,6 @@ class UserService(
     private val accountService: AccountService,
 ): FileService() {
 
-    fun getUsers(): List<UserDto> {
-        return userRepository.findAll().map { UserDto(it) }
-    }
-
     fun getUser(userId: Long): UserDto {
         return userRepository.findOne(userId)?.let { UserDto(it) } ?: throw NoEntityFoundException()
     }
@@ -64,27 +60,14 @@ class UserService(
         return userRepository.updateOne(userId, reqObj)?.let { UserDto(it) } ?: throw NoEntityFoundException()
     }
 
-    fun deleteUser(userId: Long): Boolean {
+    fun deleteUser(userId: Long) {
         return transaction {
-            deleteUserData(userId)
+            userRepository.deleteData(userId)
             userRepository.deleteOne(userId)
         }
     }
 
-    fun deleteUserData(userId: Long): Boolean {
-        return transaction {
-            try {
-                transactionRepository.deleteAll(userId)
-                transferRepository.deleteAll(userId)
-                budgetRepository.deleteAll(userId)
-                importRepository.deleteAll(userId)
-                importRuleRepository.deleteAll(userId)
-                accountRepository.deleteAll(userId)
-                return@transaction true
-            } catch (e: Exception) {
-                TransactionManager.current().rollback()
-                return@transaction false
-            }
-        }
+    fun deleteUserData(userId: Long) {
+        return userRepository.deleteData(userId)
     }
 }

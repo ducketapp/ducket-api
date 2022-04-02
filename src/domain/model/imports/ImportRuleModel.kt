@@ -12,12 +12,14 @@ import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.javatime.timestamp
 import java.time.Instant
 
+const val KEYWORDS_DELIMITER = "; "
+
 internal object ImportRulesTable : LongIdTable("import_rule") {
     val userId = reference("user_id", UsersTable)
     val recordCategoryId = reference("record_category_id", CategoriesTable)
     val name = varchar("name", 45)
-    val isExpense = bool("expense")
-    val isIncome = bool("income")
+    val expense = bool("expense")
+    val income = bool("income")
     val keywords = varchar("keywords", 512)
     val createdAt = timestamp("created_at")
     val modifiedAt = timestamp("modified_at")
@@ -29,8 +31,8 @@ class ImportRuleEntity(id: EntityID<Long>) : LongEntity(id) {
     var user by UserEntity referencedOn ImportRulesTable.userId
     var recordCategory by CategoryEntity referencedOn ImportRulesTable.recordCategoryId
     var name by ImportRulesTable.name
-    var isExpense by ImportRulesTable.isExpense
-    var isIncome by ImportRulesTable.isIncome
+    var expense by ImportRulesTable.expense
+    var income by ImportRulesTable.income
     var keywords by ImportRulesTable.keywords
     var createdAt by ImportRulesTable.createdAt
     var modifiedAt by ImportRulesTable.modifiedAt
@@ -40,9 +42,9 @@ class ImportRuleEntity(id: EntityID<Long>) : LongEntity(id) {
         user.toModel(),
         recordCategory.toModel(),
         name,
-        isExpense,
-        isIncome,
-        keywords.split(" "),
+        expense,
+        income,
+        keywords.split(KEYWORDS_DELIMITER),
         createdAt,
         modifiedAt,
     )

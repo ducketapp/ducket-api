@@ -43,17 +43,6 @@ class TransferRepository(
         }.sortedByDescending { it.date }.map { it.toModel() }
     }
 
-    fun findAllIncludingObserved(userId: Long): List<Transfer> = transaction {
-        val followedUsers = userRepository.findUsersFollowingByUser(userId)
-
-        TransferEntity.wrapRows(
-            TransfersTable.select {
-                TransfersTable.userId.eq(userId)
-                    .or(TransfersTable.userId.inList(followedUsers.map { it.id }))
-            }
-        ).toList().map { it.toModel() }
-    }
-
     fun findAllOutgoing(userId: Long, accountId: Long): List<Transfer> = transaction {
         TransferEntity.find {
             TransfersTable.userId.eq(userId)

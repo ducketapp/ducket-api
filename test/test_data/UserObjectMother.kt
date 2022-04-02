@@ -5,6 +5,7 @@ import io.ducket.api.domain.controller.user.UserAuthDto
 import io.ducket.api.domain.controller.user.UserCreateDto
 import io.ducket.api.domain.controller.user.UserUpdateDto
 import org.mindrot.jbcrypt.BCrypt
+import java.math.BigDecimal
 import java.time.Instant
 
 class UserObjectMother {
@@ -35,6 +36,7 @@ class UserObjectMother {
             name = "John Wick",
             phone = "+12025550115",
             email = "johnwick@test.com",
+            startBalance = BigDecimal.ZERO,
             password = "1234",
             currencyIsoCode = "USD",
         )

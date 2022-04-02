@@ -1,9 +1,8 @@
 package io.ducket.api
 
-import domain.model.user.User
 import io.ducket.api.domain.controller.account.AccountCreateDto
+import io.ducket.api.domain.controller.account.AccountDto
 import io.ducket.api.domain.controller.user.UserDto
-import io.ducket.api.domain.controller.user.UserUpdateDto
 import io.ducket.api.domain.repository.*
 import io.ducket.api.domain.service.AccountService
 import io.ducket.api.domain.service.UserService
@@ -12,10 +11,8 @@ import io.ducket.api.plugins.DuplicateEntityException
 import io.ducket.api.plugins.NoEntityFoundException
 import io.ducket.api.test_data.AccountObjectMother
 import io.ducket.api.test_data.UserObjectMother
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.mockk.*
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -27,86 +24,27 @@ internal class UserServiceTest {
 
     private val userRepositoryMock: UserRepository = mockk()
     private val accountRepositoryMock: AccountRepository = mockk()
-    private val transactionRepository: TransactionRepository = mockk()
+    private val transactionRepositoryMock: TransactionRepository = mockk()
     private val transferRepository: TransferRepository = mockk()
     private val budgetRepository: BudgetRepository = mockk()
     private val importRuleRepository: ImportRuleRepository = mockk()
     private val importRepository: ImportRepository = mockk()
-    private val accountService: AccountService = mockk()
+    private val accountServiceMock: AccountService = mockk()
 
     private val cut = UserService(
         userRepositoryMock,
         accountRepositoryMock,
-        transactionRepository,
+        transactionRepositoryMock,
         transferRepository,
         budgetRepository,
         importRuleRepository,
         importRepository,
-        accountService,
+        accountServiceMock,
     )
 
     @BeforeEach
     fun beforeEach() {
         clearAllMocks()
-    }
-
-    @Test
-    fun should_ReturnNewUser_When_CreateUser() {
-        // given
-        val dbTransactionSlot = slot<Transaction.() -> Any>()
-        val accountSlot = slot<AccountCreateDto>()
-
-        val newUserDto = UserObjectMother.newJohnWick()
-        val user = UserObjectMother.johnWick()
-        val account = AccountObjectMother.cashUsd()
-        val expected = UserDto(user)
-
-        mockkStatic("org.jetbrains.exposed.sql.transactions.ThreadLocalTransactionManagerKt")
-
-        every { userRepositoryMock.findOneByEmail(newUserDto.email) } returns null
-        every { userRepositoryMock.create(newUserDto) } returns user
-        every { accountRepositoryMock.create(user.id, capture(accountSlot)) } returns account
-        every { transaction(any(), capture(dbTransactionSlot)) } answers { dbTransactionSlot.invoke(mockk()) }
-
-        // when
-        val actual = cut.setupNewUser(newUserDto)
-
-        // then
-        actual shouldBe expected
-        accountSlot.captured shouldBe AccountObjectMother.newCashUsd()
-    }
-
-    @Test
-    fun should_ThrowDuplicateEntityException_When_CreateExistingUser() {
-        // given
-        val newUserDto = UserObjectMother.newJohnWick()
-        val user = UserObjectMother.default()
-        every { userRepositoryMock.findOneByEmail(newUserDto.email) } returns user
-
-        // when
-        val executable: () -> Unit = { cut.setupNewUser(newUserDto) }
-
-        // then
-        shouldThrowExactly<DuplicateEntityException>(executable).also {
-            it.message shouldBe "Such email has already been taken"
-        }
-        verify { userRepositoryMock.create(any()) wasNot Called }
-        verify { accountRepositoryMock.create(any(), any()) wasNot Called }
-    }
-
-    @Test
-    fun should_ThrowNoEntityFoundException_When_GetNonRegisteredUser() {
-        // given
-        val nonRegisteredUserId = 1L
-        every { userRepositoryMock.findOne(nonRegisteredUserId) } returns null
-
-        // when
-        val executable: () -> Unit = { cut.getUser(nonRegisteredUserId) }
-
-        // then
-        shouldThrowExactly<NoEntityFoundException>(executable).also {
-            it.message shouldBe "No such user was found"
-        }
     }
 
     @Test
@@ -124,7 +62,22 @@ internal class UserServiceTest {
     }
 
     @Test
-    fun should_ThrowAuthenticationException_When_AuthenticateNonRegisteredUser() {
+    fun should_ThrowException_When_GetNonRegisteredUser() {
+        // given
+        val nonRegisteredUserId = 1L
+        every { userRepositoryMock.findOne(nonRegisteredUserId) } returns null
+
+        // when
+        val executable: () -> Unit = { cut.getUser(nonRegisteredUserId) }
+
+        // then
+        shouldThrowExactly<NoEntityFoundException>(executable).also {
+            it.message shouldBe NoEntityFoundException().message
+        }
+    }
+
+    @Test
+    fun should_ThrowException_When_AuthenticateWithNonRegisteredUser() {
         // given
         val authUserDto = UserObjectMother.authJohnWick()
         every { userRepositoryMock.findOneByEmail(authUserDto.email) } returns null
@@ -134,37 +87,43 @@ internal class UserServiceTest {
 
         // then
         shouldThrowExactly<AuthenticationException>(executable).also {
-            it.message shouldBe "No such user was found"
+            it.message shouldBe AuthenticationException().message
         }
     }
 
     @Test
-    fun should_ReturnUser_When_AuthenticateValidRegisteredUser() {
+    fun should_ReturnUser_When_AuthenticateWithRegisteredUser() {
         // given
+        val authUserDtoPasswordSlot = slot<String>()
+        val userPasswordHashSlot = slot<String>()
         val authUserDto = UserObjectMother.authJohnWick()
         val user = UserObjectMother.johnWick()
         val expected = UserDto(user)
         mockkStatic("org.mindrot.jbcrypt.BCrypt")
 
         every { userRepositoryMock.findOneByEmail(authUserDto.email) } returns user
-        every { BCrypt.checkpw(any(), any()) } returns true
+        every { BCrypt.checkpw(capture(authUserDtoPasswordSlot), capture(userPasswordHashSlot)) } returns true
 
         // when
         val actual = cut.authenticateUser(authUserDto)
 
         // then
         actual shouldBe expected
+        authUserDtoPasswordSlot.captured shouldBe authUserDto.password
+        userPasswordHashSlot.captured shouldBe user.passwordHash
     }
 
     @Test
-    fun should_ThrowAuthenticationException_When_AuthenticateRegisteredUserWithInvalidPassword() {
+    fun should_ThrowException_When_AuthenticateRegisteredUserWithInvalidPassword() {
         // given
+        val authUserDtoPasswordSlot = slot<String>()
+        val userPasswordHashSlot = slot<String>()
         val authUserDto = UserObjectMother.authJohnWick()
         val user = UserObjectMother.johnWick()
         mockkStatic("org.mindrot.jbcrypt.BCrypt")
 
         every { userRepositoryMock.findOneByEmail(authUserDto.email) } returns user
-        every { BCrypt.checkpw(any(), any()) } returns false
+        every { BCrypt.checkpw(capture(authUserDtoPasswordSlot), capture(userPasswordHashSlot)) } returns false
 
         // when
         val executable: () -> Unit = { cut.authenticateUser(authUserDto) }
@@ -173,37 +132,124 @@ internal class UserServiceTest {
         shouldThrowExactly<AuthenticationException>(executable).also {
             it.message shouldBe "The password is incorrect"
         }
+        authUserDtoPasswordSlot.captured shouldBe authUserDto.password
+        userPasswordHashSlot.captured shouldBe user.passwordHash
+    }
+
+    @Test
+    fun should_ReturnNewUser_When_CreateUser() {
+        // given
+        val dbTransactionSlot = slot<Transaction.() -> Any>()
+        val accountCreateDtoSlot = slot<AccountCreateDto>()
+        val userIdSlot = slot<Long>()
+
+        val userCreateDto = UserObjectMother.newJohnWick()
+        val accountDto = AccountDto(AccountObjectMother.cashUsd(), userCreateDto.startBalance)
+        val user = UserObjectMother.johnWick()
+        val expected = UserDto(user)
+        mockkStatic("org.jetbrains.exposed.sql.transactions.ThreadLocalTransactionManagerKt")
+
+        every { userRepositoryMock.findOneByEmail(userCreateDto.email) } returns null
+        every { userRepositoryMock.create(userCreateDto) } returns user
+        every { accountServiceMock.createAccount(capture(userIdSlot), capture(accountCreateDtoSlot)) } returns accountDto
+        every { transaction(any(), capture(dbTransactionSlot)) } answers { dbTransactionSlot.invoke(mockk()) }
+
+        // when
+        val actual = cut.setupNewUser(userCreateDto)
+
+        // then
+        actual shouldBe expected
+        accountCreateDtoSlot.captured shouldBe AccountObjectMother.newCashUsd()
+        userIdSlot.captured shouldBe user.id
+    }
+
+    @Test
+    fun should_ThrowException_When_CreateExistingUser() {
+        // given
+        val newUserDto = UserObjectMother.newJohnWick()
+        val user = UserObjectMother.default()
+        every { userRepositoryMock.findOneByEmail(newUserDto.email) } returns user
+
+        // when
+        val executable: () -> Unit = { cut.setupNewUser(newUserDto) }
+
+        // then
+        shouldThrowExactly<DuplicateEntityException>(executable).also {
+            it.message shouldBe "Such email has already been taken"
+        }
+        verify { userRepositoryMock.create(any()) wasNot Called }
+        verify { accountServiceMock.createAccount(any(), any()) wasNot Called }
     }
 
     @Test
     fun should_ReturnUpdatedUser_When_UpdateUser() {
         // given
+        val userIdSlot = slot<Long>()
         val userUpdateDto = UserObjectMother.updateJohnWick()
+        val userId = UserObjectMother.johnWick().id
         val updatedUser = UserObjectMother.johnWick()
         val expected = UserDto(updatedUser)
-
-        every { userRepositoryMock.updateOne(updatedUser.id, userUpdateDto) } returns updatedUser
+        every { userRepositoryMock.updateOne(capture(userIdSlot), userUpdateDto) } returns updatedUser
 
         // when
-        val actual = cut.updateUser(updatedUser.id, userUpdateDto)
+        val actual = cut.updateUser(userId, userUpdateDto)
 
         // then
         actual shouldBe expected
+        userIdSlot.captured shouldBe userId
     }
 
     @Test
-    fun should_ReturnNoEntityFoundException_When_UpdateNonRegisteredUser() {
+    fun should_ReturnException_When_UpdateNonRegisteredUser() {
         // given
+        val userId = 1L
         val userUpdateDto = UserObjectMother.updateJohnWick()
-
-        every { userRepositoryMock.updateOne(1L, userUpdateDto) } returns null
+        every { userRepositoryMock.updateOne(userId, userUpdateDto) } returns null
 
         // when
-        val executable: () -> Unit = { cut.updateUser(1L, userUpdateDto) }
+        val executable: () -> Unit = { cut.updateUser(userId, userUpdateDto) }
 
         // then
         shouldThrowExactly<NoEntityFoundException>(executable).also {
-            it.message shouldBe "Cannot update the user"
+            it.message shouldBe NoEntityFoundException().message
         }
+    }
+
+    @Test
+    fun should_DeleteUser_When_DeleteUser() {
+        // given
+        val userId = 1L
+        val dbTransactionSlot = slot<Transaction.() -> Any>()
+        mockkStatic("org.jetbrains.exposed.sql.transactions.ThreadLocalTransactionManagerKt")
+
+        every { userRepositoryMock.deleteData(userId) } returns Unit
+        every { userRepositoryMock.deleteOne(userId) } returns Unit
+        every { transaction(any(), capture(dbTransactionSlot)) } answers { dbTransactionSlot.invoke(mockk()) }
+
+        // when
+        val actual = cut.deleteUser(userId)
+
+        // then
+        actual shouldBe Unit
+        verify(exactly = 1) { userRepositoryMock.deleteData(userId) }
+        verify(exactly = 1) { userRepositoryMock.deleteOne(userId) }
+    }
+
+    @Test
+    fun should_DeleteUserData_When_DeleteUserData() {
+        // given
+        val userId = 1L
+        val dbTransactionSlot = slot<Transaction.() -> Any>()
+        mockkStatic("org.jetbrains.exposed.sql.transactions.ThreadLocalTransactionManagerKt")
+
+        every { userRepositoryMock.deleteData(userId) } returns Unit
+        every { transaction(any(), capture(dbTransactionSlot)) } answers { dbTransactionSlot.invoke(mockk()) }
+
+        // when
+        val actual = cut.deleteUserData(userId)
+
+        // then
+        actual shouldBe Unit
+        verify(exactly = 1) { userRepositoryMock.deleteData(userId) }
     }
 }

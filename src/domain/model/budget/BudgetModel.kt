@@ -2,7 +2,6 @@ package io.ducket.api.domain.model.budget
 
 import domain.model.account.Account
 import domain.model.account.AccountEntity
-import domain.model.category.CategoriesTable
 import domain.model.category.Category
 import domain.model.category.CategoryEntity
 import domain.model.currency.CurrenciesTable
@@ -25,9 +24,9 @@ internal object BudgetsTable : LongIdTable("budget") {
     val currencyId = reference("currency_id", CurrenciesTable)
     val fromDate = date("from_date")
     val toDate = date("to_date")
-    val name = varchar("name", 45)
+    val name = varchar("name", 64)
     val limit = decimal("limit", 10, 2)
-    val isClosed = bool("is_closed")
+    val closed = bool("is_closed")
     val notes = varchar("notes", 128).nullable()
     val createdAt = timestamp("created_at")
     val modifiedAt = timestamp("modified_at")
@@ -43,7 +42,7 @@ class BudgetEntity(id: EntityID<Long>) : LongEntity(id) {
     var toDate by BudgetsTable.toDate
     var name by BudgetsTable.name
     var limit by BudgetsTable.limit
-    var isClosed by BudgetsTable.isClosed
+    var closed by BudgetsTable.closed
     var notes by BudgetsTable.notes
     var createdAt by BudgetsTable.createdAt
     var modifiedAt by BudgetsTable.modifiedAt
@@ -61,7 +60,7 @@ class BudgetEntity(id: EntityID<Long>) : LongEntity(id) {
         toDate,
         name,
         limit,
-        isClosed,
+        closed,
         notes,
         createdAt,
         modifiedAt

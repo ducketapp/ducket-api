@@ -11,7 +11,7 @@ import org.jetbrains.exposed.sql.javatime.timestamp
 import java.time.Instant
 
 internal object GroupsTable : LongIdTable("group") {
-    val name = varchar("name", 32)
+    val name = varchar("name", 64)
     val creatorId = reference("creator_id", UsersTable)
     val createdAt = timestamp("created_at")
     val modifiedAt = timestamp("modified_at")

@@ -11,7 +11,7 @@ import java.time.Instant
 
 internal object ImportsTable : LongIdTable("import") {
     val userId = reference("user_id", UsersTable)
-    val filePath = varchar("file_path", 45)
+    val filePath = varchar("file_path", 64)
     val importedAt = timestamp("imported_at")
 }
 

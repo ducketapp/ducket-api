@@ -19,8 +19,6 @@ fun Route.users(
         }
 
         authenticate {
-            get { userController.getUsers(this.context) }
-
             route("/{userId}") {
                 get { userController.getUser(this.context) }
                 put { userController.updateUser(this.context) }

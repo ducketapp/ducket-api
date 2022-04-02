@@ -42,17 +42,6 @@ class AccountRepository(
         }.toList().map { it.toModel() }
     }
 
-    fun findAllIncludingObserved(userId: Long): List<Account> = transaction {
-        val followedUsers = userRepository.findUsersFollowingByUser(userId)
-
-        AccountEntity.wrapRows(
-            AccountsTable.select {
-                AccountsTable.userId.eq(userId)
-                    .or(AccountsTable.userId.inList(followedUsers.map { it.id }))
-            }
-        ).toList().map { it.toModel() }
-    }
-
 //    fun findAll(userId: Long): List<Account> = transaction {
 //        AccountEntity.find {
 //            AccountsTable.userId.eq(userId)

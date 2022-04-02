@@ -3,6 +3,7 @@
 /out
 /build
 /logs
+/.resourceCache
 *.iml
 *.ipr
 *.iws

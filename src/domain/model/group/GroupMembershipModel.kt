@@ -14,7 +14,6 @@ import java.time.Instant
 internal object GroupMembershipsTable : LongIdTable("group_membership") {
     val groupId = reference("group_id", GroupsTable)
     val memberId = reference("member_id", UsersTable)
-    // val role = enumerationByName("role", 32, MembershipRole::class)
     val status = enumerationByName("status", 32, MembershipStatus::class)
     val createdAt = timestamp("created_at")
     val modifiedAt = timestamp("modified_at")
@@ -25,7 +24,6 @@ class GroupMembershipEntity(id: EntityID<Long>) : LongEntity(id) {
 
     var group by GroupEntity referencedOn GroupMembershipsTable.groupId
     var member by UserEntity referencedOn GroupMembershipsTable.memberId
-    // var role by GroupMembershipsTable.role
     var status by GroupMembershipsTable.status
     var createdAt by GroupMembershipsTable.createdAt
     var modifiedAt by GroupMembershipsTable.modifiedAt
@@ -34,7 +32,6 @@ class GroupMembershipEntity(id: EntityID<Long>) : LongEntity(id) {
         id.value,
         group.toModel(),
         member.toModel(),
-        // role,
         status,
         createdAt,
         modifiedAt,
@@ -45,7 +42,6 @@ data class GroupMembership(
     val id: Long,
     val group: Group,
     val member: User,
-    // val role: MembershipRole,
     val status: MembershipStatus,
     val createdAt: Instant,
     val modifiedAt: Instant,

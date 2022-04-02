@@ -3,6 +3,7 @@ package io.ducket.api.app.di
 import io.ducket.api.CurrencyRateProvider
 import io.ducket.api.app.database.AppDatabaseFactory
 import io.ducket.api.app.database.DatabaseFactory
+import io.ducket.api.app.database.TestingDatabaseFactory
 import io.ducket.api.config.AppConfig
 import io.ducket.api.config.JwtManager
 import io.ducket.api.domain.controller.account.AccountController
@@ -11,6 +12,7 @@ import io.ducket.api.domain.controller.category.CategoryController
 import io.ducket.api.domain.controller.currency.CurrencyController
 import io.ducket.api.domain.controller.group.GroupController
 import io.ducket.api.domain.controller.record.RecordController
+import io.ducket.api.domain.controller.rule.ImportRuleController
 import io.ducket.api.domain.controller.transaction.TransactionController
 import io.ducket.api.domain.controller.transfer.TransferController
 import io.ducket.api.domain.controller.user.UserController
@@ -21,14 +23,29 @@ import org.koin.dsl.single
 
 object AppModule {
 
-    internal val module = module {
+    internal val testConfigModule = module {
         /**
-         * Application
+         * Configuration
          */
         single<AppConfig>()
-        single<CurrencyRateProvider>()
+        single<DatabaseFactory> { TestingDatabaseFactory() }
+        single { JwtManager(get()) }
+    }
+
+    internal val configModule = module {
+        /**
+         * Configuration
+         */
+        single<AppConfig>()
         single<DatabaseFactory> { AppDatabaseFactory(get()) }
         single { JwtManager(get()) }
+    }
+
+    internal val appModule = module {
+        /**
+         * Clients
+         */
+        single<CurrencyRateProvider>()
 
         /**
          * Controllers
@@ -42,6 +59,7 @@ object AppModule {
         single { BudgetController(get()) }
         single { CurrencyController(get()) }
         single { GroupController(get()) }
+        single { ImportRuleController(get()) }
 
         /**
          * Services

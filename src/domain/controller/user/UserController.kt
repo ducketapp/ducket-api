@@ -41,12 +41,6 @@ class UserController(
         }
     }
 
-    suspend fun getUsers(ctx: ApplicationCall) {
-        userService.getUsers().apply {
-            ctx.respond(HttpStatusCode.OK, this)
-        }
-    }
-
     suspend fun getUser(ctx: ApplicationCall) {
         val userId = ctx.parameters.getOrFail("userId").toLong()
 
@@ -68,18 +62,14 @@ class UserController(
     suspend fun deleteUser(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
 
-        userService.deleteUser(userId).apply {
-            if (this) ctx.respond(HttpStatusCode.NoContent)
-            else ctx.respond(HttpStatusCode.UnprocessableEntity)
-        }
+        userService.deleteUser(userId)
+        ctx.respond(HttpStatusCode.NoContent)
     }
 
     suspend fun deleteUserData(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
 
-        userService.deleteUserData(userId).apply {
-            if (this) ctx.respond(HttpStatusCode.NoContent)
-            else ctx.respond(HttpStatusCode.UnprocessableEntity)
-        }
+        userService.deleteUserData(userId)
+        ctx.respond(HttpStatusCode.NoContent)
     }
 }

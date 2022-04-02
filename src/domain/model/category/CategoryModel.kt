@@ -7,7 +7,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
 
 internal object CategoriesTable : LongIdTable("category") {
-    val name = varchar("name", 45)
+    val name = varchar("name", 64)
     val group = enumerationByName("group", 32, CategoryGroup::class)
 }
 

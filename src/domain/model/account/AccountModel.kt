@@ -20,7 +20,7 @@ internal object AccountsTable : LongIdTable("account") {
     val userId = reference("user_id", UsersTable)
     val currencyId = reference("currency_id", CurrenciesTable)
     val accountType = enumerationByName("account_type", 32, AccountType::class)
-    val name = varchar("name", 45)
+    val name = varchar("name", 64)
     val notes = varchar("notes", 128).nullable()
     val createdAt = timestamp("created_at")
     val modifiedAt = timestamp("modified_at")

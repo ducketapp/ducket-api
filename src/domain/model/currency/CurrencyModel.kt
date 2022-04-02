@@ -1,17 +1,14 @@
 package domain.model.currency
 
-import io.ducket.api.domain.model.StringIdTable
-import org.jetbrains.exposed.dao.Entity
-import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
 
 internal object CurrenciesTable : LongIdTable("currency") {
-    val area = varchar("area", 45)
-    val name = varchar("name", 45)
-    val symbol = varchar("symbol", 45)
+    val area = varchar("area", 32)
+    val name = varchar("name", 32)
+    val symbol = varchar("symbol", 8)
     val isoCode = varchar("iso_code", 3)
 }
 

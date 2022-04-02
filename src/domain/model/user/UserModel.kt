@@ -11,9 +11,9 @@ import java.time.Instant
 
 internal object UsersTable : LongIdTable("user") {
     val phone = varchar("phone", 32).nullable().uniqueIndex()
-    val email = varchar("email", 128).uniqueIndex()
+    val email = varchar("email", 64).uniqueIndex()
     val name = varchar("name", 64)
-    val passwordHash = varchar("password_hash", 64)
+    val passwordHash = varchar("password_hash", 128)
     val mainCurrencyId = reference("main_currency_id", CurrenciesTable)
     val createdAt = timestamp("created_at")
     val modifiedAt = timestamp("modified_at")

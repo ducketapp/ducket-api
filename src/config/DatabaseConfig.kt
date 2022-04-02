@@ -1,12 +1,10 @@
 package io.ducket.api.config
 
 data class DatabaseConfig(
+    val driver: String,
+    val database: String,
     val host: String,
     val port: Int,
-    val name: String,
     val user: String,
     val password: String,
-    val driver: String,
-) {
-    val url = "jdbc:mysql://$host:$port/$name?useUnicode=true&serverTimezone=UTC&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true"
-}
+)

@@ -50,7 +50,7 @@ class ImportService(
         val csvRecords = csvParser.records.takeIf { it.size > 0 }
             ?: throw InvalidDataException("Invalid records amount: 0")
 
-        var csvTransactions = csvRecords.stream().map {
+        var csvTransactions = csvRecords.map {
             try {
                 val date = Instant.parse(it.get(headers[0]))
                 val category = it.get(headers[1]).trimWhitespaces()

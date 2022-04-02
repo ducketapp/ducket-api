@@ -31,8 +31,8 @@ internal object TransactionsTable : LongIdTable("transaction") {
     val amount = decimal("amount", 10, 2)
     val payeeOrPayer = varchar("payee_or_payer", 128).nullable()
     val notes = varchar("notes", 128).nullable()
-    val longitude = varchar("longitude", 45).nullable()
-    val latitude = varchar("latitude", 45).nullable()
+    val longitude = varchar("longitude", 32).nullable()
+    val latitude = varchar("latitude", 32).nullable()
     val createdAt = timestamp("created_at")
     val modifiedAt = timestamp("modified_at")
 }

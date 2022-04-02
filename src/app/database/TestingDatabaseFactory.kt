@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource
 import domain.model.category.CategoriesTable
 import domain.model.currency.CurrenciesTable
 import org.flywaydb.core.Flyway
+import org.flywaydb.core.api.exception.FlywayValidateException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.DatabaseConfig
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -16,22 +17,28 @@ class TestingDatabaseFactory: DatabaseFactory {
     lateinit var hikariDataSource: HikariDataSource
 
     override fun connect() {
-        val hikari = getSource()
+        hikariDataSource = getSource()
+
         Database.connect(
-            datasource = hikari,
+            datasource = hikariDataSource,
             databaseConfig = DatabaseConfig.invoke {
                 useNestedTransactions = true
             }
         )
-//        TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
-//
-//        val flyway = Flyway.configure()
-//            .baselineOnMigrate(true)
-//            .dataSource(hikari)
-//            .load()
-//
-//        flyway.info()
-//        flyway.migrate()
+
+        val flyway = Flyway.configure()
+            // .baselineOnMigrate(true)
+            .dataSource(hikariDataSource)
+            .locations("classpath:io/ducket/api/app/database/migration")
+            .load()
+
+        try {
+            flyway.info()
+            flyway.migrate()
+        } catch (e: FlywayValidateException) {
+            flyway.repair()
+            flyway.migrate()
+        }
     }
 
     override fun close() {
@@ -39,11 +46,14 @@ class TestingDatabaseFactory: DatabaseFactory {
     }
 
     override fun getSource(): HikariDataSource {
+        val databaseUrl = "jdbc:h2:mem:test;DATABASE_TO_UPPER=FALSE;DB_CLOSE_DELAY=-1;MODE=MySQL"
+
         return HikariConfig().let { hikariConfig ->
+            hikariConfig.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+            hikariConfig.jdbcUrl = databaseUrl
             hikariConfig.driverClassName = "org.h2.Driver"
-            hikariConfig.jdbcUrl = "jdbc:h2:mem:ducket-db;MODE=MySQL;DATABASE_TO_UPPER=false;IGNORECASE=TRUE;INIT=RUNSCRIPT FROM 'classpath:db/migration/V1.0__Initial.sql';DB_CLOSE_DELAY=-1"
-            hikariConfig.username = "sa"
-            hikariConfig.password = "sa"
+            hikariConfig.username = "test"
+            hikariConfig.password = "test"
             hikariConfig.maximumPoolSize = 3
             hikariConfig.isAutoCommit = false
             hikariConfig.validate()

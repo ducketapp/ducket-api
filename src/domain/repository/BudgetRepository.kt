@@ -23,7 +23,7 @@ class BudgetRepository(
             toDate = dto.toDate
             limit = dto.thresholdAmount
             user = UserEntity[userId]
-            isClosed = false
+            closed = false
             createdAt = Instant.now()
             modifiedAt = Instant.now()
         }.toModel()
@@ -45,17 +45,6 @@ class BudgetRepository(
         BudgetEntity.find {
             BudgetsTable.userId.inList(userIds.asList())
         }.toList().map { it.toModel() }
-    }
-
-    fun findAllIncludingObserved(userId: Long): List<Budget> = transaction {
-        val followedUsers = userRepository.findUsersFollowingByUser(userId)
-
-        BudgetEntity.wrapRows(
-            BudgetsTable.select {
-                BudgetsTable.userId.eq(userId)
-                    .or(BudgetsTable.userId.inList(followedUsers.map { it.id }))
-            }
-        ).toList().map { it.toModel() }
     }
 
     fun delete(userId: Long, vararg budgetIds: Long) = transaction {
