@@ -21,24 +21,11 @@ import org.junit.jupiter.api.Test
 import org.mindrot.jbcrypt.BCrypt
 
 internal class UserServiceTest {
-
     private val userRepositoryMock: UserRepository = mockk()
-    private val accountRepositoryMock: AccountRepository = mockk()
-    private val transactionRepositoryMock: TransactionRepository = mockk()
-    private val transferRepository: TransferRepository = mockk()
-    private val budgetRepository: BudgetRepository = mockk()
-    private val importRuleRepository: ImportRuleRepository = mockk()
-    private val importRepository: ImportRepository = mockk()
     private val accountServiceMock: AccountService = mockk()
 
     private val cut = UserService(
         userRepositoryMock,
-        accountRepositoryMock,
-        transactionRepositoryMock,
-        transferRepository,
-        budgetRepository,
-        importRuleRepository,
-        importRepository,
         accountServiceMock,
     )
 

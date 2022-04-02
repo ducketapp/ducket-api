@@ -14,12 +14,6 @@ import org.mindrot.jbcrypt.BCrypt
 
 class UserService(
     private val userRepository: UserRepository,
-    private val accountRepository: AccountRepository,
-    private val transactionRepository: TransactionRepository,
-    private val transferRepository: TransferRepository,
-    private val budgetRepository: BudgetRepository,
-    private val importRuleRepository: ImportRuleRepository,
-    private val importRepository: ImportRepository,
     private val accountService: AccountService,
 ): FileService() {
 
