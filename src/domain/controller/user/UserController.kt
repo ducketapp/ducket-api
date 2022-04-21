@@ -1,7 +1,8 @@
 package io.ducket.api.domain.controller.user
 
 import io.ducket.api.config.JwtManager
-import io.ducket.api.config.UserPrincipal
+import io.ducket.api.auth.UserPrincipal
+import io.ducket.api.auth.UserRole
 import io.ducket.api.domain.service.*
 import io.ducket.api.principalOrThrow
 import io.ktor.application.*
@@ -22,7 +23,7 @@ class UserController(
             userService.setupNewUser(this.validate()).apply {
                 ctx.response.header(
                     name = HttpHeaders.Authorization,
-                    value = "Bearer ${jwtManager.generateToken(UserPrincipal(this.id, this.email))}",
+                    value = getAuthHeaderValue(UserPrincipal(this.id, this.email, setOf(UserRole.SUPER_USER))),
                 )
                 ctx.respond(HttpStatusCode.Created, this)
             }
@@ -34,7 +35,7 @@ class UserController(
             userService.authenticateUser(this.validate()).apply {
                 ctx.response.header(
                     name = HttpHeaders.Authorization,
-                    value = "Bearer ${jwtManager.generateToken(UserPrincipal(this.id, this.email))}",
+                    value = getAuthHeaderValue(UserPrincipal(this.id, this.email, setOf(UserRole.SUPER_USER))),
                 )
                 ctx.respond(HttpStatusCode.OK, this)
             }
@@ -72,4 +73,6 @@ class UserController(
         userService.deleteUserData(userId)
         ctx.respond(HttpStatusCode.NoContent)
     }
+
+    private fun getAuthHeaderValue(principal: UserPrincipal): String = "Bearer ${jwtManager.generateToken(principal)}"
 }

@@ -1,5 +1,6 @@
 package io.ducket.api.routes
 
+
 import io.ducket.api.domain.controller.account.AccountController
 import io.ktor.auth.*
 import io.ktor.routing.*

@@ -3,6 +3,8 @@ package io.ducket.api
 import com.fasterxml.jackson.databind.SerializationFeature
 import io.ducket.api.app.di.AppModule
 import io.ducket.api.app.database.DatabaseFactory
+import io.ducket.api.auth.Authorization
+import io.ducket.api.auth.UserPrincipal
 import io.ducket.api.config.*
 import io.ducket.api.domain.controller.account.AccountController
 import io.ducket.api.domain.controller.budget.BudgetController
@@ -107,10 +109,18 @@ fun Application.module(
     install(Authentication) {
         jwt {
             verifier(jwtManager.verifier)
+            // what to do when a non-authenticated request is made to a protected URL
             challenge { _, _ -> throw AuthenticationException("Invalid auth token") }
+            // defines how to extract a Principal from a session
             validate {
                 jwtManager.validateToken(jwtCredential = it)
             }
+        }
+    }
+
+    install(Authorization) {
+        getRoles { principal ->
+            (principal as UserPrincipal).roles
         }
     }
 
