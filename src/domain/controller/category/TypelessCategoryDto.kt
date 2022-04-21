@@ -1,9 +1,13 @@
 package io.ducket.api.domain.controller.category
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import domain.model.category.Category
 
-data class TypelessCategoryDto(@JsonIgnore val category: Category) {
-    val id: Long = category.id
-    val name: String = category.name
+data class TypelessCategoryDto(
+    val id: Long,
+    val name: String,
+) {
+    constructor(category: Category): this(
+        id = category.id,
+        name = category.name,
+    )
 }

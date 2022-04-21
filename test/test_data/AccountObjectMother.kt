@@ -32,8 +32,8 @@ class AccountObjectMother {
             modifiedAt = Instant.ofEpochSecond(1642708900),
         )
 
-        fun cashUsd() = Account(
-            id = 3,
+        fun account() = Account(
+            id = 3L,
             name = "Cash USD",
             notes = "Account in United States dollar",
             user = UserObjectMother.default(),
@@ -44,7 +44,7 @@ class AccountObjectMother {
             modifiedAt = Instant.ofEpochSecond(1642708900),
         )
 
-        fun newCashUsd() = AccountCreateDto(
+        fun newAccount() = AccountCreateDto(
             name = "Cash USD",
             notes = "Account in United States dollar",
             currencyIsoCode = "USD",

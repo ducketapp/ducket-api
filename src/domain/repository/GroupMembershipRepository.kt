@@ -1,19 +1,12 @@
 package io.ducket.api.domain.repository
 
-import com.sun.org.apache.xpath.internal.operations.Bool
-import domain.model.transaction.TransactionEntity
-import domain.model.transaction.TransactionsTable
 import domain.model.user.UserEntity
 import domain.model.user.UsersTable
 import io.ducket.api.app.MembershipStatus
 import io.ducket.api.domain.controller.group.GroupMembershipCreateDto
-import io.ducket.api.domain.model.attachment.AttachmentsTable
 import io.ducket.api.domain.model.group.*
 import io.ducket.api.domain.model.group.GroupMembershipsTable
-import io.ducket.api.domain.model.transaction.TransactionAttachmentsTable
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Instant
 
@@ -48,8 +41,10 @@ class GroupMembershipRepository {
             this.group = GroupEntity[groupId]
             this.member = UserEntity.find { UsersTable.email.eq(dto.memberEmail) }.first()
             this.status = status
-            this.createdAt = Instant.now()
-            this.modifiedAt = Instant.now()
+            Instant.now().also {
+                this.createdAt = it
+                this.modifiedAt = it
+            }
         }.toModel()
     }
 
@@ -64,15 +59,13 @@ class GroupMembershipRepository {
         }?.toModel()
     }
 
-    fun deleteAll(groupId: Long): Boolean = transaction {
-        GroupMembershipsTable.deleteWhere {
-            GroupMembershipsTable.groupId.eq(groupId)
-        } > 0
+    fun deleteAll(groupId: Long): Unit = transaction {
+        GroupMembershipsTable.deleteWhere { GroupMembershipsTable.groupId.eq(groupId) }
     }
 
-    fun delete(groupId: Long, vararg membershipIds: Long): Boolean = transaction {
+    fun delete(groupId: Long, vararg membershipIds: Long): Unit = transaction {
         GroupMembershipsTable.deleteWhere {
             GroupMembershipsTable.id.inList(membershipIds.asList()).and(GroupMembershipsTable.groupId.eq(groupId))
-        } > 0
+        }
     }
 }

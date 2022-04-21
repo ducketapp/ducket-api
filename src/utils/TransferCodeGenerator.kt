@@ -1,6 +1,5 @@
 package io.ducket.api.utils
 
-import io.ducket.api.extension.cut
 import java.time.Instant
 
 object TransferCodeGenerator {
@@ -12,6 +11,6 @@ object TransferCodeGenerator {
             out += Integer.valueOf(ts.toString().cut(startIndex = i, cutLength = 2)).toString(radix = 36)
         }
 
-        return "TRANSFER_${out.uppercase()}"
+        return "TR_${out.uppercase()}"
     }
 }

@@ -9,18 +9,17 @@ import domain.model.user.UsersTable
 import domain.model.currency.CurrencyEntity
 import domain.model.imports.ImportRulesTable
 import domain.model.imports.ImportsTable
-import domain.model.transaction.TransactionEntity
-import domain.model.transaction.TransactionsTable
 import domain.model.user.User
 import io.ducket.api.BCRYPT_HASH_ROUNDS
+import io.ducket.api.domain.model.attachment.AttachmentsTable
 import io.ducket.api.domain.model.budget.BudgetsTable
 import io.ducket.api.domain.model.group.GroupEntity
 import io.ducket.api.domain.model.group.GroupMembershipsTable
 import io.ducket.api.domain.model.group.GroupsTable
-import io.ducket.api.domain.model.transaction.TransactionAttachmentsTable
-import io.ducket.api.domain.model.transfer.TransferAttachmentsTable
-import io.ducket.api.domain.model.transfer.TransferEntity
-import io.ducket.api.domain.model.transfer.TransfersTable
+import io.ducket.api.domain.model.ledger.LedgerRecordEntity
+import io.ducket.api.domain.model.ledger.LedgerRecordsTable
+import domain.model.operation.OperationAttachmentsTable
+import domain.model.operation.OperationsTable
 
 import io.ducket.api.getLogger
 import org.jetbrains.exposed.sql.*
@@ -29,17 +28,18 @@ import org.mindrot.jbcrypt.BCrypt
 import java.time.Instant
 
 class UserRepository {
-    private val logger = getLogger()
 
     fun create(dto: UserCreateDto): User = transaction {
         UserEntity.new {
-            name = dto.name
-            phone = dto.phone
-            email = dto.email
-            mainCurrency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(dto.currencyIsoCode) }.first()
-            passwordHash = BCrypt.hashpw(dto.password, BCrypt.gensalt(BCRYPT_HASH_ROUNDS))
-            createdAt = Instant.now()
-            modifiedAt = Instant.now()
+            this.name = dto.name
+            this.phone = dto.phone
+            this.email = dto.email
+            this.mainCurrency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(dto.currencyIsoCode) }.first()
+            this.passwordHash = BCrypt.hashpw(dto.password, BCrypt.gensalt(BCRYPT_HASH_ROUNDS))
+            Instant.now().also {
+                this.createdAt = it
+                this.modifiedAt = it
+            }
         }.toModel()
     }
 
@@ -61,7 +61,6 @@ class UserRepository {
                 found.name = it
                 found.modifiedAt = Instant.now()
             }
-
             dto.password?.let {
                 found.passwordHash = BCrypt.hashpw(it, BCrypt.gensalt(BCRYPT_HASH_ROUNDS))
                 found.modifiedAt = Instant.now()
@@ -70,26 +69,28 @@ class UserRepository {
     }
 
     fun deleteData(userId: Long): Unit = transaction {
-        // Delete transaction's attachments
-        // Delete transactions
-        TransactionEntity.find {
-            TransactionsTable.userId.eq(userId)
-        }.map { it.id.value }.also {
-            TransactionAttachmentsTable.deleteWhere { TransactionAttachmentsTable.transactionId.inList(it) }
-            TransactionsTable.deleteWhere { TransactionsTable.id.inList(it) }
+        LedgerRecordEntity.wrapRows(
+            LedgerRecordsTable.select {
+                exists(OperationsTable.select {
+                    OperationsTable.userId.eq(userId)
+                })
+            }
+        ).also {
+            LedgerRecordsTable.deleteWhere {
+                LedgerRecordsTable.id.inList(it.map { it.id.value })
+            }
+
+            AttachmentsTable.deleteWhere {
+                exists(OperationAttachmentsTable.select {
+                    OperationAttachmentsTable.operationId.inList(it.map { it.operation.id.value })
+                })
+            }
+
+            OperationsTable.deleteWhere {
+                OperationsTable.id.inList(it.map { it.operation.id.value })
+            }
         }
 
-        // Delete transfer's attachments
-        // Delete transfers
-        TransferEntity.find {
-            TransfersTable.userId.eq(userId)
-        }.map { it.id.value }.also {
-            TransferAttachmentsTable.deleteWhere { TransferAttachmentsTable.transferId.inList(it) }
-            TransfersTable.deleteWhere { TransfersTable.id.inList(it) }
-        }
-
-        // Delete owned groups & included group memberships
-        // Delete group memberships
         GroupEntity.find {
             GroupsTable.creatorId.eq(userId)
         }.map { it.id.value }.also {
@@ -104,6 +105,6 @@ class UserRepository {
     }
 
     fun deleteOne(userId: Long): Unit = transaction {
-        UserEntity.findById(userId)!!.delete()
+        UserEntity.findById(userId)?.delete()
     }
 }

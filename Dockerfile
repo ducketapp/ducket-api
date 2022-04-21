@@ -9,4 +9,4 @@ RUN ./gradlew shadowJar --console=verbose --no-daemon
 
 FROM openjdk:${VERSION}-jre
 COPY --from=build /app/build/libs/ducket-api*all.jar /app/build/ducket-api.jar
-CMD ["java", "-Dlog.path=/app/logs", "-Ddata.path=/app/data", "-Decb.path=/tmp/ecb", "-Dio.netty.native.workdir=/tmp", "-jar", "/app/build/ducket-api.jar"]
+CMD ["java", "-config=resources/application.conf", "-Dlog.path=/app/logs", "-Ddata.path=/app/data", "-Decb.path=/tmp/ecb", "-Dio.netty.native.workdir=/tmp", "-jar", "/app/build/ducket-api.jar"]

@@ -6,7 +6,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 class CategoryRepository {
 
-    fun findById(categoryId: Long): Category? = transaction {
+    fun findOne(categoryId: Long): Category? = transaction {
         CategoryEntity.findById(categoryId)?.toModel()
     }
 

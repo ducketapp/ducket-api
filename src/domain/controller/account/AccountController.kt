@@ -1,5 +1,6 @@
 package io.ducket.api.domain.controller.account
 
+import io.ducket.api.app.DataAggregationType
 import io.ducket.api.domain.controller.BulkDeleteDto
 import io.ducket.api.domain.service.AccountService
 import io.ducket.api.domain.service.ImportService
@@ -7,7 +8,6 @@ import io.ducket.api.principalOrThrow
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
-import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.util.*
@@ -27,9 +27,9 @@ class AccountController(
 
     suspend fun getAccounts(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
-        val allAccounts = accountService.getAccountsAccessibleToUser(userId)
+        val accounts = accountService.getAccounts(userId)
 
-        ctx.respond(HttpStatusCode.OK, allAccounts)
+        ctx.respond(HttpStatusCode.OK, accounts)
     }
 
     suspend fun createAccount(ctx: ApplicationCall) {
@@ -71,14 +71,14 @@ class AccountController(
         ctx.respond(HttpStatusCode.NoContent)
     }
 
-    suspend fun importAccountTransactions(ctx: ApplicationCall) {
-        val userId = ctx.authentication.principalOrThrow().id
-        val accountId = ctx.parameters.getOrFail("accountId").toLong()
-
-        val payloadMultiparts = ctx.receiveMultipart().readAllParts()
-
-        importService.importAccountTransactions(userId, accountId,  payloadMultiparts).apply {
-            ctx.respond(HttpStatusCode.OK, this)
-        }
-    }
+//    suspend fun importAccountTransactions(ctx: ApplicationCall) {
+//        val userId = ctx.authentication.principalOrThrow().id
+//        val accountId = ctx.parameters.getOrFail("accountId").toLong()
+//
+//        val payloadMultiparts = ctx.receiveMultipart().readAllParts()
+//
+//        importService.importAccountLedgerRecords(userId, accountId,  payloadMultiparts).apply {
+//            ctx.respond(HttpStatusCode.OK, this)
+//        }
+//    }
 }

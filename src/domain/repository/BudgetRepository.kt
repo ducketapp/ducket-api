@@ -10,22 +10,35 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Instant
 
-class BudgetRepository(
-    private val userRepository: UserRepository,
-) {
+class BudgetRepository {
 
     fun create(userId: Long, dto: BudgetCreateDto): Budget = transaction {
         BudgetEntity.new {
-            name = dto.name
-            // category = CategoryEntity[dto.categoryId]
-            currency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(dto.currencyIsoCode) }.first()
-            fromDate = dto.fromDate
-            toDate = dto.toDate
-            limit = dto.thresholdAmount
-            user = UserEntity[userId]
-            closed = false
-            createdAt = Instant.now()
-            modifiedAt = Instant.now()
+            this.name = dto.name
+            this.currency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(dto.currencyIsoCode) }.first()
+            this.fromDate = dto.fromDate
+            this.toDate = dto.toDate
+            this.limit = dto.threshold
+            this.user = UserEntity[userId]
+            this.closed = false
+            Instant.now().also {
+                this.createdAt = it
+                this.modifiedAt = it
+            }
+        }.also { newBudget ->
+            dto.accountIds.forEach { accountId ->
+                BudgetAccountsTable.insert {
+                    it[this.budgetId] = newBudget.id
+                    it[this.accountId] = accountId
+                }
+            }
+
+            dto.categoryIds.forEach { categoryId ->
+                BudgetCategoriesTable.insert {
+                    it[this.budgetId] = newBudget.id
+                    it[this.categoryId] = categoryId
+                }
+            }
         }.toModel()
     }
 
@@ -50,12 +63,6 @@ class BudgetRepository(
     fun delete(userId: Long, vararg budgetIds: Long) = transaction {
         BudgetsTable.deleteWhere {
             BudgetsTable.id.inList(budgetIds.asList()).and(BudgetsTable.userId.eq(userId))
-        }
-    }
-
-    fun deleteAll(userId: Long) = transaction {
-        BudgetsTable.deleteWhere {
-            BudgetsTable.userId.eq(userId)
         }
     }
 }

@@ -15,10 +15,12 @@ class GroupRepository {
 
     fun create(userId: Long, dto: GroupCreateDto): Group = transaction {
         GroupEntity.new {
-            name = dto.name
-            creator = UserEntity[userId]
-            createdAt = Instant.now()
-            modifiedAt = Instant.now()
+            this.name = dto.name
+            this.creator = UserEntity[userId]
+            Instant.now().also {
+                this.createdAt = it
+                this.modifiedAt = it
+            }
         }.toModel()
     }
 

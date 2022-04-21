@@ -8,7 +8,7 @@ data class GroupCreateDto(
 ) {
     fun validate(): GroupCreateDto {
         org.valiktor.validate(this) {
-            validate(GroupCreateDto::name).isNotBlank().hasSize(1, 32)
+            validate(GroupCreateDto::name).isNotBlank().hasSize(1, 64)
             members.forEach { it.validate() }
         }
         return this

@@ -2,8 +2,8 @@ package io.ducket.api.domain.controller.budget
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import io.ducket.api.InstantSerializer
-import io.ducket.api.LocalDateSerializer
+import io.ducket.api.utils.InstantSerializer
+import io.ducket.api.utils.LocalDateSerializer
 import io.ducket.api.domain.controller.account.AccountDto
 import io.ducket.api.domain.controller.currency.CurrencyDto
 import io.ducket.api.domain.controller.category.TypelessCategoryDto
@@ -19,9 +19,9 @@ data class BudgetDto(
     val name: String,
     val notes: String?,
     val isClosed: Boolean,
-    var percentage: BigDecimal = BigDecimal.ZERO,
-    var currentAmount: BigDecimal = BigDecimal.ZERO,
-    val thresholdAmount: BigDecimal,
+    var percentage: BigDecimal,
+    var total: BigDecimal,
+    val threshold: BigDecimal,
     val owner: UserDto,
     val currency: CurrencyDto,
     val accounts: List<AccountDto>,
@@ -38,8 +38,8 @@ data class BudgetDto(
         fromDate = budget.fromDate,
         toDate = budget.toDate,
         percentage = progress.percentage,
-        currentAmount = progress.amount,
-        thresholdAmount = budget.limit,
+        total = progress.amount,
+        threshold = budget.limit,
         owner = UserDto(budget.user),
         currency = CurrencyDto(budget.currency),
         accounts = budget.accounts.map { AccountDto(it) },

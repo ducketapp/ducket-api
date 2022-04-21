@@ -14,19 +14,19 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Instant
 
-class AccountRepository(
-    private val userRepository: UserRepository,
-) {
+class AccountRepository {
 
     fun create(userId: Long, dto: AccountCreateDto): Account = transaction {
         AccountEntity.new {
-            name = dto.name
-            notes = dto.notes
-            user = UserEntity[userId]
-            currency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(dto.currencyIsoCode) }.first()
-            accountType = dto.accountType
-            createdAt = Instant.now()
-            modifiedAt = Instant.now()
+            this.name = dto.name
+            this.notes = dto.notes
+            this.user = UserEntity[userId]
+            this.currency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(dto.currencyIsoCode) }.first()
+            this.accountType = dto.accountType
+            Instant.now().also {
+                this.createdAt = it
+                this.modifiedAt = it
+            }
         }.toModel()
     }
 
@@ -41,12 +41,6 @@ class AccountRepository(
             AccountsTable.userId.inList(userIds.asList())
         }.toList().map { it.toModel() }
     }
-
-//    fun findAll(userId: Long): List<Account> = transaction {
-//        AccountEntity.find {
-//            AccountsTable.userId.eq(userId)
-//        }.sortedByDescending { it.createdAt }.toList().map { it.toModel() }
-//    }
 
     fun findOne(userId: Long, accountId: Long): Account? = transaction {
         AccountEntity.find {
@@ -71,15 +65,9 @@ class AccountRepository(
         }?.toModel()
     }
 
-    fun delete(userId: Long, vararg accountIds: Long) = transaction {
+    fun delete(userId: Long, vararg accountIds: Long): Unit = transaction {
         AccountsTable.deleteWhere {
             AccountsTable.id.inList(accountIds.asList()).and(AccountsTable.userId.eq(userId))
-        }
-    }
-
-    fun deleteAll(userId: Long): Unit = transaction {
-        AccountsTable.deleteWhere {
-            AccountsTable.userId.eq(userId)
         }
     }
 }

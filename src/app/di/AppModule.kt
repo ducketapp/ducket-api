@@ -11,10 +11,8 @@ import io.ducket.api.domain.controller.budget.BudgetController
 import io.ducket.api.domain.controller.category.CategoryController
 import io.ducket.api.domain.controller.currency.CurrencyController
 import io.ducket.api.domain.controller.group.GroupController
-import io.ducket.api.domain.controller.record.RecordController
+import io.ducket.api.domain.controller.ledger.LedgerController
 import io.ducket.api.domain.controller.rule.ImportRuleController
-import io.ducket.api.domain.controller.transaction.TransactionController
-import io.ducket.api.domain.controller.transfer.TransferController
 import io.ducket.api.domain.controller.user.UserController
 import io.ducket.api.domain.repository.*
 import io.ducket.api.domain.service.*
@@ -53,27 +51,25 @@ object AppModule {
         single { UserController(get()) }
         single { AccountController(get(), get()) }
         single { CategoryController(get()) }
-        single { RecordController(get(), get(), get()) }
-        single { TransactionController(get(), get()) }
-        single { TransferController(get(), get()) }
         single { BudgetController(get()) }
         single { CurrencyController(get()) }
         single { GroupController(get()) }
         single { ImportRuleController(get()) }
+        single { LedgerController(get()) }
 
         /**
          * Services
          */
         single { UserService(get(), get()) }
-        single { AccountService(get(), get(), get(), get(), get()) }
+        single { AccountService(get(), get(), get(), get()) }
         single { CategoryService(get()) }
-        single { TransferService(get(), get(), get(), get()) }
-        single { TransactionService(get(), get(), get()) }
         single { BudgetService(get(), get(), get()) }
         single { CurrencyService(get()) }
         single { ImportRuleService(get()) }
-        single { ImportService(get(), get(), get(), get()) }
+        single { ImportService(get(), get(), get(), get(), get(), get()) }
         single { GroupService(get(), get(), get()) }
+        single { LocalFileService() }
+        single { LedgerService(get(), get(), get(), get(), get(), get()) }
 
         /**
          * Repositories
@@ -83,11 +79,12 @@ object AppModule {
         single { CurrencyRepository() }
         single { ImportRepository() }
         single { ImportRuleRepository() }
-        single { AccountRepository(get()) }
-        single { BudgetRepository(get()) }
-        single { TransactionRepository(get()) }
-        single { TransferRepository(get()) }
+        single { AccountRepository() }
+        single { BudgetRepository() }
         single { GroupRepository() }
         single { GroupMembershipRepository() }
+        single { OperationRepository() }
+        single { OperationAttachmentRepository() }
+        single { LedgerRepository() }
     }
 }

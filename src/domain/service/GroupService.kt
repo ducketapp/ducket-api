@@ -1,5 +1,6 @@
 package io.ducket.api.domain.service
 
+import io.ducket.api.app.DataAggregationType
 import io.ducket.api.app.MembershipAction
 import io.ducket.api.app.MembershipStatus
 import io.ducket.api.domain.controller.BulkDeleteDto
@@ -231,7 +232,7 @@ class GroupService(
         }
     }
 
-    fun getDistinctUsersWithMutualGroupMemberships(userId: Long): List<UserDto> {
+    fun getActiveMembersFromSharedUserGroups(userId: Long): List<UserDto> {
         return getGroupsByMember(userId)
             .flatMap { it.otherMemberships }
             .filter { it.status == MembershipStatus.ACTIVE }

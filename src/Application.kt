@@ -9,10 +9,8 @@ import io.ducket.api.domain.controller.budget.BudgetController
 import io.ducket.api.domain.controller.category.CategoryController
 import io.ducket.api.domain.controller.currency.CurrencyController
 import io.ducket.api.domain.controller.group.GroupController
-import io.ducket.api.domain.controller.record.RecordController
+import io.ducket.api.domain.controller.ledger.LedgerController
 import io.ducket.api.domain.controller.rule.ImportRuleController
-import io.ducket.api.domain.controller.transaction.TransactionController
-import io.ducket.api.domain.controller.transfer.TransferController
 import io.ducket.api.domain.controller.user.UserController
 import io.ducket.api.plugins.AuthenticationException
 import io.ducket.api.plugins.AuthorizationException
@@ -76,6 +74,7 @@ fun Application.module(
 
     database.connect()
     ratesClient.pullRates()
+    DatabaseFilesCleanUpScheduler(5 * 60 * 1000).start()
 
     install(CallLogging) {
         level = Level.DEBUG
@@ -127,14 +126,12 @@ fun Application.module(
 
     val userController: UserController by inject()
     val accountController: AccountController by inject()
-    val recordController: RecordController by inject()
     val categoryController: CategoryController by inject()
     val budgetController: BudgetController by inject()
-    val transactionController: TransactionController by inject()
-    val transferController: TransferController by inject()
     val currencyController: CurrencyController by inject()
     val groupController: GroupController by inject()
     val importRuleController: ImportRuleController by inject()
+    val ledgerController: LedgerController by inject()
 
     install(Routing) {
         get("/metrics") {
@@ -163,10 +160,10 @@ fun Application.module(
             users(userController)
             accounts(accountController)
             categories(categoryController)
-            records(recordController, transactionController, transferController)
             budgets(budgetController)
             groups(groupController)
             importRules(importRuleController)
+            ledgerRecords(ledgerController)
         }
     }
 
@@ -187,7 +184,7 @@ private fun Application.setupAppConfig() {
     System.setProperty("handlers", "org.slf4j.bridge.SLF4JBridgeHandler")
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 
-    val dbDataPath = System.getProperty("data.path", "resources/db/data")
+    val dbDataPath = System.getProperty("data.path", "resources/data")
     val ecbDataPath = System.getProperty("ecb.path", Paths.get(System.getProperty("java.io.tmpdir"), "ecb").toString())
     val hoconConfig = this.environment.config.config("ktor")
 

@@ -8,14 +8,13 @@ import io.ducket.api.domain.controller.user.UserCreateDto
 import io.ducket.api.domain.controller.user.UserUpdateDto
 import io.ducket.api.domain.repository.*
 import io.ducket.api.plugins.*
-import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
 
 class UserService(
     private val userRepository: UserRepository,
     private val accountService: AccountService,
-): FileService() {
+): LocalFileService() {
 
     fun getUser(userId: Long): UserDto {
         return userRepository.findOne(userId)?.let { UserDto(it) } ?: throw NoEntityFoundException()

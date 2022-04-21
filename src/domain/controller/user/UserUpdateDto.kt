@@ -1,6 +1,6 @@
 package io.ducket.api.domain.controller.user
 
-import io.ducket.api.extension.declaredMemberPropertiesNull
+import io.ducket.api.utils.declaredMemberPropertiesNull
 import io.ducket.api.plugins.InvalidDataException
 import org.valiktor.functions.hasSize
 import org.valiktor.functions.isNotEmpty
@@ -14,9 +14,9 @@ data class UserUpdateDto(
 
     fun validate() : UserUpdateDto {
         org.valiktor.validate(this) {
-            validate(UserUpdateDto::name).isNotEmpty().hasSize(2, 45)
-            validate(UserUpdateDto::phone).isNotEmpty().startsWith("+").hasSize(11)
-            validate(UserUpdateDto::password).isNotEmpty().hasSize(8, 14)
+            validate(UserUpdateDto::name).isNotEmpty().hasSize(2, 64)
+            validate(UserUpdateDto::phone).isNotEmpty().startsWith("+")
+            validate(UserUpdateDto::password).isNotEmpty().hasSize(4, 16)
 
             if (this@UserUpdateDto.declaredMemberPropertiesNull()) throw InvalidDataException()
         }

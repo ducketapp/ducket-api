@@ -1,11 +1,23 @@
 package io.ducket.api.app
 
-enum class UserFollowAction {
-    APPROVE, DELETE
-}
-
 enum class AccountType {
     GENERAL, DEBIT_CARD, CREDIT_CARD, CASH, BANK_ACCOUNT, SAVINGS
+}
+
+enum class LedgerRecordStrategy {
+    RECORD, TRANSFER
+}
+
+enum class LedgerRecordType {
+    INCOME, EXPENSE
+}
+
+enum class DataAggregationType {
+    PERSONAL, SHARED, ALL
+}
+
+enum class ImportRuleLookupType {
+    INCOME_ONLY, EXPENSE_ONLY, ANY
 }
 
 enum class MembershipAction {
@@ -16,7 +28,7 @@ enum class MembershipStatus {
     PENDING, ACTIVE
 }
 
-enum class CategoryGroup {
+enum class CategoryTypeGroup {
     HOUSING,
     FOOD_AND_DRINKS,
     SHOPPING,
@@ -28,4 +40,81 @@ enum class CategoryGroup {
     INVESTMENTS,
     INCOME,
     OTHER,
+}
+
+enum class CategoryType {
+    HOUSING,
+    BUILDING_AND_REPAIR,
+    MORTGAGE,
+    RENT_PAYMENT,
+    HOME_SECURITY,
+    UTILITIES,
+    HOME_MEDIA,
+    FOOD_AND_DRINKS,
+    CAFE,
+    RESTAURANTS_OR_BARS,
+    FOOD_DELIVERY_OR_TAKEOUT,
+    FASTFOOD,
+    GROCERY,
+    SPORT_NUTRITION,
+    SHOPPING,
+    GIFTS,
+    HOME_SUPPLIES,
+    ELECTRONICS_OR_APPLIANCES,
+    BOOKS_OR_STATIONERY,
+    ACCESSORIES_AND_EQUIPMENT,
+    PHARMACY,
+    CLOTHES_OR_SHOES,
+    FURNITURE_AND_DECOR,
+    DIGITAL_PRODUCTS,
+    FAMILY,
+    CHILD_SUPPLIES,
+    CHILD_HEALTHCARE,
+    CHILD_EDUCATION,
+    DAYCARE,
+    BABYSITTER,
+    PETS,
+    PERSONAL_CARE,
+    WELLNESS_AND_BEAUTY,
+    HEALTHCARE,
+    EDUCATION,
+    SPORT_ACTIVITIES,
+    LEISURE,
+    HOBBY,
+    HOLIDAYS_AND_VACATIONS,
+    PUBLIC_EVENTS,
+    CINEMA_OR_THEATER,
+    GAMES,
+    TRANSPORT,
+    PUBLIC_TRANSPORT,
+    INTERCITY_TRANSPORT,
+    RIDE_SHARING,
+    TAXI,
+    BUSINESS_TRIP,
+    PETROL_AND_CHARGING,
+    PERSONAL_VEHICLE,
+    FINANCIAL_COSTS,
+    INSURANCE,
+    CHARITY,
+    CHARGES_AND_FEES,
+    LOANS_AND_DEBTS,
+    TAXES,
+    SUBSCRIPTIONS,
+    SERVICES,
+    MOBILE_PHONE,
+    INTERNET,
+    PARKING_LOT,
+    INVESTMENTS,
+    STOCKS_AND_SHARES,
+    CRYPTO,
+    NFT,
+    REALTY,
+    SAVINGS,
+    INCOME,
+    SALARY,
+    REIMBURSEMENT_OR_REFUND,
+    SELLING,
+    OTHER,
+    WITHDRAWAL_OR_TRANSFER,
+    UNCATEGORIZED,
 }

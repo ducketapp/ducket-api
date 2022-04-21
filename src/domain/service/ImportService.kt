@@ -1,97 +1,160 @@
 package io.ducket.api.domain.service
 
-import io.ducket.api.domain.controller.imports.CsvTransactionDto
+import domain.model.imports.ImportRule
+import io.ducket.api.app.CategoryType
+import io.ducket.api.app.ImportRuleLookupType.*
+import io.ducket.api.app.LedgerRecordType
+import io.ducket.api.app.LedgerRecordType.*
+import io.ducket.api.domain.controller.imports.CsvRecordDto
 import io.ducket.api.domain.controller.imports.ImportDto
-import io.ducket.api.domain.controller.transaction.TransactionDto
-import io.ducket.api.domain.repository.AccountRepository
-import io.ducket.api.domain.repository.CategoryRepository
-import io.ducket.api.domain.repository.ImportRepository
-import io.ducket.api.domain.repository.ImportRuleRepository
-import io.ducket.api.extension.trimWhitespaces
+import io.ducket.api.domain.controller.ledger.LedgerRecordCreateDto
+import io.ducket.api.domain.controller.ledger.LedgerRecordDto
+import io.ducket.api.domain.controller.ledger.OperationCreateDto
+import io.ducket.api.domain.repository.*
 import io.ducket.api.getLogger
 import io.ducket.api.plugins.InvalidDataException
 import io.ducket.api.plugins.NoEntityFoundException
+import io.ducket.api.utils.trimWhitespaces
 import io.ktor.http.content.*
 import org.ahocorasick.trie.Trie
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
+import org.apache.commons.csv.CSVRecord
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.lang.Exception
 import java.time.Instant
-import kotlin.streams.toList
+import java.time.format.DateTimeParseException
+
 
 class ImportService(
     private val importRepository: ImportRepository,
     private val accountRepository: AccountRepository,
     private val importRuleRepository: ImportRuleRepository,
     private val categoryRepository: CategoryRepository,
-): FileService() {
-    private val logger = getLogger()
+    private val operationRepository: OperationRepository,
+    private val ledgerRepository: LedgerRepository,
+): LocalFileService() {
+    private val csvRecordsTableColumns = listOf("date", "category", "subject", "description", "notes", "type", "amount", "currency")
 
     fun getImports(userId: Long): List<ImportDto> {
         return importRepository.getAllByUserId(userId).map { ImportDto(it) }
     }
 
-    fun importAccountTransactions(userId: Long, accountId: Long, multipartData: List<PartData>): List<TransactionDto> {
-        accountRepository.findOne(userId, accountId) ?: throw NoEntityFoundException("No such account was found")
+//    fun importAccountLedgerRecords(userId: Long, accountId: Long, multipartData: List<PartData>): List<LedgerRecordDto> {
+//        accountRepository.findOne(userId, accountId) ?: throw NoEntityFoundException()
+//
+//        val importDataPair = extractImportData(multipartData)
+//        val reader = BufferedReader(InputStreamReader(importDataPair.second.inputStream()))
+//
+//        val csvParser = CSVParser(reader, CSVFormat.DEFAULT
+//            .withFirstRecordAsHeader()
+//            .withDelimiter(',')
+//            .withIgnoreHeaderCase().withTrim()
+//        )
+//
+//        if (!csvParser.headerMap.keys.containsAll(csvRecordsTableColumns) && csvParser.headerMap.size != csvRecordsTableColumns.size) {
+//            throw InvalidDataException("Invalid csv columns set")
+//        }
+//
+//        val csvRows = csvParser.records
+//
+//        if (csvRows.size == 0) {
+//            throw InvalidDataException("Csv table can not be empty")
+//        }
+//
+//        val csvRecords = csvRows.map { mapToCsvRecordDto(it) }.also { csvRecords ->
+//            val rules = importRuleRepository.findAll(userId)
+//            val resolvedCsvRecords = resolveCsvRecordsCategories(csvRecords, rules)
+//
+//            val groupCategoriesMap = categoryRepository.findAll().groupBy { it.group }
+//
+//            resolvedCsvRecords.map { csvRecord ->
+//                LedgerRecordCreateDto(
+//                    amount = csvRecord.amount,
+//                    type = csvRecord.type,
+//                    accountId = accountId,
+//                    operation = OperationCreateDto(
+//                        category = csvRecord.category,
+//                        categoryGroup = groupCategoriesMap
+//                    )
+//                )
+//            }
+//        }
+//
+//        val importFile = createLocalImportFile(importDataPair.first.extension, importDataPair.second)
+//
+//        transaction {
+//            csvRecords.forEach {
+//                val operationId = operationRepository.create(
+//                    userId = userId,
+//                    dto = OperationCreateDto(
+//                        category =
+//                    )
+//                ).id.value
+//
+//                ledgerRepository.createTransfer(
+//                    operationId = operationId,
+//                    transferAccountId = payload.toAccountId,
+//                    accountId = payload.fromAccountId,
+//                    amount = payload.amount,
+//                    rate = rate,
+//                )
+//            }
+//        }
+//        val newRecords = importRepository.importLedgerRecords(userId, accountId, csvTransactions, importFile)
+//
+//        return newRecords.map { TransactionDto(it) }
+//    }
 
-        val importDataPair = extractImportData(multipartData)
-        val reader = BufferedReader(InputStreamReader(importDataPair.second.inputStream()))
-
-        val csvParser = CSVParser(reader, CSVFormat.DEFAULT
-            .withFirstRecordAsHeader()
-            .withDelimiter(',')
-            .withIgnoreHeaderCase().withTrim())
-
-        val headers = listOf("date", "category", "beneficiary_or_sender", "description", "amount")
-        csvParser.headerMap.takeIf { it.keys.containsAll(headers) && it.size == headers.size }
-            ?: throw InvalidDataException("Invalid header set")
-
-        val csvRecords = csvParser.records.takeIf { it.size > 0 }
-            ?: throw InvalidDataException("Invalid records amount: 0")
-
-        var csvTransactions = csvRecords.map {
-            try {
-                val date = Instant.parse(it.get(headers[0]))
-                val category = it.get(headers[1]).trimWhitespaces()
-                val beneficiaryOrSender = it.get(headers[2]).trimWhitespaces()
-                val description = it.get(headers[3]).trimWhitespaces()
-                val amount = it.get(headers[4]).toBigDecimal()
-
-                return@map CsvTransactionDto(date, category, beneficiaryOrSender, description, amount)
-            } catch (e: Exception) {
-                throw InvalidDataException("Invalid value, row #${it.recordNumber}: ${e.message}")
-            }
-        }.toList()
-
-        csvTransactions = resolveCsvTransactionsCategory(userId, csvTransactions)
-
-        val importFile = createLocalImportFile(importDataPair.first.extension, importDataPair.second)
-        val newTransactions = importRepository.importTransactions(userId, accountId, csvTransactions, importFile)
-
-        return newTransactions.map { TransactionDto(it) }
+    private fun mapToCsvRecordDto(record: CSVRecord): CsvRecordDto {
+        try {
+            return CsvRecordDto(
+                date = Instant.parse(record[csvRecordsTableColumns[0]]),
+                category = record[csvRecordsTableColumns[1]].trimWhitespaces().uppercase(),
+                subject = record[csvRecordsTableColumns[2]].trimWhitespaces(),
+                description = record[csvRecordsTableColumns[3]].trimWhitespaces(),
+                notes = record[csvRecordsTableColumns[4]].trimWhitespaces(),
+                type = LedgerRecordType.valueOf(record[csvRecordsTableColumns[5]].trimWhitespaces()),
+                amount = record[csvRecordsTableColumns[6]].toBigDecimal(),
+            )
+        } catch (e1: DateTimeParseException) {
+            throw InvalidDataException("Invalid date at row #${record.recordNumber}: ${record[0]}")
+        } catch (e2: IllegalArgumentException) {
+            throw InvalidDataException("Invalid type at row #${record.recordNumber}: ${record[5]}")
+        } catch (e3: NumberFormatException) {
+            throw InvalidDataException("Invalid amount at row #${record.recordNumber}: ${record[6]}")
+        } catch (e4: Exception) {
+            throw InvalidDataException("Invalid data at row #${record.recordNumber}")
+        }
     }
 
-    private fun resolveCsvTransactionsCategory(userId: Long, csvTransactions: List<CsvTransactionDto>): List<CsvTransactionDto> {
-        val rules = importRuleRepository.findAll(userId)
-        val categoryNames = categoryRepository.findAll().map { it.name }
+    private fun resolveCsvRecordsCategories(csvRecords: List<CsvRecordDto>, rules: List<ImportRule>): List<CsvRecordDto> {
+        val categories = categoryRepository.findAll().map { it.name }
 
-        return csvTransactions.map { csvTransaction ->
-            if (csvTransaction.category.isBlank() || !categoryNames.contains(csvTransaction.category)) {
-                val ruleResolvingText = csvTransaction.beneficiaryOrSender + csvTransaction.description
+        return csvRecords.map { csvRecord ->
+            if (csvRecord.category.isBlank() || !categories.contains(csvRecord.category)) {
+                val ruleResolvingText = csvRecord.subject + " " + csvRecord.description
 
-                val rule = rules.map { rule ->
+                val rule = rules.filter {
+                    if (it.lookupType == EXPENSE_ONLY) return@filter csvRecord.type == EXPENSE
+                    if (it.lookupType == INCOME_ONLY) return@filter csvRecord.type == INCOME
+                    return@filter true
+                }.map { rule ->
                     val trie = Trie.builder().ignoreCase().addKeywords(rule.keywords).build()
                     val emits = trie.parseText(ruleResolvingText)
                     Pair(rule, emits.size)
                 }.filter { it.second > 0 }.maxByOrNull { it.second }?.first
 
-                rule?.apply {
-                    csvTransaction.category = this.recordCategory.name
+                if (rule != null) {
+                    csvRecord.category = rule.category.name
+                } else {
+                    csvRecord.category = CategoryType.UNCATEGORIZED.name
                 }
             }
 
-            return@map csvTransaction
+            return@map csvRecord
         }
     }
 }

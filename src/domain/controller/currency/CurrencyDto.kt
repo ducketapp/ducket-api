@@ -1,12 +1,19 @@
 package io.ducket.api.domain.controller.currency
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import domain.model.currency.Currency
 
-data class CurrencyDto(@JsonIgnore val currency: Currency) {
-    val id: Long = currency.id
-    val name: String = currency.name
-    val area: String = currency.area
-    val symbol: String = currency.symbol
-    val isoCode: String = currency.isoCode
+data class CurrencyDto(
+    val id: Long,
+    val name: String,
+    val area: String,
+    val symbol: String,
+    val isoCode: String,
+) {
+    constructor(currency: Currency): this(
+        id = currency.id,
+        name = currency.name,
+        area = currency.area,
+        symbol = currency.symbol,
+        isoCode = currency.isoCode,
+    )
 }

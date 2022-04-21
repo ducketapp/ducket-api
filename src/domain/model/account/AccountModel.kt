@@ -3,12 +3,11 @@ package domain.model.account
 import domain.model.currency.CurrenciesTable
 import domain.model.currency.Currency
 import domain.model.currency.CurrencyEntity
-import domain.model.transaction.TransactionsTable
 import domain.model.user.User
 import domain.model.user.UserEntity
 import domain.model.user.UsersTable
 import io.ducket.api.app.AccountType
-import io.ducket.api.domain.model.transfer.TransfersTable
+import io.ducket.api.domain.model.ledger.LedgerRecordsTable
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -37,9 +36,6 @@ class AccountEntity(id: EntityID<Long>) : LongEntity(id) {
     var createdAt by AccountsTable.createdAt
     var modifiedAt by AccountsTable.modifiedAt
 
-    private var transactionsAccount by AccountEntity via TransactionsTable
-    private var transfersAccount by AccountEntity.via(TransfersTable.accountId, TransfersTable.accountId)
-
     fun toModel() = Account(
         id.value,
         name,
@@ -47,7 +43,6 @@ class AccountEntity(id: EntityID<Long>) : LongEntity(id) {
         user.toModel(),
         currency.toModel(),
         accountType,
-        (transactionsAccount + transfersAccount).count(),
         createdAt,
         modifiedAt,
     )
@@ -60,7 +55,6 @@ data class Account(
     val user: User,
     val currency: Currency,
     val type: AccountType,
-    val recordsCount: Int,
     val createdAt: Instant,
     val modifiedAt: Instant,
 )

@@ -1,6 +1,5 @@
 package io.ducket.api.domain.service
 
-import io.ducket.api.domain.controller.account.AccountDto
 import io.ducket.api.domain.controller.rule.ImportRuleCreateDto
 import io.ducket.api.domain.controller.rule.ImportRuleDto
 import io.ducket.api.domain.controller.rule.ImportRuleUpdateDto

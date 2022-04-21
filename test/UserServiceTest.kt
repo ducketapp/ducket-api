@@ -21,8 +21,8 @@ import org.junit.jupiter.api.Test
 import org.mindrot.jbcrypt.BCrypt
 
 internal class UserServiceTest {
-    private val userRepositoryMock: UserRepository = mockk()
-    private val accountServiceMock: AccountService = mockk()
+    private val userRepositoryMock = mockk<UserRepository>()
+    private val accountServiceMock = mockk<AccountService>()
 
     private val cut = UserService(
         userRepositoryMock,
@@ -37,7 +37,7 @@ internal class UserServiceTest {
     @Test
     fun should_ReturnUser_When_GetRegisteredUser() {
         // given
-        val user = UserObjectMother.johnWick()
+        val user = UserObjectMother.user()
         val expected = UserDto(user)
         every { userRepositoryMock.findOne(user.id) } returns user
 
@@ -66,7 +66,7 @@ internal class UserServiceTest {
     @Test
     fun should_ThrowException_When_AuthenticateWithNonRegisteredUser() {
         // given
-        val authUserDto = UserObjectMother.authJohnWick()
+        val authUserDto = UserObjectMother.authUser()
         every { userRepositoryMock.findOneByEmail(authUserDto.email) } returns null
 
         // when
@@ -83,8 +83,8 @@ internal class UserServiceTest {
         // given
         val authUserDtoPasswordSlot = slot<String>()
         val userPasswordHashSlot = slot<String>()
-        val authUserDto = UserObjectMother.authJohnWick()
-        val user = UserObjectMother.johnWick()
+        val authUserDto = UserObjectMother.authUser()
+        val user = UserObjectMother.user()
         val expected = UserDto(user)
         mockkStatic("org.mindrot.jbcrypt.BCrypt")
 
@@ -105,8 +105,8 @@ internal class UserServiceTest {
         // given
         val authUserDtoPasswordSlot = slot<String>()
         val userPasswordHashSlot = slot<String>()
-        val authUserDto = UserObjectMother.authJohnWick()
-        val user = UserObjectMother.johnWick()
+        val authUserDto = UserObjectMother.authUser()
+        val user = UserObjectMother.user()
         mockkStatic("org.mindrot.jbcrypt.BCrypt")
 
         every { userRepositoryMock.findOneByEmail(authUserDto.email) } returns user
@@ -130,9 +130,9 @@ internal class UserServiceTest {
         val accountCreateDtoSlot = slot<AccountCreateDto>()
         val userIdSlot = slot<Long>()
 
-        val userCreateDto = UserObjectMother.newJohnWick()
-        val accountDto = AccountDto(AccountObjectMother.cashUsd(), userCreateDto.startBalance)
-        val user = UserObjectMother.johnWick()
+        val userCreateDto = UserObjectMother.newUser()
+        val accountDto = AccountDto(AccountObjectMother.account(), userCreateDto.startBalance)
+        val user = UserObjectMother.user()
         val expected = UserDto(user)
         mockkStatic("org.jetbrains.exposed.sql.transactions.ThreadLocalTransactionManagerKt")
 
@@ -146,15 +146,15 @@ internal class UserServiceTest {
 
         // then
         actual shouldBe expected
-        accountCreateDtoSlot.captured shouldBe AccountObjectMother.newCashUsd()
+        accountCreateDtoSlot.captured shouldBe AccountObjectMother.newAccount()
         userIdSlot.captured shouldBe user.id
     }
 
     @Test
     fun should_ThrowException_When_CreateExistingUser() {
         // given
-        val newUserDto = UserObjectMother.newJohnWick()
-        val user = UserObjectMother.default()
+        val newUserDto = UserObjectMother.newUser()
+        val user = UserObjectMother.user()
         every { userRepositoryMock.findOneByEmail(newUserDto.email) } returns user
 
         // when
@@ -172,9 +172,9 @@ internal class UserServiceTest {
     fun should_ReturnUpdatedUser_When_UpdateUser() {
         // given
         val userIdSlot = slot<Long>()
-        val userUpdateDto = UserObjectMother.updateJohnWick()
-        val userId = UserObjectMother.johnWick().id
-        val updatedUser = UserObjectMother.johnWick()
+        val userUpdateDto = UserObjectMother.updateUser()
+        val userId = UserObjectMother.user().id
+        val updatedUser = UserObjectMother.user()
         val expected = UserDto(updatedUser)
         every { userRepositoryMock.updateOne(capture(userIdSlot), userUpdateDto) } returns updatedUser
 
@@ -190,7 +190,7 @@ internal class UserServiceTest {
     fun should_ReturnException_When_UpdateNonRegisteredUser() {
         // given
         val userId = 1L
-        val userUpdateDto = UserObjectMother.updateJohnWick()
+        val userUpdateDto = UserObjectMother.updateUser()
         every { userRepositoryMock.updateOne(userId, userUpdateDto) } returns null
 
         // when

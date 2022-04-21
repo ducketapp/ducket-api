@@ -5,6 +5,7 @@ import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 import java.util.*
 
+@Deprecated("Use LongIdTable instead")
 open class StringIdTable(name: String = "", columnName: String = "id", columnLength: Int = 36) : IdTable<String>(name) {
     override val id: Column<EntityID<String>> = varchar(columnName, columnLength)
         .clientDefault { UUID.randomUUID().toString() }

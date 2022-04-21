@@ -12,20 +12,18 @@ import java.math.BigDecimal
 data class AccountDto(
     val id: Long,
     val name: String,
-    var balance: BigDecimal,
+    var balance: BigDecimal?,
     val owner: UserDto,
     val accountType: String,
-    val recordsCount: Int,
     val accountCurrency: CurrencyDto,
     val notes: String?,
 ) {
-    constructor(account: Account, balance: BigDecimal = BigDecimal.ZERO) : this(
+    constructor(account: Account, balance: BigDecimal? = null) : this(
         id = account.id,
         name = account.name,
         balance = balance,
         owner = UserDto(account.user),
         accountType = account.type.name,
-        recordsCount = account.recordsCount,
         accountCurrency = CurrencyDto(account.currency),
         notes = account.notes,
     )

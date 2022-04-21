@@ -3,6 +3,7 @@ package io.ducket.api.app.database
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ducket.api.config.AppConfig
+import kotlinx.coroutines.Dispatchers
 import org.flywaydb.core.Flyway
 import org.flywaydb.core.api.exception.FlywayValidateException
 import org.jetbrains.exposed.sql.Database
@@ -66,7 +67,14 @@ class AppDatabaseFactory(appConfig: AppConfig) : DatabaseFactory {
         }
     }
 
-    suspend fun <T> dbQuery(
-        block: suspend () -> T
-    ): T = newSuspendedTransaction(transactionIsolation = TRANSACTION_REPEATABLE_READ) { block() }
+    /**
+     * Prevents both dirty and non-repeatable reads, but still allows for phantom reads.
+     * A phantom read is when a transaction ("Transaction A") selects a list of rows through a WHERE clause,
+     * another transaction ("Transaction B") performs an INSERT or DELETE with a row that satisfies Transaction A's WHERE clause,
+     * and Transaction A selects using the same WHERE clause again, resulting in an inconsistency.
+     */
+    suspend fun <T> dbQuery(block: suspend () -> T): T = newSuspendedTransaction(transactionIsolation = TRANSACTION_REPEATABLE_READ) { block() }
+
+    suspend fun <T> dbTransaction(block: suspend () -> T): T =
+        newSuspendedTransaction(context = Dispatchers.IO, transactionIsolation = TRANSACTION_REPEATABLE_READ) { block() }
 }

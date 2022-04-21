@@ -15,14 +15,15 @@ class ImportRuleRepository {
 
     fun create(userId: Long, dto: ImportRuleCreateDto): ImportRule = transaction {
         ImportRuleEntity.new {
-            name = dto.name
-            recordCategory = CategoryEntity[dto.categoryId]
-            user = UserEntity[userId]
-            expense = dto.expense
-            income = dto.income
-            keywords = dto.keywords.joinToString(KEYWORDS_DELIMITER)
-            createdAt = Instant.now()
-            modifiedAt = Instant.now()
+            this.name = dto.name
+            this.category = CategoryEntity[dto.categoryId]
+            this.user = UserEntity[userId]
+            this.lookupType = dto.lookupType
+            this.keywords = dto.keywords.joinToString(KEYWORDS_DELIMITER)
+            Instant.now().also {
+                this.createdAt = it
+                this.modifiedAt = it
+            }
         }.toModel()
     }
 
@@ -47,23 +48,16 @@ class ImportRuleRepository {
             ImportRulesTable.id.eq(ruleId).and(ImportRulesTable.userId.eq(userId))
         }.firstOrNull()?.also { found ->
             dto.name?.let { found.name = it }
-            dto.expense?.let { found.expense = it }
-            dto.income?.let { found.income = it }
+            dto.lookupType?.let { found.lookupType = it }
             dto.keywords?.let { found.keywords = it.joinToString(KEYWORDS_DELIMITER) }
-            dto.categoryId?.let { found.recordCategory = CategoryEntity[it] }
+            dto.categoryId?.let { found.category = CategoryEntity[it] }
             found.modifiedAt = Instant.now()
         }?.toModel()
     }
 
-    fun delete(userId: Long, vararg ruleIds: Long) = transaction {
+    fun delete(userId: Long, vararg ruleIds: Long): Unit = transaction {
         ImportRulesTable.deleteWhere {
             ImportRulesTable.id.inList(ruleIds.asList()).and(ImportRulesTable.userId.eq(userId))
-        }
-    }
-
-    fun deleteAll(userId: Long) = transaction {
-        ImportRulesTable.deleteWhere {
-            ImportRulesTable.userId.eq(userId)
         }
     }
 }

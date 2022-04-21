@@ -1,6 +1,6 @@
 package domain.model.category
 
-import io.ducket.api.app.CategoryGroup
+import io.ducket.api.app.CategoryTypeGroup
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -8,7 +8,7 @@ import org.jetbrains.exposed.dao.id.LongIdTable
 
 internal object CategoriesTable : LongIdTable("category") {
     val name = varchar("name", 64)
-    val group = enumerationByName("group", 32, CategoryGroup::class)
+    val group = enumerationByName("group", 32, CategoryTypeGroup::class)
 }
 
 class CategoryEntity(id: EntityID<Long>) : LongEntity(id) {
@@ -24,8 +24,8 @@ class CategoryEntity(id: EntityID<Long>) : LongEntity(id) {
     )
 }
 
-class Category(
+data class Category(
     val id: Long,
     val name: String,
-    val group: CategoryGroup,
+    val group: CategoryTypeGroup,
 )

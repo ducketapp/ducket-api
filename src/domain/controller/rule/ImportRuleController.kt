@@ -10,7 +10,7 @@ import io.ktor.response.*
 import io.ktor.util.*
 
 class ImportRuleController(
-    val importRuleService: ImportRuleService,
+    private val importRuleService: ImportRuleService,
 ) {
 
     suspend fun createImportRule(ctx: ApplicationCall) {

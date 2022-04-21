@@ -1,7 +1,7 @@
 package io.ducket.api.domain.controller.account
 
 import io.ducket.api.app.AccountType
-import io.ducket.api.extension.declaredMemberPropertiesNull
+import io.ducket.api.utils.declaredMemberPropertiesNull
 import io.ducket.api.plugins.InvalidDataException
 import org.valiktor.functions.*
 
@@ -12,9 +12,9 @@ class AccountUpdateDto(
 ) {
     fun validate(): AccountUpdateDto {
         org.valiktor.validate(this) {
-            validate(AccountUpdateDto::name).hasSize(1, 45)
+            validate(AccountUpdateDto::name).hasSize(1, 64)
             validate(AccountUpdateDto::notes).hasSize(0, 128)
-            validate(AccountUpdateDto::accountType).isNotNull().isIn(AccountType.values().toList())
+            validate(AccountUpdateDto::accountType).isNotNull()
 
             if (this@AccountUpdateDto.declaredMemberPropertiesNull()) throw InvalidDataException()
         }
