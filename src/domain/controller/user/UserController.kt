@@ -1,6 +1,6 @@
 package io.ducket.api.domain.controller.user
 
-import io.ducket.api.config.JwtManager
+import io.ducket.api.auth.JwtManager
 import io.ducket.api.auth.UserPrincipal
 import io.ducket.api.auth.UserRole
 import io.ducket.api.domain.service.*
@@ -19,11 +19,11 @@ class UserController(
     private val jwtManager: JwtManager by inject(JwtManager::class.java)
 
     suspend fun signUp(ctx: ApplicationCall) {
-        ctx.receive<UserCreateDto>().apply {
-            userService.setupNewUser(this.validate()).apply {
+        ctx.receive<UserCreateDto>().let { payload ->
+            userService.createUser(payload.validate()).run {
                 ctx.response.header(
                     name = HttpHeaders.Authorization,
-                    value = getAuthHeaderValue(UserPrincipal(this.id, this.email, setOf(UserRole.SUPER_USER))),
+                    value = jwtManager.getAuthorizationHeaderValue(UserPrincipal(id, email, UserRole.SUPER_USER)),
                 )
                 ctx.respond(HttpStatusCode.Created, this)
             }
@@ -31,11 +31,11 @@ class UserController(
     }
 
     suspend fun signIn(ctx: ApplicationCall) {
-        ctx.receive<UserAuthDto>().apply {
-            userService.authenticateUser(this.validate()).apply {
+        ctx.receive<UserAuthenticateDto>().let { payload ->
+            userService.authenticateUser(payload.validate()).run {
                 ctx.response.header(
                     name = HttpHeaders.Authorization,
-                    value = getAuthHeaderValue(UserPrincipal(this.id, this.email, setOf(UserRole.SUPER_USER))),
+                    value = jwtManager.getAuthorizationHeaderValue(UserPrincipal(id, email, UserRole.SUPER_USER)),
                 )
                 ctx.respond(HttpStatusCode.OK, this)
             }
@@ -73,6 +73,4 @@ class UserController(
         userService.deleteUserData(userId)
         ctx.respond(HttpStatusCode.NoContent)
     }
-
-    private fun getAuthHeaderValue(principal: UserPrincipal): String = "Bearer ${jwtManager.generateToken(principal)}"
 }

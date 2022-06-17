@@ -6,6 +6,7 @@ import io.ducket.api.domain.model.attachment.AttachmentsTable
 import domain.model.operation.OperationAttachmentsTable
 import domain.model.operation.OperationEntity
 import domain.model.operation.OperationsTable
+import domain.model.user.UserEntity
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
@@ -32,8 +33,9 @@ class OperationAttachmentRepository {
         }.count().toInt()
     }
 
-    fun createAttachment(operationId: Long, newFile: File): Unit = transaction {
+    fun createAttachment(userId: Long, operationId: Long, newFile: File): Unit = transaction {
         AttachmentEntity.new {
+            user = UserEntity[userId]
             filePath = newFile.absolutePath
             createdAt = Instant.now()
         }.also { attachment ->

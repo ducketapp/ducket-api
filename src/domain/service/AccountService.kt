@@ -1,14 +1,11 @@
 package io.ducket.api.domain.service
 
 import io.ducket.api.app.LedgerRecordType.*
-import io.ducket.api.app.CategoryType
-import io.ducket.api.app.CategoryTypeGroup
 import io.ducket.api.domain.controller.BulkDeleteDto
 import io.ducket.api.domain.controller.account.*
 import io.ducket.api.domain.controller.ledger.LedgerRecordCreateDto
 import io.ducket.api.domain.controller.ledger.OperationCreateDto
 import io.ducket.api.domain.repository.*
-import io.ducket.api.utils.sumByDecimal
 import io.ducket.api.plugins.DuplicateEntityException
 import io.ducket.api.plugins.InvalidDataException
 import io.ducket.api.plugins.NoEntityFoundException
@@ -19,20 +16,14 @@ import java.time.Instant
 
 class AccountService(
     private val accountRepository: AccountRepository,
-    private val ledgerRepository: LedgerRepository,
     private val ledgerService: LedgerService,
-    private val groupService: GroupService,
 ) {
 
     fun getAccounts(userId: Long): List<AccountDto> {
-        val activeMembersFromSharedUserGroups = groupService.getActiveMembersFromSharedUserGroups(userId).map { it.id }
-
-        return accountRepository.findAll(*activeMembersFromSharedUserGroups.toLongArray(), userId).map {
-            AccountDto(it, resolveAccountBalance(it.user.id, it.id))
-        }
+        return accountRepository.findAll(userId).map { AccountDto(it) }
     }
     
-    fun getAccountAccessibleToUser(userId: Long, accountId: Long): AccountDto {
+    fun getAccount(userId: Long, accountId: Long): AccountDto {
         return getAccounts(userId).firstOrNull { it.id == accountId } ?: throw NoEntityFoundException()
     }
 
@@ -45,19 +36,18 @@ class AccountService(
                     ledgerService.createLedgerRecord(
                         userId = userId,
                         payload = LedgerRecordCreateDto(
-                            transfer = false,
                             amount = payload.startBalance,
                             type = if (payload.startBalance.lt(BigDecimal.ZERO)) EXPENSE else INCOME,
                             accountId = newAccount.id,
                             operation = OperationCreateDto(
-                                category = CategoryType.OTHER,
-                                categoryGroup = CategoryTypeGroup.OTHER,
-                                description = "Corrective record",
+                                category = "Other",
+                                categoryGroup = "Other",
+                                description = "Starting balance",
                                 date = Instant.now(),
                             )
                         )
                     )
-                    return@transaction AccountDto(newAccount, payload.startBalance)
+                    return@transaction AccountDto(newAccount.copy(balance = payload.startBalance))
                 }
                 return@transaction AccountDto(newAccount)
             }
@@ -80,11 +70,5 @@ class AccountService(
 
     fun deleteAccount(userId: Long, accountId: Long) {
         accountRepository.delete(userId, accountId)
-    }
-
-    fun resolveAccountBalance(ownerId: Long, accountId: Long): BigDecimal {
-        return ledgerRepository.findAllByAccount(ownerId, accountId).sumByDecimal {
-            if (it.type == EXPENSE) it.amountPosted.negate() else it.amountPosted
-        }
     }
 }

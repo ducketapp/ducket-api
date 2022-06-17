@@ -16,7 +16,7 @@ class LedgerController(
 
     suspend fun getLedgerRecords(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
-        val ledgerRecords = ledgerService.getLedgerRecordsAccessibleToUser(userId)
+        val ledgerRecords = ledgerService.getLedgerRecords(userId)
 
         ctx.respond(HttpStatusCode.OK, ledgerRecords)
     }
@@ -25,7 +25,7 @@ class LedgerController(
         val userId = ctx.authentication.principalOrThrow().id
         val recordId = ctx.parameters.getOrFail("recordId").toLong()
 
-        ledgerService.getLedgerRecordAccessibleToUser(userId, recordId).apply {
+        ledgerService.getLedgerRecord(userId, recordId).apply {
             ctx.respond(HttpStatusCode.OK, this)
         }
     }

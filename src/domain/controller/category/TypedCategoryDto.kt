@@ -1,12 +1,11 @@
 package io.ducket.api.domain.controller.category
 
 import domain.model.category.Category
-import io.ducket.api.app.CategoryTypeGroup
 
 data class TypedCategoryDto(
     val id: Long,
     val name: String,
-    val group: CategoryTypeGroup,
+    val group: String,
 ) {
     constructor(category: Category): this(
         id = category.id,

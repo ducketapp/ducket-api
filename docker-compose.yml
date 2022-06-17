@@ -9,16 +9,14 @@ services:
       - TZ=${DB_TZ}
       - MYSQL_ROOT_USER=${DB_ROOT_USER}
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-      - MYSQL_USER=${DB_USER}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
-      - MYSQL_DATABASE=${DB_NAME}
       - MYSQL_TCP_PORT=${DB_PORT}
     ports:
       - ${DB_PORT}:${DB_PORT}
     volumes:
+      - ./resources/database/init:/docker-entrypoint-initdb.d
       - database_data:/var/lib/mysql
     healthcheck:
-      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_ROOT_USER --password=$$MYSQL_ROOT_PASSWORD
       interval: 5s
       timeout: 2s
       retries: 3
@@ -35,13 +33,15 @@ services:
     environment:
       - DB_HOST=ducket-database
       - DB_PORT=${DB_PORT}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_USER=${DB_ROOT_USER}
+      - DB_PASSWORD=${DB_ROOT_PASSWORD}
+      - DB_MAIN_SCHEME=${DB_MAIN_SCHEME}
+      - DB_SCHEDULER_SCHEME=${DB_SCHEDULER_SCHEME}
+      - DB_RATES_SCHEME=${DB_RATES_SCHEME}
       - APP_SECRET=${APP_SECRET}
-      - APP_PORT=8100
+      - APP_PORT=${APP_PORT}
     ports:
-      - 8100:8100
+      - ${APP_PORT}:${APP_PORT}
     volumes:
       - backend_build:/app/build
       - backend_data:/app/data

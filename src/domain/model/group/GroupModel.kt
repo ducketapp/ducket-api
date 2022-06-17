@@ -11,8 +11,8 @@ import org.jetbrains.exposed.sql.javatime.timestamp
 import java.time.Instant
 
 internal object GroupsTable : LongIdTable("group") {
-    val name = varchar("name", 64)
-    val creatorId = reference("creator_id", UsersTable)
+    val name = varchar("name", 32)
+    val ownerId = reference("owner_id", UsersTable)
     val createdAt = timestamp("created_at")
     val modifiedAt = timestamp("modified_at")
 }
@@ -21,14 +21,17 @@ class GroupEntity(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<GroupEntity>(GroupsTable)
 
     var name by GroupsTable.name
-    var creator by UserEntity referencedOn GroupsTable.creatorId
+    var owner by UserEntity referencedOn GroupsTable.ownerId
     var createdAt by GroupsTable.createdAt
     var modifiedAt by GroupsTable.modifiedAt
+
+    val memberships by GroupMembershipEntity referrersOn GroupMembershipsTable.groupId
 
     fun toModel() = Group(
         id.value,
         name,
-        creator.toModel(),
+        owner.toModel(),
+        memberships.map { it.toModel() },
         createdAt,
         modifiedAt,
     )
@@ -37,7 +40,8 @@ class GroupEntity(id: EntityID<Long>) : LongEntity(id) {
 data class Group(
     val id: Long,
     val name: String,
-    val creator: User,
+    val owner: User,
+    val memberships: List<GroupMembership>,
     val createdAt: Instant,
     val modifiedAt: Instant,
 )

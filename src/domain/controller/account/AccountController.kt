@@ -1,6 +1,5 @@
 package io.ducket.api.domain.controller.account
 
-import io.ducket.api.app.DataAggregationType
 import io.ducket.api.domain.controller.BulkDeleteDto
 import io.ducket.api.domain.service.AccountService
 import io.ducket.api.domain.service.ImportService
@@ -21,7 +20,7 @@ class AccountController(
         val userId = ctx.authentication.principalOrThrow().id
         val accountId = ctx.parameters.getOrFail("accountId").toLong()
 
-        val account = accountService.getAccountAccessibleToUser(userId, accountId)
+        val account = accountService.getAccount(userId, accountId)
         ctx.respond(HttpStatusCode.OK, account)
     }
 

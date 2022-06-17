@@ -9,8 +9,6 @@ import domain.model.currency.CurrencyEntity
 import domain.model.user.UserEntity
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.or
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.Instant
 
@@ -22,7 +20,7 @@ class AccountRepository {
             this.notes = dto.notes
             this.user = UserEntity[userId]
             this.currency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(dto.currencyIsoCode) }.first()
-            this.accountType = dto.accountType
+            this.type = dto.type
             Instant.now().also {
                 this.createdAt = it
                 this.modifiedAt = it
@@ -36,9 +34,9 @@ class AccountRepository {
         }.firstOrNull()?.toModel()
     }
 
-    fun findAll(vararg userIds: Long): List<Account> = transaction {
+    fun findAll(userId: Long): List<Account> = transaction {
         AccountEntity.find {
-            AccountsTable.userId.inList(userIds.asList())
+            AccountsTable.userId.eq(userId)
         }.toList().map { it.toModel() }
     }
 
@@ -60,7 +58,7 @@ class AccountRepository {
         }.firstOrNull()?.also { found ->
             dto.name?.let { found.name = it }
             dto.notes?.let { found.notes = it }
-            dto.accountType?.let { found.accountType = it }
+            dto.type?.let { found.type = it }
             found.modifiedAt = Instant.now()
         }?.toModel()
     }

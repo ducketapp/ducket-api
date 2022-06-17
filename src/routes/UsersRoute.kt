@@ -1,31 +1,24 @@
 package io.ducket.api.routes
 
+import io.ducket.api.auth.UserRole
+import io.ducket.api.auth.authorization.authorize
 import io.ducket.api.domain.controller.user.UserController
-import io.ducket.api.plugins.AuthorizationException
-import io.ducket.api.principalOrThrow
-import io.ktor.application.*
 import io.ktor.auth.*
-import io.ktor.http.*
-import io.ktor.request.*
 import io.ktor.routing.*
 
-fun Route.users(
-    userController: UserController,
-) {
+fun Route.users(userController: UserController) {
     route("/users") {
-        route("/auth") {
-            post("/sign-in") { userController.signIn(this.context) }
-            post("/sign-up") { userController.signUp(this.context) }
-        }
+        post("/sign-in") { userController.signIn(this.context) }
+        post("/sign-up") { userController.signUp(this.context) }
 
         authenticate {
-            route("/{userId}") {
-                get { userController.getUser(this.context) }
-                put { userController.updateUser(this.context) }
-                delete { userController.deleteUser(this.context) }
+            authorize(UserRole.SUPER_USER) {
+                route("/{userId}") {
+                    get { userController.getUser(this.context) }
+                    put { userController.updateUser(this.context) }
+                    delete { userController.deleteUser(this.context) }
 
-                route("/data") {
-                    delete { userController.deleteUserData(this.context) }
+                    delete("/data") { userController.deleteUserData(this.context) }
                 }
             }
         }

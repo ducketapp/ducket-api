@@ -5,5 +5,5 @@ import io.ktor.auth.*
 data class UserPrincipal(
     val id: Long,
     val email: String,
-    val roles: Set<UserRole>,
+    val role: UserRole,
 ): Principal

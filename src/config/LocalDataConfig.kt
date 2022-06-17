@@ -1,6 +1,6 @@
 package io.ducket.api.config
 
 data class LocalDataConfig(
-    val ecbDataPath: String,
+    val exrDataPath: String,
     val dbDataPath: String,
 )

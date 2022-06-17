@@ -142,7 +142,7 @@ internal class UserServiceTest {
         every { transaction(any(), capture(dbTransactionSlot)) } answers { dbTransactionSlot.invoke(mockk()) }
 
         // when
-        val actual = cut.setupNewUser(userCreateDto)
+        val actual = cut.createUser(userCreateDto)
 
         // then
         actual shouldBe expected
@@ -158,7 +158,7 @@ internal class UserServiceTest {
         every { userRepositoryMock.findOneByEmail(newUserDto.email) } returns user
 
         // when
-        val executable: () -> Unit = { cut.setupNewUser(newUserDto) }
+        val executable: () -> Unit = { cut.createUser(newUserDto) }
 
         // then
         shouldThrowExactly<DuplicateEntityException>(executable).also {

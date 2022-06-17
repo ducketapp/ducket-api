@@ -8,13 +8,13 @@ import org.valiktor.functions.*
 class AccountUpdateDto(
     val name: String?,
     val notes: String?,
-    val accountType: AccountType?,
+    val type: AccountType?,
 ) {
     fun validate(): AccountUpdateDto {
         org.valiktor.validate(this) {
             validate(AccountUpdateDto::name).hasSize(1, 64)
-            validate(AccountUpdateDto::notes).hasSize(0, 128)
-            validate(AccountUpdateDto::accountType).isNotNull()
+            validate(AccountUpdateDto::notes).hasSize(1, 128)
+            validate(AccountUpdateDto::type).isNotNull()
 
             if (this@AccountUpdateDto.declaredMemberPropertiesNull()) throw InvalidDataException()
         }

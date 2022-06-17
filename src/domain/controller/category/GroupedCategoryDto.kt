@@ -1,8 +1,6 @@
 package io.ducket.api.domain.controller.category
 
-import io.ducket.api.app.CategoryTypeGroup
-
 data class GroupedCategoryDto(
-    val group: CategoryTypeGroup,
+    val group: String,
     val groupCategories: List<TypelessCategoryDto>,
 )

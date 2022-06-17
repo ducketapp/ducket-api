@@ -1,65 +1,66 @@
 package io.ducket.api.domain.service
 
-import io.ducket.api.CurrencyRateProvider
+import clients.rates.ReferenceRatesClient
+import io.ducket.api.app.BudgetPeriodType
 import io.ducket.api.domain.controller.BulkDeleteDto
 import io.ducket.api.domain.controller.budget.BudgetCreateDto
 import io.ducket.api.domain.controller.budget.BudgetDto
-import io.ducket.api.domain.controller.budget.BudgetProgressDto
 import io.ducket.api.domain.model.budget.Budget
-import io.ducket.api.domain.model.budget.BudgetEntity
 import io.ducket.api.domain.model.ledger.LedgerRecord
 import io.ducket.api.domain.repository.*
-import io.ducket.api.utils.lt
 import io.ducket.api.getLogger
 import io.ducket.api.plugins.DuplicateEntityException
-import io.ducket.api.plugins.InvalidDataException
 import io.ducket.api.plugins.NoEntityFoundException
-import io.ducket.api.utils.isAfterInclusive
-import io.ducket.api.utils.isBeforeInclusive
-import io.ducket.api.utils.sumByDecimal
+import io.ducket.api.utils.*
 import org.koin.java.KoinJavaComponent.inject
+import org.threeten.extra.LocalDateRange
+import org.threeten.extra.YearQuarter
+import org.threeten.extra.YearWeek
 import java.math.BigDecimal
-import java.time.ZoneId
+import java.time.*
 
 class BudgetService(
     private val budgetRepository: BudgetRepository,
+    private val budgetPeriodLimitRepository: BudgetPeriodLimitRepository,
     private val ledgerRepository: LedgerRepository,
     private val groupService: GroupService,
 ) {
     private val logger = getLogger()
-    private val currencyRateProvider: CurrencyRateProvider by inject(CurrencyRateProvider::class.java)
+    private val ratesClient: ReferenceRatesClient by inject(ReferenceRatesClient::class.java)
 
     fun createBudget(userId: Long, payload: BudgetCreateDto): BudgetDto {
-        if (payload.fromDate.isAfter(payload.toDate)) {
-            throw InvalidDataException("Invalid time frames")
-        }
-
-        budgetRepository.findOneByName(userId, payload.name)?.let {
+        budgetRepository.findOneByName(userId, payload.title)?.run {
             throw DuplicateEntityException()
         }
 
-        return budgetRepository.create(userId, payload).let {
-            BudgetDto(
-                budget = BudgetEntity[it.id].toModel(),
-                progress = resolveBudgetProgress(it),
-            )
-        }
+        val budget = budgetRepository.create(userId, payload)
+        val budgetPeriodLimit = budgetPeriodLimitRepository.create(
+            budgetId = budget.id,
+            default = true,
+            limit = payload.defaultLimit,
+            period = payload.currentPeriod,
+        )
+        val budgetPeriodProgress = getBudgetPeriodProgress(budget, budgetPeriodLimit.period)
+
+        return BudgetDto(budget, budgetPeriodLimit, budgetPeriodProgress)
     }
 
-    fun getBudgetAccessibleToUser(userId: Long, budgetId: Long): BudgetDto {
-        return getBudgetsAccessibleToUser(userId).firstOrNull { it.id == budgetId } ?: throw NoEntityFoundException()
+    fun getBudget(userId: Long, budgetId: Long, period: String?): BudgetDto {
+        val budget = budgetRepository.findOne(userId, budgetId) ?: throw NoEntityFoundException()
+        val budgetPeriodLimit = budget.limits
+            .filter { it.period == period || it.default }
+            .sortedBy { it.default }
+            .lastOrNull()!!
+        val budgetPeriodProgress = getBudgetPeriodProgress(budget, budgetPeriodLimit.period)
+
+        return BudgetDto(budget, budgetPeriodLimit, budgetPeriodProgress)
     }
 
-    fun getBudgetsAccessibleToUser(userId: Long): List<BudgetDto> {
-        val userIdsWithMutualGroupMemberships = groupService.getActiveMembersFromSharedUserGroups(userId).map { it.id }
-
-        return budgetRepository.findAll(*userIdsWithMutualGroupMemberships.toLongArray(), userId).map {
-            return@map BudgetDto(
-                budget = it,
-                progress = resolveBudgetProgress(it),
-            )
-        }
-    }
+//    fun getBudgets(userId: Long): List<BudgetDto> {
+//        budgetRepository.findAll(userId).map { budget ->
+//
+//        }
+//    }
 
     fun deleteBudgets(userId: Long, payload: BulkDeleteDto) {
         budgetRepository.delete(userId, *payload.ids.toLongArray())
@@ -69,35 +70,74 @@ class BudgetService(
         budgetRepository.delete(userId, budgetId)
     }
 
-    private fun resolveBudgetProgress(budget: Budget): BudgetProgressDto {
-        val ledgerRecords = ledgerRepository.findAll(budget.user.id)
-
-        val affectedLedgerRecords = ledgerRecords.filter { record ->
-            record.operation.date.isAfterInclusive(budget.fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
-                    && record.operation.date.isBeforeInclusive(budget.toDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
-                    && budget.accounts.map { it.id }.contains(record.account.id)
-                    && budget.categories.map { it.id }.contains(record.operation.category.id)
-        }
-
-        return resolveRecordsTotalBalance(affectedLedgerRecords, budget.currency.isoCode).let { amount ->
-            BudgetProgressDto().also {
-                if (amount.lt(BigDecimal.ZERO)) {
-                    it.percentage = amount.abs() * BigDecimal(100) / budget.limit
-                    it.amount = amount.abs()
-                }
+    private fun getPeriodDateRange(period: String, periodType: BudgetPeriodType): LocalDateRange {
+        return when (periodType) {
+            BudgetPeriodType.DAILY -> {
+                LocalDate.parse(period).let { LocalDateRange.ofClosed(it, it) }
+            }
+            BudgetPeriodType.WEEKLY -> {
+                LocalDateRange.ofClosed(
+                    YearWeek.parse(period).atDay(DayOfWeek.MONDAY),
+                    YearWeek.parse(period).atDay(DayOfWeek.SUNDAY)
+                )
+            }
+            BudgetPeriodType.MONTHLY -> {
+                LocalDateRange.ofClosed(
+                    YearMonth.parse(period).atDay(1),
+                    YearMonth.parse(period).atEndOfMonth()
+                )
+            }
+            BudgetPeriodType.QUARTERLY -> {
+                LocalDateRange.ofClosed(
+                    YearQuarter.parse(period).atDay(1),
+                    YearQuarter.parse(period).atEndOfQuarter()
+                )
+            }
+            BudgetPeriodType.ANNUALLY -> {
+                LocalDateRange.ofClosed(
+                    LocalDate.of(period.toInt(), Month.JANUARY, 1),
+                    LocalDate.of(period.toInt(), Month.DECEMBER, 31)
+                )
             }
         }
     }
 
-    private fun resolveRecordsTotalBalance(records: List<LedgerRecord>, currencyIsoCode: String): BigDecimal {
-        return records.map { record ->
-            val recordCurrencyIsoCode = record.account.currency.isoCode
+    private fun getBudgetPeriodProgress(budget: Budget, period: String): BigDecimal {
+        val periodRange = getPeriodDateRange(period, budget.periodType)
 
-            if (recordCurrencyIsoCode != currencyIsoCode) {
+        if (budget.endDate != null) {
+            val budgetRange = LocalDateRange.ofClosed(budget.startDate, budget.endDate)
+            if (!budgetRange.encloses(periodRange)) {
+                return BigDecimal.ZERO
+            }
+        } else {
+            if (periodRange.start.isBefore(budget.startDate)) {
+                return BigDecimal.ZERO
+            }
+        }
+
+        val ledgerRecords = ledgerRepository.findAll(budget.user.id).filter { record ->
+            periodRange.contains(record.operation.date.toLocalDate())
+                    && budget.accounts.map { it.id }.contains(record.account.id)
+                    && budget.category.id == record.operation.category?.id
+        }
+
+        return getRecordsTotalBalance(ledgerRecords, budget.currency.isoCode)
+            .takeIf { it > BigDecimal.ZERO } ?: BigDecimal.ZERO
+    }
+
+    private fun getRecordsTotalBalance(records: List<LedgerRecord>, currency: String): BigDecimal {
+        return records.map { record ->
+            val recordCurrency = record.account.currency.isoCode
+
+            if (recordCurrency != currency) {
                 try {
-                    val rate = currencyRateProvider.getCurrencyRate(base = recordCurrencyIsoCode, term = currencyIsoCode)
-                    return@map record.amountPosted * rate
-                } catch (e: CurrencyRateProvider.CurrencyRateClientException) {
+//                    val rate = runBlocking {
+//                        ecbClient.getFirstRateStartingFromDate(recordCurrency, currency, record.operation.date.toLocalDate())
+//                    }
+//                    return@map record.amountPosted * rate.value
+                    return BigDecimal.ONE
+                } catch (e: Exception) {
                     logger.error("Cannot convert record amount: $record")
                     return@map BigDecimal.ZERO
                 }

@@ -16,7 +16,7 @@ class OperationRepository {
 
     fun create(userId: Long, dto: OperationCreateDto): OperationEntity = transaction {
         val category = CategoryEntity.find {
-            CategoriesTable.name.eq(dto.category.name).and(CategoriesTable.group.eq(dto.categoryGroup))
+            CategoriesTable.name.eq(dto.category).and(CategoriesTable.group.eq(dto.categoryGroup))
         }.first()
 
         OperationEntity.new {

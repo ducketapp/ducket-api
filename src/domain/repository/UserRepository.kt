@@ -10,21 +10,17 @@ import domain.model.currency.CurrencyEntity
 import domain.model.imports.ImportRulesTable
 import domain.model.imports.ImportsTable
 import domain.model.user.User
-import io.ducket.api.BCRYPT_HASH_ROUNDS
 import io.ducket.api.domain.model.attachment.AttachmentsTable
 import io.ducket.api.domain.model.budget.BudgetsTable
-import io.ducket.api.domain.model.group.GroupEntity
-import io.ducket.api.domain.model.group.GroupMembershipsTable
 import io.ducket.api.domain.model.group.GroupsTable
 import io.ducket.api.domain.model.ledger.LedgerRecordEntity
 import io.ducket.api.domain.model.ledger.LedgerRecordsTable
 import domain.model.operation.OperationAttachmentsTable
 import domain.model.operation.OperationsTable
+import io.ducket.api.utils.HashUtils
 
-import io.ducket.api.getLogger
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.mindrot.jbcrypt.BCrypt
 import java.time.Instant
 
 class UserRepository {
@@ -35,7 +31,7 @@ class UserRepository {
             this.phone = dto.phone
             this.email = dto.email
             this.mainCurrency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(dto.currencyIsoCode) }.first()
-            this.passwordHash = BCrypt.hashpw(dto.password, BCrypt.gensalt(BCRYPT_HASH_ROUNDS))
+            this.passwordHash = HashUtils.hash(dto.password)
             Instant.now().also {
                 this.createdAt = it
                 this.modifiedAt = it
@@ -62,7 +58,7 @@ class UserRepository {
                 found.modifiedAt = Instant.now()
             }
             dto.password?.let {
-                found.passwordHash = BCrypt.hashpw(it, BCrypt.gensalt(BCRYPT_HASH_ROUNDS))
+                found.passwordHash = HashUtils.hash(it)
                 found.modifiedAt = Instant.now()
             }
         }?.toModel()
@@ -91,13 +87,7 @@ class UserRepository {
             }
         }
 
-        GroupEntity.find {
-            GroupsTable.creatorId.eq(userId)
-        }.map { it.id.value }.also {
-            GroupMembershipsTable.deleteWhere { GroupMembershipsTable.groupId.inList(it).or(GroupMembershipsTable.memberId.eq(userId)) }
-            GroupsTable.deleteWhere { GroupsTable.id.inList(it) }
-        }
-
+        GroupsTable.deleteWhere { GroupsTable.ownerId.eq(userId) }
         BudgetsTable.deleteWhere { BudgetsTable.userId.eq(userId) }
         ImportsTable.deleteWhere { ImportsTable.userId.eq(userId) }
         ImportRulesTable.deleteWhere { ImportRulesTable.userId.eq(userId) }

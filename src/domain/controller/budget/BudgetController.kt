@@ -28,16 +28,17 @@ class BudgetController(
     suspend fun getBudgets(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
 
-        budgetService.getBudgetsAccessibleToUser(userId).apply {
-            ctx.respond(HttpStatusCode.OK, this)
-        }
+//        budgetService.getBudgets(userId).apply {
+//            ctx.respond(HttpStatusCode.OK, this)
+//        }
     }
 
     suspend fun getBudget(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
         val budgetId = ctx.parameters.getOrFail("budgetId").toLong()
+        val period = ctx.request.queryParameters["period"]
 
-        budgetService.getBudgetAccessibleToUser(userId, budgetId).apply {
+        budgetService.getBudget(userId, budgetId, period).apply {
             ctx.respond(HttpStatusCode.OK, this)
         }
     }

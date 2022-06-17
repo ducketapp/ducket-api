@@ -11,6 +11,9 @@ import domain.model.user.UserEntity
 import domain.model.user.UsersTable
 import io.ducket.api.domain.model.attachment.Attachment
 import io.ducket.api.domain.model.attachment.AttachmentEntity
+import io.ducket.api.domain.model.operation.OperationTagsTable
+import io.ducket.api.domain.model.tag.Tag
+import io.ducket.api.domain.model.tag.TagEntity
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -21,7 +24,7 @@ import java.time.Instant
 
 internal object OperationsTable : LongIdTable("operation") {
     val userId = reference("user_id", UsersTable)
-    val categoryId = reference("category_id", CategoriesTable)
+    val categoryId = optReference("category_id", CategoriesTable)
     val importId = optReference("import_id", ImportsTable)
     val description = varchar("description", 64).nullable()
     val subject = varchar("subject", 64).nullable()
@@ -37,7 +40,7 @@ class OperationEntity(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<OperationEntity>(OperationsTable)
 
     var user by UserEntity referencedOn OperationsTable.userId
-    var category by CategoryEntity referencedOn OperationsTable.categoryId
+    var category by CategoryEntity optionalReferencedOn OperationsTable.categoryId
     var import by ImportEntity optionalReferencedOn OperationsTable.importId
     var description by OperationsTable.description
     var subject by OperationsTable.subject
@@ -49,16 +52,18 @@ class OperationEntity(id: EntityID<Long>) : LongEntity(id) {
     var modifiedAt by OperationsTable.modifiedAt
 
     var attachments by AttachmentEntity via OperationAttachmentsTable
+    var tags by TagEntity via OperationTagsTable
 
     fun toModel() = Operation(
         id = id.value,
         user = user.toModel(),
-        category = category.toModel(),
+        category = category?.toModel(),
         import = import?.toModel(),
         description = description,
         subject = subject,
         notes = notes,
         attachments = attachments.toList().map { it.toModel() },
+        tags = tags.toList().map { it.toModel() },
         latitude = latitude,
         longitude = longitude,
         date = date,
@@ -70,12 +75,13 @@ class OperationEntity(id: EntityID<Long>) : LongEntity(id) {
 data class Operation(
     val id: Long,
     val user: User,
-    val category: Category,
+    val category: Category?,
     val import: Import?,
     val description: String?,
     val subject: String?,
     val notes: String?,
     val attachments: List<Attachment>,
+    val tags: List<Tag>,
     val latitude: BigDecimal?,
     val longitude: BigDecimal?,
     val date: Instant,

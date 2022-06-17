@@ -9,7 +9,6 @@ import java.time.Instant
 data class LedgerRecordCreateDto(
     var rate: BigDecimal? = null,
     val transferAccountId: Long? = null,
-    val transfer: Boolean,
     val amount: BigDecimal,
     val type: LedgerRecordType,
     val accountId: Long,
@@ -17,17 +16,16 @@ data class LedgerRecordCreateDto(
 ) {
     fun validate(): LedgerRecordCreateDto {
         org.valiktor.validate(this) {
-            if (transfer) {
-                validate(LedgerRecordCreateDto::rate).isPositive().scaleBetween(0, 4)
-                validate(LedgerRecordCreateDto::transferAccountId).isGreaterThan(0L)
-                validate(LedgerRecordCreateDto::type).isEqualTo(LedgerRecordType.EXPENSE)
+            if (transferAccountId != null) {
+                validate(LedgerRecordCreateDto::rate).isNotNull().isPositive().scaleBetween(0, 4)
+                validate(LedgerRecordCreateDto::transferAccountId).isNotNull().isPositive()
+                validate(LedgerRecordCreateDto::type).isNotNull().isEqualTo(LedgerRecordType.EXPENSE)
             } else {
-                validate(LedgerRecordCreateDto::type).isNotNull()
                 validate(LedgerRecordCreateDto::rate).isNull()
-                validate(LedgerRecordCreateDto::transferAccountId).isNull()
             }
+
             validate(LedgerRecordCreateDto::amount).isPositive().scaleBetween(0, 2)
-            validate(LedgerRecordCreateDto::accountId).isGreaterThan(0L)
+            validate(LedgerRecordCreateDto::accountId).isPositive()
             validate(LedgerRecordCreateDto::operation).isNotNull().validate {
                 validate(OperationCreateDto::category).isNotNull()
                 validate(OperationCreateDto::categoryGroup).isNotNull()

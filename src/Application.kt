@@ -1,202 +1,134 @@
 package io.ducket.api
 
-import com.fasterxml.jackson.databind.SerializationFeature
+import clients.rates.ReferenceRatesClient
+import io.ducket.api.app.database.AppDatabase
 import io.ducket.api.app.di.AppModule
-import io.ducket.api.app.database.DatabaseFactory
-import io.ducket.api.auth.Authorization
+import io.ducket.api.app.scheduler.AppJobFactory
+import io.ducket.api.app.scheduler.ObsoleteDataCleanUpJob
 import io.ducket.api.auth.UserPrincipal
 import io.ducket.api.config.*
-import io.ducket.api.domain.controller.account.AccountController
-import io.ducket.api.domain.controller.budget.BudgetController
-import io.ducket.api.domain.controller.category.CategoryController
-import io.ducket.api.domain.controller.currency.CurrencyController
-import io.ducket.api.domain.controller.group.GroupController
-import io.ducket.api.domain.controller.ledger.LedgerController
-import io.ducket.api.domain.controller.rule.ImportRuleController
-import io.ducket.api.domain.controller.user.UserController
-import io.ducket.api.plugins.AuthenticationException
-import io.ducket.api.plugins.AuthorizationException
-import io.ducket.api.plugins.applicationStatusPages
-import io.ducket.api.plugins.defaultStatusPages
-import io.ducket.api.routes.*
+import io.ducket.api.domain.repository.CurrencyRepository
+import io.ducket.api.domain.service.CurrencyRateService
+import io.ducket.api.plugins.*
 import io.ktor.application.*
 import io.ktor.auth.*
-import io.ktor.auth.jwt.*
-import io.ktor.features.*
-import io.ktor.http.*
-import io.ktor.jackson.*
-import io.ktor.metrics.micrometer.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics
-import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics
-import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics
-import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics
-import io.micrometer.core.instrument.binder.system.FileDescriptorMetrics
-import io.micrometer.core.instrument.binder.system.ProcessorMetrics
-import io.micrometer.core.instrument.binder.system.UptimeMetrics
-import io.micrometer.prometheus.PrometheusConfig
-import io.micrometer.prometheus.PrometheusMeterRegistry
-import org.koin.core.module.Module
-import org.koin.ktor.ext.Koin
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import org.jetbrains.exposed.sql.transactions.TransactionManager
+import org.koin.core.qualifier.named
 import org.koin.ktor.ext.inject
-import org.koin.logger.SLF4JLogger
+import org.quartz.*
+import org.quartz.impl.StdSchedulerFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.slf4j.event.Level
 import java.nio.file.Paths
 import java.util.*
 
-const val BCRYPT_HASH_ROUNDS = 12
-
-fun main(args: Array<String>): Unit {
+fun main(args: Array<String>) {
     embeddedServer(Netty, commandLineEnvironment(args)).start(wait = true)
 }
 
 @Suppress("unused")
 @kotlin.jvm.JvmOverloads
-fun Application.module(
-    testing: Boolean = false,
-    diModules: MutableList<Module> = mutableListOf(AppModule.configModule, AppModule.appModule),
-) {
-    install(Koin) {
-        SLF4JLogger()
-        modules(diModules)
-    }
+fun Application.module(testing: Boolean = false) {
+    installDependencyInjection()
+    initializeAppConfig()
+    initializeDatabases()
+    installCallLogging()
+    installMetrics()
+    installAuthentication()
+    installAuthorization()
+    installDefaultHeaders()
+    installSerialization()
+    installRouting()
+    installErrorHandling()
+    initializeSchedulers()
 
-    this.setupAppConfig()
+    // pullReferenceRatesStaticData()
+}
 
-    val appConfig by inject<AppConfig>()
-    val database by inject<DatabaseFactory>()
-    val jwtManager by inject<JwtManager>()
-    val ratesClient by inject<CurrencyRateProvider>()
+private fun Application.pullReferenceRatesStaticData() {
+    val referenceRatesClient by inject<ReferenceRatesClient>()
+    val currencyRateService by inject<CurrencyRateService>()
+    val currencyRepository by inject<CurrencyRepository>()
 
-    database.connect()
-    ratesClient.pullRates()
-    DatabaseFilesCleanUpScheduler(5 * 60 * 1000).start()
+    CoroutineScope(Job() + Dispatchers.IO).launch {
+        val supportedCurrencies = currencyRepository.findAll().map { it.isoCode }
+        val result = referenceRatesClient.getAllRates(*supportedCurrencies.toTypedArray())
 
-    install(CallLogging) {
-        level = Level.DEBUG
-
-        filter { call -> call.request.path().startsWith("/") }
-        format { call ->
-            val status = call.response.status()
-            val uri = call.request.uri
-            val httpMethod = call.request.httpMethod.value
-            val userAgent = call.request.headers["User-Agent"]
-            "($status) [$httpMethod], $userAgent - $uri"
-        }
-    }
-
-    val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
-
-    install(MicrometerMetrics) {
-        registry = appMicrometerRegistry
-        meterBinders = listOf(
-            ClassLoaderMetrics(),
-            JvmMemoryMetrics(),
-            JvmGcMetrics(),
-            ProcessorMetrics(),
-            JvmThreadMetrics(),
-            FileDescriptorMetrics(),
-            UptimeMetrics()
-        )
-    }
-
-    install(Authentication) {
-        jwt {
-            verifier(jwtManager.verifier)
-            // what to do when a non-authenticated request is made to a protected URL
-            challenge { _, _ -> throw AuthenticationException("Invalid auth token") }
-            // defines how to extract a Principal from a session
-            validate {
-                jwtManager.validateToken(jwtCredential = it)
-            }
-        }
-    }
-
-    install(Authorization) {
-        getRoles { principal ->
-            (principal as UserPrincipal).roles
-        }
-    }
-
-    install(DefaultHeaders) {
-        header("X-Engine", "Ktor") // will send this header with each response
-    }
-
-    install(ContentNegotiation) {
-        jackson {
-            enable(SerializationFeature.INDENT_OUTPUT)
-        }
-    }
-
-    val userController: UserController by inject()
-    val accountController: AccountController by inject()
-    val categoryController: CategoryController by inject()
-    val budgetController: BudgetController by inject()
-    val currencyController: CurrencyController by inject()
-    val groupController: GroupController by inject()
-    val importRuleController: ImportRuleController by inject()
-    val ledgerController: LedgerController by inject()
-
-    install(Routing) {
-        get("/metrics") {
-            call.respond(appMicrometerRegistry.scrape())
-        }
-
-        route("/api") {
-            intercept(ApplicationCallPipeline.Call) {
-                // TODO refactor
-                if (!call.request.path().contains("auth") && !call.request.path().contains("currencies")) {
-                    val currentUserId = call.authentication.principalOrThrow().id
-
-                    call.parameters["userId"]?.toLong()?.let { requestedUserId ->
-                        if (currentUserId != requestedUserId) {
-                            // let the user to access user data in readonly mode
-                            if (call.request.httpMethod != HttpMethod.Get) {
-                                throw AuthorizationException("Access restricted")
-                            }
-                        }
-                    }
-                }
-            }
-
-            root()
-            currencies(currencyController)
-            users(userController)
-            accounts(accountController)
-            categories(categoryController)
-            budgets(budgetController)
-            groups(groupController)
-            importRules(importRuleController)
-            ledgerRecords(ledgerController)
-        }
-    }
-
-    install(StatusPages) {
-        defaultStatusPages()
-        applicationStatusPages()
+        currencyRateService.putCurrencyRates(result.dataSet.references)
     }
 }
 
-/**
- * Required environment variables:
- * APP_SECRET, DB_USER, DB_PASSWORD
- */
-@Suppress("unused")
-private fun Application.setupAppConfig() {
+private fun Application.initializeDatabases() {
+    val mainDatabase by inject<AppDatabase>(named(AppModule.DatabaseType.MAIN_DB))
+    // val schedulerDatabase by inject<AppDatabase>(named(AppModule.DatabaseType.SCHEDULER_DB))
+
+    mainDatabase.connect()
+    // schedulerDatabase.connect()
+
+    TransactionManager.defaultDatabase = mainDatabase.database
+}
+
+private fun Application.initializeSchedulers() {
+    val appConfig by inject<AppConfig>()
+    val jobFactory by inject<AppJobFactory>()
+
+    val schedulerProperties = Properties().apply {
+        setProperty("org.quartz.scheduler.instanceName", "QuartzScheduler")
+        setProperty("org.quartz.threadPool.threadCount", "3")
+        setProperty("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool")
+        setProperty("org.quartz.jobStore.class", "org.quartz.simpl.RAMJobStore")
+
+        setProperty("org.quartz.plugin.jobHistory.class", "org.quartz.plugins.history.LoggingJobHistoryPlugin")
+        setProperty("org.quartz.plugin.jobHistory.jobToBeFiredMessage", """Job [{1}.{0}] to be fired by trigger [{4}.{3}], re-fire: {7}""")
+        setProperty("org.quartz.plugin.jobHistory.jobSuccessMessage", """Job [{1}.{0}] execution complete and reports: {8}""")
+        setProperty("org.quartz.plugin.jobHistory.jobFailedMessage", """Job [{1}.{0}] execution failed with exception: {8}""")
+        setProperty("org.quartz.plugin.jobHistory.jobWasVetoedMessage", """Job [{1}.{0}] was vetoed. It was to be fired by trigger [{4}.{3}] at: {2, date, dd-MM-yyyy HH:mm:ss.SSS}""")
+
+        setProperty("org.quartz.plugin.triggerHistory.class", "org.quartz.plugins.history.LoggingTriggerHistoryPlugin")
+        setProperty("org.quartz.plugin.triggerHistory.triggerFiredMessage", """Trigger [{1}.{0}] fired job [{6}.{5}] scheduled at: {2, date, dd-MM-yyyy HH:mm:ss.SSS}, next scheduled at: {3, date, dd-MM-yyyy HH:mm:ss.SSS}""")
+        setProperty("org.quartz.plugin.triggerHistory.triggerCompleteMessage", """Trigger [{1}.{0}] completed firing job [{6}.{5}] with resulting trigger instruction code: {9}. Next scheduled at: {3, date, dd-MM-yyyy HH:mm:ss.SSS}""")
+        setProperty("org.quartz.plugin.triggerHistory.triggerMisfiredMessage", """Trigger [{1}.{0}] misfired job [{6}.{5}]. Should have fired at: {3, date, dd-MM-yyyy HH:mm:ss.SSS}""")
+
+        setProperty("org.quartz.plugin.shutdownHook.class", "org.quartz.plugins.management.ShutdownHookPlugin")
+        setProperty("org.quartz.plugin.shutdownHook.cleanShutdown", "true")
+    }
+
+    val jobDetail: JobDetail = JobBuilder.newJob(ObsoleteDataCleanUpJob::class.java)
+        .withIdentity("ObsoleteDataCleanUpJob", "SchedulerGroup")
+        .usingJobData(ObsoleteDataCleanUpJob.JOB_DATA_PATH_KEY, appConfig.localDataConfig.dbDataPath)
+        .build()
+
+    val trigger: Trigger = TriggerBuilder.newTrigger()
+        .withIdentity("EveryOneMinuteTrigger", "SchedulerGroup")
+        .withSchedule(
+            SimpleScheduleBuilder
+                .simpleSchedule()
+                .withIntervalInMinutes(1)
+                .repeatForever()
+        ).build()
+
+    val scheduler = StdSchedulerFactory(schedulerProperties).scheduler
+
+    scheduler.start()
+    scheduler.setJobFactory(jobFactory)
+    scheduler.scheduleJob(jobDetail, trigger)
+}
+
+private fun Application.initializeAppConfig() {
     val appConfig by inject<AppConfig>()
 
     System.setProperty("handlers", "org.slf4j.bridge.SLF4JBridgeHandler")
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 
-    val dbDataPath = System.getProperty("data.path", "resources/data")
+    val dbDataPath = System.getProperty("data.path", "resources/database/data")
     val ecbDataPath = System.getProperty("ecb.path", Paths.get(System.getProperty("java.io.tmpdir"), "ecb").toString())
-    val hoconConfig = this.environment.config.config("ktor")
+    val hoconConfig = environment.config.config("ktor")
 
     appConfig.apply {
         this.serverConfig = ServerConfig(
@@ -204,9 +136,12 @@ private fun Application.setupAppConfig() {
             port = hoconConfig.property("deployment.port").getString().toInt(),
         )
 
-        this.databaseConfig = DatabaseConfig(
+        this.databaseServerConfig = DatabaseServerConfig(
+            schema = DatabaseServerSchemaConfig(
+                main = hoconConfig.property("database.schema.main").getString(),
+                scheduler = hoconConfig.property("database.schema.scheduler").getString(),
+            ),
             driver = hoconConfig.property("database.driver").getString(),
-            database = hoconConfig.property("database.name").getString(),
             host = hoconConfig.property("database.host").getString(),
             port = hoconConfig.property("database.port").getString().toInt(),
             user = hoconConfig.property("database.user").getString(),
@@ -220,7 +155,7 @@ private fun Application.setupAppConfig() {
         )
 
         this.localDataConfig = LocalDataConfig(
-            ecbDataPath = ecbDataPath,
+            exrDataPath = ecbDataPath,
             dbDataPath = dbDataPath,
         )
     }

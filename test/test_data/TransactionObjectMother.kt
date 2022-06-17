@@ -1,8 +1,8 @@
 package io.ducket.api.test_data
 
 import domain.model.operation.Transaction
-import io.ducket.api.app.CategoryType
-import io.ducket.api.app.CategoryTypeGroup
+import io.ducket.api.app.DefaultCategory
+import io.ducket.api.app.DefaultCategoryGroup
 import io.ducket.api.domain.controller.transaction.TransactionCreateDto
 import java.math.BigDecimal
 import java.time.Instant
@@ -29,8 +29,8 @@ class TransactionObjectMother {
         fun newCorrectiveTransaction(amount: BigDecimal) = TransactionCreateDto(
             amount = amount,
             accountId = AccountObjectMother.account().id,
-            category = CategoryType.OTHER,
-            categoryGroup = CategoryTypeGroup.OTHER,
+            category = DefaultCategory.OTHER,
+            categoryGroup = DefaultCategoryGroup.OTHER,
             notes = "Corrective transaction",
             date = Instant.ofEpochSecond(1642708900),
         )

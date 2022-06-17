@@ -49,7 +49,7 @@ class AccountObjectMother {
             notes = "Account in United States dollar",
             currencyIsoCode = "USD",
             startBalance = BigDecimal.ZERO,
-            accountType = AccountType.CASH,
+            type = AccountType.CASH,
         )
     }
 }

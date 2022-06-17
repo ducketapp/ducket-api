@@ -3,7 +3,7 @@ buildscript {
         kotlin_version = "1.6.10"
         logback_version = "1.2.1"
         log4j_version = "2.14.1"
-        ktor_version = "1.5.1"
+        ktor_version = "1.6.8"
         ktorm_version = "3.2.0"
         kodein_version = "6.1.0"
         hikaricp_version = "3.4.5"
@@ -99,6 +99,9 @@ dependencies {
     implementation "io.ktor:ktor-metrics-micrometer:$ktor_version"
     implementation "io.micrometer:micrometer-registry-prometheus:1.7.1"
 
+    // Job Scheduler
+    implementation "org.quartz-scheduler:quartz:2.3.2"
+
     // Koin DI
     implementation "io.insert-koin:koin-ktor:3.1.4"
     implementation "io.insert-koin:koin-logger-slf4j:3.1.4"
@@ -117,7 +120,7 @@ dependencies {
     implementation "org.ahocorasick:ahocorasick:0.4.0"
 
     // validation
-    implementation "io.konform:konform:0.3.0"
+    implementation "io.konform:konform-jvm:0.3.0"
     implementation "org.valiktor:valiktor-core:0.12.0"
 
     // password hashing
@@ -128,7 +131,12 @@ dependencies {
 
     // Ktor's core components
     implementation "io.ktor:ktor-server-core:$ktor_version"
+    implementation "io.ktor:ktor-server:$ktor_version"
     implementation "io.ktor:ktor-server-host-common:$ktor_version"
+    implementation "io.ktor:ktor-server-netty:$ktor_version"
+
+    // Java time extension
+    implementation "org.threeten:threeten-extra:1.7.0"
 
     // auth
     implementation "io.ktor:ktor-auth:$ktor_version"
@@ -144,23 +152,21 @@ dependencies {
     implementation "org.flywaydb:flyway-core:$flyway_version"
     implementation "org.flywaydb:flyway-mysql:$flyway_version" // otherwise FlywayException: Unsupported Database: MySQL 8.0
 
-    // Netty engine
-    implementation "io.ktor:ktor-server-netty:$ktor_version"
-
-    // cio engine
+    // Client
+    implementation "io.ktor:ktor-client-core:$ktor_version"
     implementation "io.ktor:ktor-client-cio:$ktor_version"
+    implementation "io.ktor:ktor-client-apache:$ktor_version"
+    implementation "io.ktor:ktor-client-serialization:$ktor_version"
+    implementation "io.ktor:ktor-client-jackson:$ktor_version"
+    implementation "io.ktor:ktor-client-logging:$ktor_version"
 
     // An implementation of SLF4J
     implementation "ch.qos.logback:logback-classic:$logback_version"
     implementation "org.slf4j:jul-to-slf4j:1.7.0"
 
-    // client serialization
-    implementation "io.ktor:ktor-client-serialization:$ktor_version"
-    implementation "io.ktor:ktor-client-jackson:$ktor_version"
+    // for serialization/deserialization
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.11.1"
     implementation "org.apache.camel:camel-xpath:3.9.0"
-
-    // for serialization/deserialization
     implementation "io.ktor:ktor-jackson:$ktor_version"
 
     // provides a convenient mechanism for converting Kotlin objects into a serialized form like JSON, and vice versa

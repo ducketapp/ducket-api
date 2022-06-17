@@ -1,15 +1,14 @@
 package io.ducket.api.domain.controller.group
 
-import org.valiktor.functions.*
+import org.valiktor.functions.hasSize
+import org.valiktor.functions.isNotEmpty
 
 data class GroupCreateDto(
     val name: String,
-    val members: List<GroupMembershipCreateDto>,
 ) {
     fun validate(): GroupCreateDto {
         org.valiktor.validate(this) {
-            validate(GroupCreateDto::name).isNotBlank().hasSize(1, 64)
-            members.forEach { it.validate() }
+            validate(GroupCreateDto::name).isNotEmpty().hasSize(1, 32)
         }
         return this
     }

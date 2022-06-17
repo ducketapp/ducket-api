@@ -27,7 +27,6 @@ class InstantSerializer : StdSerializer<Instant>(Instant::class.java) {
 
     override fun serialize(value: Instant?, gen: JsonGenerator?, provider: SerializerProvider?) {
         gen?.writeString(DateTimeFormatter.ISO_INSTANT.format(value))
-        // gen?.writeString(DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(value?.atZone(ZoneId.of("Europe/Warsaw"))))
     }
 }
 

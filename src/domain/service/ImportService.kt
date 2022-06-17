@@ -1,28 +1,16 @@
 package io.ducket.api.domain.service
 
 import domain.model.imports.ImportRule
-import io.ducket.api.app.CategoryType
 import io.ducket.api.app.ImportRuleLookupType.*
 import io.ducket.api.app.LedgerRecordType
 import io.ducket.api.app.LedgerRecordType.*
 import io.ducket.api.domain.controller.imports.CsvRecordDto
 import io.ducket.api.domain.controller.imports.ImportDto
-import io.ducket.api.domain.controller.ledger.LedgerRecordCreateDto
-import io.ducket.api.domain.controller.ledger.LedgerRecordDto
-import io.ducket.api.domain.controller.ledger.OperationCreateDto
 import io.ducket.api.domain.repository.*
-import io.ducket.api.getLogger
 import io.ducket.api.plugins.InvalidDataException
-import io.ducket.api.plugins.NoEntityFoundException
 import io.ducket.api.utils.trimWhitespaces
-import io.ktor.http.content.*
 import org.ahocorasick.trie.Trie
-import org.apache.commons.csv.CSVFormat
-import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVRecord
-import org.jetbrains.exposed.sql.transactions.transaction
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.lang.Exception
 import java.time.Instant
 import java.time.format.DateTimeParseException
@@ -150,7 +138,7 @@ class ImportService(
                 if (rule != null) {
                     csvRecord.category = rule.category.name
                 } else {
-                    csvRecord.category = CategoryType.UNCATEGORIZED.name
+                    csvRecord.category = "Uncategorized"
                 }
             }
 

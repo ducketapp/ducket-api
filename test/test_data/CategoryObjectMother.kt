@@ -1,16 +1,16 @@
 package io.ducket.api.test_data
 
 import domain.model.category.Category
-import io.ducket.api.app.CategoryType
-import io.ducket.api.app.CategoryTypeGroup
+import io.ducket.api.app.DefaultCategory
+import io.ducket.api.app.DefaultCategoryGroup
 
 class CategoryObjectMother {
     companion object {
 
         fun category() = Category(
             id = 1L,
-            name = CategoryType.GROCERY.name,
-            group = CategoryTypeGroup.FOOD_AND_DRINKS,
+            name = DefaultCategory.GROCERY.name,
+            group = DefaultCategoryGroup.FOOD,
         )
     }
 }

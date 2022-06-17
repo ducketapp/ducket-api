@@ -1,10 +1,9 @@
 package io.ducket.api.test_data
 
 import domain.model.user.User
-import io.ducket.api.domain.controller.user.UserAuthDto
+import io.ducket.api.domain.controller.user.UserAuthenticateDto
 import io.ducket.api.domain.controller.user.UserCreateDto
 import io.ducket.api.domain.controller.user.UserUpdateDto
-import org.mindrot.jbcrypt.BCrypt
 import java.math.BigDecimal
 import java.time.Instant
 
@@ -41,7 +40,7 @@ class UserObjectMother {
             currencyIsoCode = "USD",
         )
 
-        fun authUser(): UserAuthDto = UserAuthDto(
+        fun authUser(): UserAuthenticateDto = UserAuthenticateDto(
             email = "johnwick@test.com",
             password = "1234",
         )

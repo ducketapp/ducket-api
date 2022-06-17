@@ -1,5 +1,6 @@
 package io.ducket.api.domain.repository
 
+import domain.model.category.CategoryEntity
 import domain.model.currency.CurrenciesTable
 import domain.model.currency.CurrencyEntity
 import domain.model.user.UserEntity
@@ -14,29 +15,22 @@ class BudgetRepository {
 
     fun create(userId: Long, dto: BudgetCreateDto): Budget = transaction {
         BudgetEntity.new {
-            this.name = dto.name
             this.currency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(dto.currencyIsoCode) }.first()
-            this.fromDate = dto.fromDate
-            this.toDate = dto.toDate
-            this.limit = dto.threshold
+            this.category = CategoryEntity[dto.categoryId]
             this.user = UserEntity[userId]
-            this.closed = false
+            this.title = dto.title
+            // this.defaultLimit = dto.defaultLimit
+            this.startDate = dto.startDate
+            this.endDate = null
             Instant.now().also {
                 this.createdAt = it
                 this.modifiedAt = it
             }
-        }.also { newBudget ->
+        }.also { budget ->
             dto.accountIds.forEach { accountId ->
                 BudgetAccountsTable.insert {
-                    it[this.budgetId] = newBudget.id
+                    it[this.budgetId] = budget.id
                     it[this.accountId] = accountId
-                }
-            }
-
-            dto.categoryIds.forEach { categoryId ->
-                BudgetCategoriesTable.insert {
-                    it[this.budgetId] = newBudget.id
-                    it[this.categoryId] = categoryId
                 }
             }
         }.toModel()
@@ -50,7 +44,7 @@ class BudgetRepository {
 
     fun findOneByName(userId: Long, name: String): Budget? = transaction {
         BudgetEntity.find {
-            BudgetsTable.userId.eq(userId).and(BudgetsTable.name.eq(name))
+            BudgetsTable.userId.eq(userId).and(BudgetsTable.title.eq(name))
         }.firstOrNull()?.toModel()
     }
 

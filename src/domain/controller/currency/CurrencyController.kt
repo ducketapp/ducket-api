@@ -9,10 +9,10 @@ class CurrencyController(
     private val currencyService: CurrencyService,
 ) {
 
-    suspend fun getCurrenciesRates(ctx: ApplicationCall) {
-        val currenciesRates = currencyService.getCurrenciesRates()
-        ctx.respond(HttpStatusCode.OK, currenciesRates)
-    }
+//    suspend fun getCurrenciesRates(ctx: ApplicationCall) {
+//        val currenciesRates = currencyService.getCurrenciesRates()
+//        ctx.respond(HttpStatusCode.OK, currenciesRates)
+//    }
 
     suspend fun getCurrencies(ctx: ApplicationCall) {
         val exchangeRates = currencyService.getCurrencies()

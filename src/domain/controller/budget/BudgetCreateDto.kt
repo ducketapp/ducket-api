@@ -1,6 +1,7 @@
 package io.ducket.api.domain.controller.budget
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import io.ducket.api.app.BudgetPeriodType
 import io.ducket.api.utils.LocalDateDeserializer
 import io.ducket.api.utils.scaleBetween
 import org.valiktor.functions.*
@@ -9,25 +10,32 @@ import java.time.LocalDate
 
 
 data class BudgetCreateDto(
-    val threshold: BigDecimal,
-    val name: String,
+    val title: String,
+    val defaultLimit: BigDecimal,
+    val currentPeriod: String,
+    val periodType: BudgetPeriodType? = null,
     val notes: String?,
     val currencyIsoCode: String,
+    val categoryId: Long,
     val accountIds: List<Long>,
-    val categoryIds: List<Long>,
-    @JsonDeserialize(using = LocalDateDeserializer::class) val fromDate: LocalDate,
-    @JsonDeserialize(using = LocalDateDeserializer::class) val toDate: LocalDate,
+    @JsonDeserialize(using = LocalDateDeserializer::class) val startDate: LocalDate,
+    @JsonDeserialize(using = LocalDateDeserializer::class) val endDate: LocalDate?,
 ) {
     fun validate(): BudgetCreateDto {
         org.valiktor.validate(this) {
-            validate(BudgetCreateDto::threshold).isPositive().scaleBetween(0, 2)
+            if (periodType != null) {
+                validate(BudgetCreateDto::endDate).isNull()
+            } else {
+                validate(BudgetCreateDto::endDate).isNotNull().isGreaterThanOrEqualTo(startDate)
+                validate(BudgetCreateDto::startDate).isLessThanOrEqualTo(endDate!!)
+            }
+            validate(BudgetCreateDto::currentPeriod).isNotBlank().hasSize(1, 16)
+            validate(BudgetCreateDto::defaultLimit).isNotZero().isPositive().scaleBetween(0, 2)
             validate(BudgetCreateDto::notes).hasSize(1, 128)
-            validate(BudgetCreateDto::name).isNotBlank().hasSize(1, 64)
+            validate(BudgetCreateDto::title).isNotBlank().hasSize(1, 32)
             validate(BudgetCreateDto::currencyIsoCode).isNotBlank().hasSize(3)
-            validate(BudgetCreateDto::fromDate).isNotNull()
-            validate(BudgetCreateDto::toDate).isNotNull()
-            validate(BudgetCreateDto::accountIds).isNotNull().isNotEmpty()
-            validate(BudgetCreateDto::categoryIds).isNotNull().isNotEmpty()
+            validate(BudgetCreateDto::accountIds).isNotEmpty()
+            validate(BudgetCreateDto::categoryId).isPositive()
         }
         return this
     }

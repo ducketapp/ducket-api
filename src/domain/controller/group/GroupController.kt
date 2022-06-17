@@ -1,6 +1,8 @@
 package io.ducket.api.domain.controller.group
 
-import io.ducket.api.domain.controller.BulkDeleteDto
+import io.ducket.api.auth.JwtManager
+import io.ducket.api.auth.UserPrincipal
+import io.ducket.api.auth.UserRole
 import io.ducket.api.domain.service.GroupService
 import io.ducket.api.principalOrThrow
 import io.ktor.application.*
@@ -9,12 +11,14 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.util.*
+import org.koin.java.KoinJavaComponent.inject
 
 class GroupController(
-    private val groupService: GroupService,
+    private val groupService: GroupService
 ) {
+    private val jwtManager: JwtManager by inject(JwtManager::class.java)
 
-    suspend fun createGroup(ctx: ApplicationCall) {
+    suspend fun addGroup(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
 
         ctx.receive<GroupCreateDto>().apply {
@@ -27,7 +31,7 @@ class GroupController(
     suspend fun getGroups(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
 
-        groupService.getGroupsByMember(userId).apply {
+        groupService.getGroups(userId).apply {
             ctx.respond(HttpStatusCode.OK, this)
         }
     }
@@ -36,7 +40,20 @@ class GroupController(
         val userId = ctx.authentication.principalOrThrow().id
         val groupId = ctx.parameters.getOrFail("groupId").toLong()
 
-        groupService.getGroupByMember(userId, groupId).apply {
+        groupService.getGroup(userId, groupId).run {
+            if (owner.id != userId) {
+                ctx.response.header(
+                    name = HttpHeaders.Authorization,
+                    value = jwtManager.getAuthorizationHeaderValue(
+                        UserPrincipal(
+                            id = owner.id,
+                            email = owner.email,
+                            role = UserRole.SHARED_USER
+                        )
+                    ),
+                )
+            }
+
             ctx.respond(HttpStatusCode.OK, this)
         }
     }
@@ -52,16 +69,6 @@ class GroupController(
         }
     }
 
-    suspend fun deleteGroups(ctx: ApplicationCall) {
-        val userId = ctx.authentication.principalOrThrow().id
-
-        ctx.receive<BulkDeleteDto>().apply {
-            groupService.deleteGroups(userId, this.validate()).apply {
-                ctx.respond(HttpStatusCode.NoContent)
-            }
-        }
-    }
-
     suspend fun deleteGroup(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
         val groupId = ctx.parameters.getOrFail("groupId").toLong()
@@ -71,36 +78,44 @@ class GroupController(
         ctx.respond(HttpStatusCode.NoContent)
     }
 
-    suspend fun addGroupMembership(ctx: ApplicationCall) {
+//    suspend fun getGroupMembership(ctx: ApplicationCall) {
+//        val user = ctx.authentication.principalOrThrow()
+//        val groupId = ctx.parameters.getOrFail("groupId").toLong()
+//
+//        groupService.getGroupMembership(user, groupId).apply {
+//            ctx.respond(HttpStatusCode.OK, this)
+//        }
+//    }
+
+    suspend fun addGroupMember(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
         val groupId = ctx.parameters.getOrFail("groupId").toLong()
 
-        ctx.receive<GroupMembershipCreateDto>().apply {
-            groupService.createGroupMembership(userId, groupId, this.validate()).apply {
-                ctx.respond(HttpStatusCode.Created, this)
-            }
-        }
-    }
-
-    suspend fun deleteGroupMemberships(ctx: ApplicationCall) {
-        val userId = ctx.authentication.principalOrThrow().id
-        val groupId = ctx.parameters.getOrFail("groupId").toLong()
-
-        ctx.receive<GroupMembershipDeleteDto>().apply {
-            groupService.deleteGroupMemberships(userId, groupId, this.validate()).apply {
+        ctx.receive<GroupMemberCreateDto>().apply {
+            groupService.addGroupMember(userId, groupId, this.validate()).apply {
                 ctx.respond(HttpStatusCode.OK, this)
             }
         }
     }
 
-    suspend fun updateGroupMembership(ctx: ApplicationCall) {
+    suspend fun deleteGroupMember(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
         val groupId = ctx.parameters.getOrFail("groupId").toLong()
         val membershipId = ctx.parameters.getOrFail("membershipId").toLong()
 
-        ctx.receive<GroupMembershipActionDto>().apply {
-            groupService.applyGroupMembershipAction(userId, groupId, membershipId, this.validate()).apply {
-                ctx.respond(HttpStatusCode.NoContent)
+        groupService.deleteGroupMember(userId, groupId, membershipId)
+
+        ctx.respond(HttpStatusCode.NoContent)
+    }
+
+    suspend fun updateGroupMember(ctx: ApplicationCall) {
+        val userId = ctx.authentication.principalOrThrow().id
+        val groupId = ctx.parameters.getOrFail("groupId").toLong()
+        val membershipId = ctx.parameters.getOrFail("membershipId").toLong()
+
+        ctx.receive<GroupMemberUpdateDto>().let { payload ->
+            groupService.updateGroupMember(userId, groupId, membershipId, payload.validate()).run {
+                ctx.respond(HttpStatusCode.OK, this)
             }
         }
     }

@@ -18,9 +18,7 @@ data class LedgerRecordDto(
     val type: LedgerRecordType,
     val amountPosted: BigDecimal,
     val amountTransferred: BigDecimal,
-    val balance: BigDecimal,
-    @JsonSerialize(using = InstantSerializer::class) val createdAt: Instant,
-    @JsonSerialize(using = InstantSerializer::class) val modifiedAt: Instant,
+    val resultingBalance: BigDecimal,
 ) {
     constructor(ledgerRecord: LedgerRecord, balance: BigDecimal): this(
         id = ledgerRecord.id,
@@ -30,8 +28,6 @@ data class LedgerRecordDto(
         type = ledgerRecord.type,
         amountPosted = ledgerRecord.amountPosted,
         amountTransferred = ledgerRecord.amountTransferred,
-        balance = balance,
-        createdAt = ledgerRecord.createdAt,
-        modifiedAt = ledgerRecord.modifiedAt,
+        resultingBalance = balance,
     )
 }

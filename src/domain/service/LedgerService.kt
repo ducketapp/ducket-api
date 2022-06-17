@@ -1,10 +1,9 @@
 package io.ducket.api.domain.service
 
-import io.ducket.api.CurrencyRateProvider
+import clients.rates.ReferenceRatesClient
 import io.ducket.api.app.LedgerRecordType
 import io.ducket.api.domain.controller.ledger.LedgerRecordCreateDto
 import io.ducket.api.domain.controller.ledger.LedgerRecordDto
-import io.ducket.api.domain.controller.ledger.LedgerTransferCreateDto
 import io.ducket.api.domain.model.ledger.LedgerRecord
 import io.ducket.api.domain.repository.AccountRepository
 import io.ducket.api.domain.repository.LedgerRepository
@@ -14,9 +13,11 @@ import io.ducket.api.utils.sumByDecimal
 import io.ducket.api.plugins.BusinessLogicException
 import io.ducket.api.plugins.InvalidDataException
 import io.ducket.api.plugins.NoEntityFoundException
+import io.ducket.api.utils.toLocalDate
 import io.ktor.http.content.*
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.koin.java.KoinJavaComponent
+import org.koin.java.KoinJavaComponent.inject
 import java.io.File
 import java.math.BigDecimal
 
@@ -28,17 +29,16 @@ class LedgerService(
     private val ledgerRepository: LedgerRepository,
     private val accountRepository: AccountRepository,
 ) {
-    private val currencyRateProvider: CurrencyRateProvider by KoinJavaComponent.inject(CurrencyRateProvider::class.java)
+    private val ratesClient: ReferenceRatesClient by inject(ReferenceRatesClient::class.java)
 
-    fun getLedgerRecordAccessibleToUser(userId: Long, ledgerRecordId: Long): LedgerRecordDto {
-        return getLedgerRecordsAccessibleToUser(userId).firstOrNull { it.id == ledgerRecordId } ?: throw NoEntityFoundException()
+    fun getLedgerRecord(userId: Long, ledgerRecordId: Long): LedgerRecordDto {
+        return getLedgerRecords(userId).firstOrNull { it.id == ledgerRecordId } ?: throw NoEntityFoundException()
     }
 
-    fun getLedgerRecordsAccessibleToUser(userId: Long): List<LedgerRecordDto> {
-        val userIds = groupService.getActiveMembersFromSharedUserGroups(userId).map { it.id }
-        val accessibleLedgerRecords = ledgerRepository.findAll(*userIds.toLongArray(), userId)
+    fun getLedgerRecords(userId: Long): List<LedgerRecordDto> {
+        val ledgerRecords = ledgerRepository.findAll(userId)
 
-        return accessibleLedgerRecords.groupBy { it.account.id }.flatMap { accountToRecords ->
+        return ledgerRecords.groupBy { it.account.id }.flatMap { accountToRecords ->
             var currentRecordBalance = BigDecimal.ZERO
             val calculatedAccountRecords = accountToRecords.value
                 .sortedBy { it.operation.date }
@@ -62,7 +62,15 @@ class LedgerService(
         val rate = payload.rate.let { userSpecifiedRate ->
             if (userSpecifiedRate == null) {
                 if (fromAccount.currency.id != toAccount.currency.id) {
-                    return@let currencyRateProvider.getCurrencyRate(fromAccount.currency.isoCode, toAccount.currency.isoCode)
+                    val rateRecord = runBlocking {
+                        ratesClient.getFirstRateStartingFromDate(
+                            currency = fromAccount.currency.isoCode,
+                            baseCurrency = toAccount.currency.isoCode,
+                            startDate = payload.operation.date.toLocalDate()
+                        )
+                    }
+                    // return@let rateRecord.value
+                    return@let BigDecimal.ONE
                 }
             } else {
                 if (userSpecifiedRate != BigDecimal.ONE && fromAccount.currency.id == toAccount.currency.id) {
@@ -90,7 +98,7 @@ class LedgerService(
     }
 
     fun createLedgerRecord(userId: Long, payload: LedgerRecordCreateDto): LedgerRecordDto {
-        if (payload.transfer) {
+        if (payload.transferAccountId != null) {
             return createLedgerTransfer(userId, payload)
         }
 
@@ -129,7 +137,7 @@ class LedgerService(
 
         contentPairList.forEach { pair ->
             val newFile = localFileService.createLocalImageFile(pair.first.extension, pair.second)
-            operationAttachmentRepository.createAttachment(operationId, newFile)
+            operationAttachmentRepository.createAttachment(userId, operationId, newFile)
         }
     }
 

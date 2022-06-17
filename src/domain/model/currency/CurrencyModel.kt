@@ -4,12 +4,16 @@ import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
+import java.math.BigDecimal
+
+const val DEFAULT_SCALE = 4
+const val DEFAULT_ROUNDING = BigDecimal.ROUND_HALF_EVEN
 
 internal object CurrenciesTable : LongIdTable("currency") {
     val area = varchar("area", 32)
     val name = varchar("name", 32)
     val symbol = varchar("symbol", 8)
-    val isoCode = varchar("iso_code", 3)
+    val isoCode = varchar("iso_code", 3).uniqueIndex()
 }
 
 class CurrencyEntity(id: EntityID<Long>) : LongEntity(id) {

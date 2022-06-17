@@ -21,7 +21,7 @@ scrape_configs:
       - targets:
           - localhost
         labels:
-          job: ducketlogs
+          job: applogs
           __path__: /var/log/ducket/*log
 
   - job_name: containers
