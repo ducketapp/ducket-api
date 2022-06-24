@@ -163,6 +163,7 @@ dependencies {
     // An implementation of SLF4J
     implementation "ch.qos.logback:logback-classic:$logback_version"
     implementation "org.slf4j:jul-to-slf4j:1.7.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.6.0"
 
     // for serialization/deserialization
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.11.1"

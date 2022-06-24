@@ -17,6 +17,10 @@ internal object CurrencyRatesTable : LongIdTable("currency_rate") {
     val rate = decimal("rate", 10, 4)
     val date = date("date")
     val dataSource = varchar("data_source", 64).nullable()
+
+    init {
+        uniqueIndex("base_quote_date_unique_index", baseCurrencyIsoCode, quoteCurrencyIsoCode, date)
+    }
 }
 
 class CurrencyRateEntity(id: EntityID<Long>) : LongEntity(id) {

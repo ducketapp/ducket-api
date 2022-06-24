@@ -63,9 +63,8 @@ class LedgerService(
             if (userSpecifiedRate == null) {
                 if (fromAccount.currency.id != toAccount.currency.id) {
                     val rateRecord = runBlocking {
-                        ratesClient.getFirstRateStartingFromDate(
+                        ratesClient.getFirstStartingFromDate(
                             currency = fromAccount.currency.isoCode,
-                            baseCurrency = toAccount.currency.isoCode,
                             startDate = payload.operation.date.toLocalDate()
                         )
                     }

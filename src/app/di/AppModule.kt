@@ -7,7 +7,6 @@ import io.ducket.api.app.database.*
 import io.ducket.api.app.scheduler.AppJobFactory
 import io.ducket.api.config.AppConfig
 import io.ducket.api.auth.JwtManager
-import io.ducket.api.clients.CurrencyRateClient
 import io.ducket.api.domain.controller.account.AccountController
 import io.ducket.api.domain.controller.budget.BudgetController
 import io.ducket.api.domain.controller.category.CategoryController
@@ -31,7 +30,7 @@ import java.util.concurrent.TimeUnit
 
 object AppModule {
     enum class DatabaseType {
-        MAIN_DB, SCHEDULER_DB, RATES_DB
+        MAIN_DB, SCHEDULER_DB
     }
 
     val configurationModule = module {
@@ -44,11 +43,10 @@ object AppModule {
 
     val databaseModule = module {
         single<AppDatabase>(named(DatabaseType.MAIN_DB)) { MainDatabase(get()) }
-        single<AppDatabase>(named(DatabaseType.SCHEDULER_DB)) { SchedulerDatabase(get()) }
     }
 
     val schedulerModule = module {
-        single { AppJobFactory(get()) }
+        single { AppJobFactory(get(), get(), get()) }
     }
 
     val controllerModule = module {
@@ -68,8 +66,7 @@ object AppModule {
         single { AccountService(get(), get()) }
         single { CategoryService(get()) }
         single { BudgetService(get(), get(), get(), get()) }
-        single { CurrencyService(get()) }
-        single { CurrencyRateService(get(), get()) }
+        single { CurrencyService(get(), get()) }
         single { ImportRuleService(get()) }
         single { ImportService(get(), get(), get(), get(), get(), get()) }
         single { LocalFileService() }
@@ -99,7 +96,6 @@ object AppModule {
     }
 
     val clientModule = module {
-        single<CurrencyRateClient> { CurrencyRateClient() }
         single<ReferenceRatesClient> { ReferenceRatesClient(get()) }
         single<HttpClient> {
             HttpClient(Apache) {
@@ -112,18 +108,19 @@ object AppModule {
                 }
 
                 install(JsonFeature) {
-                    serializer = JacksonSerializer(jackson = XmlMapper().registerModule(KotlinModule()))
+                    serializer = JacksonSerializer(jackson = XmlMapper().registerModule(KotlinModule.Builder().build()))
                     accept(ContentType("application", "vnd.sdmx.structurespecificdata+xml"))
                 }
 
                 install(Logging) {
                     level = LogLevel.INFO
+                    logger = Logger.DEFAULT
                 }
 
                 engine {
-                    socketTimeout = TimeUnit.SECONDS.toMillis(20).toInt()
-                    connectTimeout = TimeUnit.SECONDS.toMillis(20).toInt()
-                    connectionRequestTimeout = TimeUnit.SECONDS.toMillis(20).toInt()
+                    socketTimeout = TimeUnit.SECONDS.toMillis(25).toInt()
+                    connectTimeout = TimeUnit.SECONDS.toMillis(25).toInt()
+                    connectionRequestTimeout = TimeUnit.SECONDS.toMillis(25).toInt()
                 }
 
                 expectSuccess = true

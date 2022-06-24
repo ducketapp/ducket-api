@@ -20,7 +20,7 @@ class TestMainDatabase(appConfig: AppConfig): MainDatabase(appConfig) {
         }
     }
 
-    override fun close() {
+    fun close() {
         dataSource.close()
         TransactionManager.closeAndUnregister(database)
     }

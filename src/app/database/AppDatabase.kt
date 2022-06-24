@@ -14,17 +14,11 @@ interface AppDatabase {
     val dataSource: HikariDataSource
 
     fun connect()
-    fun close()
     fun getHikariConfig(): HikariConfig
     fun getDatabaseName(): String
 
-    /**
-     * Prevents both dirty and non-repeatable reads, but still allows for phantom reads.
-     * A phantom read is when a transaction ("Transaction A") selects a list of rows through a WHERE clause,
-     * another transaction ("Transaction B") performs an INSERT or DELETE with a row that satisfies Transaction A's WHERE clause,
-     * and Transaction A selects using the same WHERE clause again, resulting in an inconsistency.
-     */
-    suspend fun <T> doTransaction(block: suspend () -> T): T {
+    @Deprecated("Use Transactional interface instead")
+    suspend fun <T> newTransaction(block: suspend () -> T): T {
         return newSuspendedTransaction(
             db = database,
             context = Dispatchers.IO,

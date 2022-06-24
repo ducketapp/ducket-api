@@ -8,7 +8,8 @@ import org.quartz.JobExecutionContext
 import java.io.File
 import java.lang.Exception
 
-open class ObsoleteDataCleanUpJob(private val attachmentRepository: AttachmentRepository): Job {
+open class AppObsoleteDataCleanUpJob(private val attachmentRepository: AttachmentRepository): Job {
+    private val logger = getLogger()
 
     override fun execute(context: JobExecutionContext?) {
         if (context == null) return
@@ -19,12 +20,12 @@ open class ObsoleteDataCleanUpJob(private val attachmentRepository: AttachmentRe
 
             File(databaseStoreDataPath).walkTopDown().forEach {
                 if (it.isFile && it.name.startsWith(LocalFileService.LOCAL_FILE_PREFIX) && !databaseDataPaths.contains(it.absolutePath)) {
-                    getLogger().info("Obsolete file was found, ${it.parent}/${it.name}. Cleaning up...")
+                    logger.info("Obsolete file was found, ${it.parent}/${it.name}. Cleaning up...")
                     it.delete()
                 }
             }
         } catch (e: Exception) {
-            getLogger().error("Cannot execute the command: ${e.localizedMessage}")
+            logger.error("Cannot execute the command: ${e.localizedMessage}")
         }
     }
 

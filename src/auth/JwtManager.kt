@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import domain.model.user.UserEntity
 import io.ducket.api.config.AppConfig
 import io.ducket.api.domain.repository.UserRepository
 import io.ducket.api.plugins.AuthenticationException
@@ -29,9 +30,9 @@ class JwtManager(appConfig: AppConfig) {
             jwtCredential.payload.getClaim("user").asString(),
             UserPrincipal::class.java
         )
+        val foundUser = UserEntity.findById(userPrincipal.id)?.toModel()
 
-        return UserRepository().findOne(userPrincipal.id)?.let { userPrincipal }
-            ?: throw AuthenticationException("Invalid token")
+        return foundUser?.let { userPrincipal } ?: throw AuthenticationException("Invalid token")
     }
 
     fun getAuthorizationHeaderValue(userPrincipal: UserPrincipal): String = "Bearer ${generateToken(userPrincipal)}"

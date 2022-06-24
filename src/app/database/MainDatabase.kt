@@ -27,8 +27,4 @@ open class MainDatabase(appConfig: AppConfig): MySqlDatabase(appConfig) {
     override fun getDatabaseName(): String {
         return databaseConfig.schema.main
     }
-
-    override fun close() {
-        // ignore
-    }
 }

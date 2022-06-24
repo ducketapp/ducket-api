@@ -3,21 +3,18 @@ package io.ducket.api
 import clients.rates.ReferenceRatesClient
 import io.ducket.api.app.database.AppDatabase
 import io.ducket.api.app.di.AppModule
+import io.ducket.api.app.scheduler.AppCurrencyRatesPullJob
 import io.ducket.api.app.scheduler.AppJobFactory
-import io.ducket.api.app.scheduler.ObsoleteDataCleanUpJob
+import io.ducket.api.app.scheduler.AppObsoleteDataCleanUpJob
 import io.ducket.api.auth.UserPrincipal
 import io.ducket.api.config.*
-import io.ducket.api.domain.repository.CurrencyRepository
-import io.ducket.api.domain.service.CurrencyRateService
+import io.ducket.api.domain.service.CurrencyService
 import io.ducket.api.plugins.*
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.koin.core.qualifier.named
 import org.koin.ktor.ext.inject
@@ -25,8 +22,8 @@ import org.quartz.*
 import org.quartz.impl.StdSchedulerFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.nio.file.Paths
 import java.util.*
+import kotlin.system.measureTimeMillis
 
 fun main(args: Array<String>) {
     embeddedServer(Netty, commandLineEnvironment(args)).start(wait = true)
@@ -36,8 +33,8 @@ fun main(args: Array<String>) {
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
     installDependencyInjection()
-    initializeAppConfig()
-    initializeDatabases()
+    setupAppConfig()
+    setupDatabases()
     installCallLogging()
     installMetrics()
     installAuthentication()
@@ -46,88 +43,82 @@ fun Application.module(testing: Boolean = false) {
     installSerialization()
     installRouting()
     installErrorHandling()
-    initializeSchedulers()
+    setupScheduler()
 
-    // pullReferenceRatesStaticData()
+    pullReferenceRatesStaticData()
 }
 
 private fun Application.pullReferenceRatesStaticData() {
-    val referenceRatesClient by inject<ReferenceRatesClient>()
-    val currencyRateService by inject<CurrencyRateService>()
-    val currencyRepository by inject<CurrencyRepository>()
+    val appConfig by inject<AppConfig>()
 
-    CoroutineScope(Job() + Dispatchers.IO).launch {
-        val supportedCurrencies = currencyRepository.findAll().map { it.isoCode }
-        val result = referenceRatesClient.getAllRates(*supportedCurrencies.toTypedArray())
+    if (appConfig.localDataConfig.dbPullRates) {
+        val referenceRatesClient by inject<ReferenceRatesClient>()
+        val currencyRateService by inject<CurrencyService>()
+        val currencyService by inject<CurrencyService>()
 
-        currencyRateService.putCurrencyRates(result.dataSet.references)
+        runBlocking {
+            log.info("Starting operation to cache static exchange rates from external client...")
+
+            measureTimeMillis {
+                val currencies = currencyService.getCurrencies().map { it.isoCode }
+                val result = referenceRatesClient.getAll(*currencies.toTypedArray())
+
+                currencyRateService.deleteAllCurrencyRates()
+                currencyRateService.putCurrencyRates(result.dataSet.references, result.header.sender.id)
+            }.also {
+                log.info("Operation has been completed in $it ms.")
+            }
+        }
     }
 }
 
-private fun Application.initializeDatabases() {
+private fun Application.setupDatabases() {
     val mainDatabase by inject<AppDatabase>(named(AppModule.DatabaseType.MAIN_DB))
-    // val schedulerDatabase by inject<AppDatabase>(named(AppModule.DatabaseType.SCHEDULER_DB))
 
     mainDatabase.connect()
-    // schedulerDatabase.connect()
-
     TransactionManager.defaultDatabase = mainDatabase.database
 }
 
-private fun Application.initializeSchedulers() {
+private fun Application.setupScheduler() {
     val appConfig by inject<AppConfig>()
     val jobFactory by inject<AppJobFactory>()
 
-    val schedulerProperties = Properties().apply {
-        setProperty("org.quartz.scheduler.instanceName", "QuartzScheduler")
-        setProperty("org.quartz.threadPool.threadCount", "3")
-        setProperty("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool")
-        setProperty("org.quartz.jobStore.class", "org.quartz.simpl.RAMJobStore")
-
-        setProperty("org.quartz.plugin.jobHistory.class", "org.quartz.plugins.history.LoggingJobHistoryPlugin")
-        setProperty("org.quartz.plugin.jobHistory.jobToBeFiredMessage", """Job [{1}.{0}] to be fired by trigger [{4}.{3}], re-fire: {7}""")
-        setProperty("org.quartz.plugin.jobHistory.jobSuccessMessage", """Job [{1}.{0}] execution complete and reports: {8}""")
-        setProperty("org.quartz.plugin.jobHistory.jobFailedMessage", """Job [{1}.{0}] execution failed with exception: {8}""")
-        setProperty("org.quartz.plugin.jobHistory.jobWasVetoedMessage", """Job [{1}.{0}] was vetoed. It was to be fired by trigger [{4}.{3}] at: {2, date, dd-MM-yyyy HH:mm:ss.SSS}""")
-
-        setProperty("org.quartz.plugin.triggerHistory.class", "org.quartz.plugins.history.LoggingTriggerHistoryPlugin")
-        setProperty("org.quartz.plugin.triggerHistory.triggerFiredMessage", """Trigger [{1}.{0}] fired job [{6}.{5}] scheduled at: {2, date, dd-MM-yyyy HH:mm:ss.SSS}, next scheduled at: {3, date, dd-MM-yyyy HH:mm:ss.SSS}""")
-        setProperty("org.quartz.plugin.triggerHistory.triggerCompleteMessage", """Trigger [{1}.{0}] completed firing job [{6}.{5}] with resulting trigger instruction code: {9}. Next scheduled at: {3, date, dd-MM-yyyy HH:mm:ss.SSS}""")
-        setProperty("org.quartz.plugin.triggerHistory.triggerMisfiredMessage", """Trigger [{1}.{0}] misfired job [{6}.{5}]. Should have fired at: {3, date, dd-MM-yyyy HH:mm:ss.SSS}""")
-
-        setProperty("org.quartz.plugin.shutdownHook.class", "org.quartz.plugins.management.ShutdownHookPlugin")
-        setProperty("org.quartz.plugin.shutdownHook.cleanShutdown", "true")
-    }
-
-    val jobDetail: JobDetail = JobBuilder.newJob(ObsoleteDataCleanUpJob::class.java)
-        .withIdentity("ObsoleteDataCleanUpJob", "SchedulerGroup")
-        .usingJobData(ObsoleteDataCleanUpJob.JOB_DATA_PATH_KEY, appConfig.localDataConfig.dbDataPath)
+    val currencyRatesPullJob = JobBuilder.newJob(AppCurrencyRatesPullJob::class.java)
+        .withIdentity("CurrencyRatesPullJob", "RegularGroup")
         .build()
 
-    val trigger: Trigger = TriggerBuilder.newTrigger()
-        .withIdentity("EveryOneMinuteTrigger", "SchedulerGroup")
-        .withSchedule(
-            SimpleScheduleBuilder
-                .simpleSchedule()
-                .withIntervalInMinutes(1)
-                .repeatForever()
-        ).build()
+    val obsoleteDataCleanUpJob = JobBuilder.newJob(AppObsoleteDataCleanUpJob::class.java)
+        .withIdentity("ObsoleteDataCleanUpJob", "MaintenanceGroup")
+        .usingJobData(AppObsoleteDataCleanUpJob.JOB_DATA_PATH_KEY, appConfig.localDataConfig.dbDataPath)
+        .build()
 
-    val scheduler = StdSchedulerFactory(schedulerProperties).scheduler
+    val everyWeekdayAfternoonTrigger = TriggerBuilder.newTrigger()
+        .withIdentity("EveryWeekdayAfternoonTrigger", "RegularGroup")
+        .withSchedule(CronScheduleBuilder.cronSchedule("0 0 15 ? * MON-FRI *").inTimeZone(TimeZone.getDefault()))
+        .build()
 
-    scheduler.start()
-    scheduler.setJobFactory(jobFactory)
-    scheduler.scheduleJob(jobDetail, trigger)
+    val everyOneHourTrigger = TriggerBuilder.newTrigger()
+        .withIdentity("EveryOneHourTrigger", "MaintenanceGroup")
+        .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInHours(1).repeatForever())
+        .build()
+
+    with(StdSchedulerFactory().scheduler) {
+        start()
+        setJobFactory(jobFactory)
+        scheduleJob(currencyRatesPullJob, everyWeekdayAfternoonTrigger)
+        scheduleJob(obsoleteDataCleanUpJob, everyOneHourTrigger)
+    }
 }
 
-private fun Application.initializeAppConfig() {
+private fun Application.setupAppConfig() {
     val appConfig by inject<AppConfig>()
 
     System.setProperty("handlers", "org.slf4j.bridge.SLF4JBridgeHandler")
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 
-    val dbDataPath = System.getProperty("data.path", "resources/database/data")
-    val ecbDataPath = System.getProperty("ecb.path", Paths.get(System.getProperty("java.io.tmpdir"), "ecb").toString())
+    val dbDataPath = System.getProperty("db.dataPath", "resources/database/data")
+    val dbPullRates = System.getProperty("db.pullRates", "true")
+
     val hoconConfig = environment.config.config("ktor")
 
     appConfig.apply {
@@ -155,8 +146,8 @@ private fun Application.initializeAppConfig() {
         )
 
         this.localDataConfig = LocalDataConfig(
-            exrDataPath = ecbDataPath,
             dbDataPath = dbDataPath,
+            dbPullRates = dbPullRates.toBoolean(),
         )
     }
 }

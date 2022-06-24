@@ -28,6 +28,7 @@
         <appender-ref ref="FILE"/>
     </root>
 
+    <logger name="Exposed" level="DEBUG"/>
     <logger name="io.netty" level="INFO"/>
     <logger name="org.quartz" level="INFO"/>
 </configuration>

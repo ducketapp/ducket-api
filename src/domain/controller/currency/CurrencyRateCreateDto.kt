@@ -1,9 +1,9 @@
-package io.ducket.api.clients.rates
+package io.ducket.api.domain.controller.currency
 
 import java.math.BigDecimal
 import java.time.LocalDate
 
-data class CurrencyExchangeRateDto(
+data class CurrencyRateCreateDto(
     val baseCurrency: String,
     val quoteCurrency: String,
     val rate: BigDecimal,
@@ -15,7 +15,7 @@ data class CurrencyExchangeRateDto(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as CurrencyExchangeRateDto
+        other as CurrencyRateCreateDto
 
         if (baseCurrency != other.baseCurrency) return false
         if (quoteCurrency != other.quoteCurrency) return false

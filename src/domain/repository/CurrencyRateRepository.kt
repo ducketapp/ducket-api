@@ -1,22 +1,17 @@
 package io.ducket.api.domain.repository
 
-import domain.model.category.CategoriesTable
-import domain.model.currency.CurrenciesTable
-import domain.model.currency.CurrencyEntity
-import io.ducket.api.clients.rates.CurrencyExchangeRateDto
+import io.ducket.api.app.database.Transactional
+import io.ducket.api.domain.controller.currency.CurrencyRateCreateDto
 import io.ducket.api.domain.model.currency.CurrencyRate
 import io.ducket.api.domain.model.currency.CurrencyRateEntity
 import io.ducket.api.domain.model.currency.CurrencyRatesTable
-import org.jetbrains.exposed.sql.batchInsert
-import org.jetbrains.exposed.sql.deleteAll
-import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.*
+import java.time.LocalDate
 
-import org.jetbrains.exposed.sql.transactions.transaction
+class CurrencyRateRepository: Transactional {
 
-class CurrencyRateRepository {
-
-    fun create(data: CurrencyExchangeRateDto) = transaction {
-        CurrencyRatesTable.insert {
+    suspend fun insert(data: CurrencyRateCreateDto) = transactional {
+        CurrencyRatesTable.insertIgnore {
             it[this.baseCurrencyIsoCode] = data.baseCurrency
             it[this.quoteCurrencyIsoCode] = data.quoteCurrency
             it[this.rate] = data.rate
@@ -25,17 +20,32 @@ class CurrencyRateRepository {
         }
     }
 
-    fun createBatch(data: List<CurrencyExchangeRateDto>): List<CurrencyRate> = transaction {
-        CurrencyRatesTable.batchInsert(data = data, ignore = true) { dataItem ->
-            this[CurrencyRatesTable.baseCurrencyIsoCode] = dataItem.baseCurrency
-            this[CurrencyRatesTable.quoteCurrencyIsoCode] = dataItem.quoteCurrency
-            this[CurrencyRatesTable.rate] = dataItem.rate
-            this[CurrencyRatesTable.date] = dataItem.date
-            this[CurrencyRatesTable.dataSource] = dataItem.dataSource
-        }.map { CurrencyRateEntity.wrapRow(it).toModel() }
+    suspend fun insertBatch(data: List<CurrencyRateCreateDto>) = transactional {
+        CurrencyRatesTable.batchInsert(data = data, ignore = true) { item ->
+            this[CurrencyRatesTable.baseCurrencyIsoCode] = item.baseCurrency
+            this[CurrencyRatesTable.quoteCurrencyIsoCode] = item.quoteCurrency
+            this[CurrencyRatesTable.rate] = item.rate
+            this[CurrencyRatesTable.date] = item.date
+            this[CurrencyRatesTable.dataSource] = item.dataSource
+        }
     }
 
-    fun deleteAll() = transaction {
+    suspend fun findLatest(baseCurrency: String, quoteCurrency: String): CurrencyRate? = transactional {
+        CurrencyRateEntity.find {
+            CurrencyRatesTable.baseCurrencyIsoCode.eq(baseCurrency)
+                .and(CurrencyRatesTable.quoteCurrencyIsoCode.eq(quoteCurrency))
+        }.orderBy(CurrencyRatesTable.date to SortOrder.DESC).firstOrNull()?.toModel()
+    }
+
+    suspend fun findOneByDate(baseCurrency: String, quoteCurrency: String, date: LocalDate): CurrencyRate? = transactional {
+        CurrencyRateEntity.find {
+            CurrencyRatesTable.date.eq(date)
+                .and(CurrencyRatesTable.baseCurrencyIsoCode.eq(baseCurrency))
+                .and(CurrencyRatesTable.quoteCurrencyIsoCode.eq(quoteCurrency))
+        }.firstOrNull()?.toModel()
+    }
+
+    suspend fun deleteAll() = transactional {
         CurrencyRatesTable.deleteAll()
     }
 }

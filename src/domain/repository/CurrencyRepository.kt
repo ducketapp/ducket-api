@@ -3,15 +3,15 @@ package io.ducket.api.domain.repository
 import domain.model.currency.CurrenciesTable
 import domain.model.currency.Currency
 import domain.model.currency.CurrencyEntity
-import org.jetbrains.exposed.sql.transactions.transaction
+import io.ducket.api.app.database.Transactional
 
-class CurrencyRepository {
+class CurrencyRepository: Transactional {
 
-    fun findOne(currencyIsoCode: String): Currency? = transaction {
-        CurrencyEntity.find { CurrenciesTable.isoCode.eq(currencyIsoCode) }.firstOrNull()?.toModel()
+    suspend fun findOne(currency: String): Currency? = transactional {
+        CurrencyEntity.find { CurrenciesTable.isoCode.eq(currency) }.firstOrNull()?.toModel()
     }
 
-    fun findAll(): List<Currency> = transaction {
+    suspend fun findAll(): List<Currency> = transactional {
         CurrencyEntity.all().map { it.toModel() }
     }
 }

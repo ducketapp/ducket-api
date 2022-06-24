@@ -9,4 +9,6 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement
 data class DataStructureDto(
     @field:JacksonXmlProperty(namespace = "message", localName = "DataSet")
     val dataSet: DataSetDto,
+    @field:JacksonXmlProperty(namespace = "message", localName = "Header")
+    val header: HeaderDto,
 )
