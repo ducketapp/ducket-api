@@ -10,7 +10,6 @@ import io.ducket.api.domain.model.attachment.AttachmentsTable
 import io.ducket.api.domain.model.budget.BudgetAccountsTable
 import io.ducket.api.domain.model.budget.BudgetCategoriesTable
 import io.ducket.api.domain.model.budget.BudgetsTable
-import io.ducket.api.domain.model.ledger.LedgerRecordsTable
 import domain.model.operation.OperationAttachmentsTable
 import domain.model.operation.OperationsTable
 import io.ducket.api.domain.model.currency.CurrencyRatesTable
@@ -45,7 +44,7 @@ open class V1__Initial : BaseJavaMigration() {
                     GroupsTable,
                     GroupMembershipsTable,
                     GroupMemberAccountPermissionsTable,
-                    LedgerRecordsTable,
+                    // LedgerRecordsTable,
                     OperationsTable,
                     OperationAttachmentsTable,
                     TagsTable,

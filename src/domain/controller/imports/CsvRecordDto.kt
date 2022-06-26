@@ -1,6 +1,6 @@
 package io.ducket.api.domain.controller.imports
 
-import io.ducket.api.app.LedgerRecordType
+import io.ducket.api.app.OperationType
 import java.math.BigDecimal
 import java.time.Instant
 
@@ -10,6 +10,6 @@ data class CsvRecordDto(
     val subject: String,
     val description: String,
     val notes: String,
-    val type: LedgerRecordType,
+    val type: OperationType,
     val amount: BigDecimal,
 )

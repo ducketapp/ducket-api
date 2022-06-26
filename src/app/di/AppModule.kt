@@ -12,7 +12,7 @@ import io.ducket.api.domain.controller.budget.BudgetController
 import io.ducket.api.domain.controller.category.CategoryController
 import io.ducket.api.domain.controller.currency.CurrencyController
 import io.ducket.api.domain.controller.group.GroupController
-import io.ducket.api.domain.controller.ledger.LedgerController
+import io.ducket.api.domain.controller.operation.OperationController
 import io.ducket.api.domain.controller.rule.ImportRuleController
 import io.ducket.api.domain.controller.tag.TagController
 import io.ducket.api.domain.controller.user.UserController
@@ -56,21 +56,21 @@ object AppModule {
         single { BudgetController(get()) }
         single { CurrencyController(get()) }
         single { ImportRuleController(get()) }
-        single { LedgerController(get()) }
+        single { OperationController() }
         single { GroupController(get()) }
         single { TagController(get()) }
     }
 
     val serviceModule = module {
         single { UserService(get(), get()) }
-        single { AccountService(get(), get()) }
+        single { AccountService(get()) }
         single { CategoryService(get()) }
         single { BudgetService(get(), get(), get(), get()) }
         single { CurrencyService(get(), get()) }
         single { ImportRuleService(get()) }
-        single { ImportService(get(), get(), get(), get(), get(), get()) }
+        single { ImportService(get(), get(), get(), get(), get()) }
         single { LocalFileService() }
-        single { LedgerService(get(), get(), get(), get(), get(), get(), get()) }
+        single { OperationService(get(), get(), get(), get(), get(), get()) }
         single { GroupService(get(), get(), get(), get(), get()) }
         single { TagService(get()) }
     }
@@ -87,7 +87,6 @@ object AppModule {
         single { BudgetPeriodLimitRepository() }
         single { OperationRepository() }
         single { OperationAttachmentRepository() }
-        single { LedgerRepository() }
         single { GroupRepository() }
         single { GroupMembershipRepository() }
         single { GroupMemberAccountPermissionRepository() }

@@ -3,13 +3,13 @@ package domain.model.account
 import domain.model.currency.CurrenciesTable
 import domain.model.currency.Currency
 import domain.model.currency.CurrencyEntity
+import domain.model.operation.OperationEntity
+import domain.model.operation.OperationsTable
 import domain.model.user.User
 import domain.model.user.UserEntity
 import domain.model.user.UsersTable
 import io.ducket.api.app.AccountType
-import io.ducket.api.app.LedgerRecordType
-import io.ducket.api.domain.model.ledger.LedgerRecordEntity
-import io.ducket.api.domain.model.ledger.LedgerRecordsTable
+import io.ducket.api.app.OperationType
 import io.ducket.api.utils.sumByDecimal
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
@@ -40,11 +40,21 @@ class AccountEntity(id: EntityID<Long>) : LongEntity(id) {
     var createdAt by AccountsTable.createdAt
     var modifiedAt by AccountsTable.modifiedAt
 
-    private val records by LedgerRecordEntity referrersOn LedgerRecordsTable.accountId
+    private val records by OperationEntity referrersOn OperationsTable.accountId
 
     private val balance: BigDecimal
         get() = records.sumByDecimal {
-            if (it.type == LedgerRecordType.EXPENSE) it.clearedFunds.negate() else it.clearedFunds
+            if (it.type == OperationType.EXPENSE) {
+                it.clearedFunds.negate()
+            } else if (it.type == OperationType.TRANSFER) {
+                if (it.account.id.value == this.id.value) {
+                    it.clearedFunds.negate()
+                } else {
+                    it.clearedFunds
+                }
+            } else {
+                it.clearedFunds
+            }
         }
 
     fun toModel() = Account(

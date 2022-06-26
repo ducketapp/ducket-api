@@ -2,8 +2,8 @@ package io.ducket.api.domain.service
 
 import domain.model.imports.ImportRule
 import io.ducket.api.app.ImportRuleLookupType.*
-import io.ducket.api.app.LedgerRecordType
-import io.ducket.api.app.LedgerRecordType.*
+import io.ducket.api.app.OperationType
+import io.ducket.api.app.OperationType.*
 import io.ducket.api.domain.controller.imports.CsvRecordDto
 import io.ducket.api.domain.controller.imports.ImportDto
 import io.ducket.api.domain.repository.*
@@ -22,7 +22,6 @@ class ImportService(
     private val importRuleRepository: ImportRuleRepository,
     private val categoryRepository: CategoryRepository,
     private val operationRepository: OperationRepository,
-    private val ledgerRepository: LedgerRepository,
 ): LocalFileService() {
     private val csvRecordsTableColumns = listOf("date", "category", "subject", "description", "notes", "type", "amount", "currency")
 
@@ -104,7 +103,7 @@ class ImportService(
                 subject = record[csvRecordsTableColumns[2]].trimWhitespaces(),
                 description = record[csvRecordsTableColumns[3]].trimWhitespaces(),
                 notes = record[csvRecordsTableColumns[4]].trimWhitespaces(),
-                type = LedgerRecordType.valueOf(record[csvRecordsTableColumns[5]].trimWhitespaces()),
+                type = OperationType.valueOf(record[csvRecordsTableColumns[5]].trimWhitespaces()),
                 amount = record[csvRecordsTableColumns[6]].toBigDecimal(),
             )
         } catch (e1: DateTimeParseException) {

@@ -1,11 +1,10 @@
 package io.ducket.api.domain.service
 
-import io.ducket.api.app.LedgerRecordType.*
+import io.ducket.api.app.OperationType.*
 import io.ducket.api.app.database.Transactional
 import io.ducket.api.domain.controller.BulkDeleteDto
 import io.ducket.api.domain.controller.account.*
-import io.ducket.api.domain.controller.ledger.LedgerRecordCreateDto
-import io.ducket.api.domain.controller.ledger.OperationCreateDto
+import io.ducket.api.domain.controller.operation.OperationCreateDto
 import io.ducket.api.domain.repository.*
 import io.ducket.api.plugins.DuplicateDataException
 import io.ducket.api.plugins.InvalidDataException
@@ -16,7 +15,6 @@ import java.time.Instant
 
 class AccountService(
     private val accountRepository: AccountRepository,
-    private val ledgerService: LedgerService,
 ): Transactional {
 
     fun getAccounts(userId: Long): List<AccountDto> {
@@ -33,20 +31,20 @@ class AccountService(
         return blockingTransaction {
             accountRepository.create(userId, reqObj).let { newAccount ->
                 if (reqObj.startBalance != BigDecimal.ZERO) {
-                    ledgerService.createLedgerRecord(
-                        userId = userId,
-                        reqObj = LedgerRecordCreateDto(
-                            amount = reqObj.startBalance,
-                            type = if (reqObj.startBalance.lt(BigDecimal.ZERO)) EXPENSE else INCOME,
-                            accountId = newAccount.id,
-                            operation = OperationCreateDto(
-                                category = "Other",
-                                categoryGroup = "Other",
-                                description = "Starting balance",
-                                date = Instant.now(),
-                            )
-                        )
-                    )
+//                    ledgerService.createLedgerRecord(
+//                        userId = userId,
+//                        reqObj = LedgerRecordCreateDto(
+//                            amount = reqObj.startBalance,
+//                            type = if (reqObj.startBalance.lt(BigDecimal.ZERO)) EXPENSE else INCOME,
+//                            accountId = newAccount.id,
+//                            operation = OperationCreateDto(
+//                                category = "Other",
+//                                categoryGroup = "Other",
+//                                description = "Starting balance",
+//                                date = Instant.now(),
+//                            )
+//                        )
+//                    )
                     return@blockingTransaction AccountDto(newAccount.copy(balance = reqObj.startBalance))
                 }
                 return@blockingTransaction AccountDto(newAccount)

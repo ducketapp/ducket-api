@@ -13,8 +13,6 @@ import domain.model.user.User
 import io.ducket.api.domain.model.attachment.AttachmentsTable
 import io.ducket.api.domain.model.budget.BudgetsTable
 import io.ducket.api.domain.model.group.GroupsTable
-import io.ducket.api.domain.model.ledger.LedgerRecordEntity
-import io.ducket.api.domain.model.ledger.LedgerRecordsTable
 import domain.model.operation.OperationAttachmentsTable
 import domain.model.operation.OperationsTable
 import io.ducket.api.app.database.Transactional
@@ -58,27 +56,27 @@ class UserRepository: Transactional {
 
     // TODO update
     suspend fun deleteData(userId: Long): Unit = blockingTransaction {
-        LedgerRecordEntity.wrapRows(
-            LedgerRecordsTable.select {
-                exists(OperationsTable.select {
-                    OperationsTable.userId.eq(userId)
-                })
-            }
-        ).also {
-            LedgerRecordsTable.deleteWhere {
-                LedgerRecordsTable.id.inList(it.map { it.id.value })
-            }
-
-            AttachmentsTable.deleteWhere {
-                exists(OperationAttachmentsTable.select {
-                    OperationAttachmentsTable.operationId.inList(it.map { it.operation.id.value })
-                })
-            }
-
-            OperationsTable.deleteWhere {
-                OperationsTable.id.inList(it.map { it.operation.id.value })
-            }
-        }
+//        LedgerRecordEntity.wrapRows(
+//            LedgerRecordsTable.select {
+//                exists(OperationsTable.select {
+//                    OperationsTable.userId.eq(userId)
+//                })
+//            }
+//        ).also {
+//            LedgerRecordsTable.deleteWhere {
+//                LedgerRecordsTable.id.inList(it.map { it.id.value })
+//            }
+//
+//            AttachmentsTable.deleteWhere {
+//                exists(OperationAttachmentsTable.select {
+//                    OperationAttachmentsTable.operationId.inList(it.map { it.operation.id.value })
+//                })
+//            }
+//
+//            OperationsTable.deleteWhere {
+//                OperationsTable.id.inList(it.map { it.operation.id.value })
+//            }
+//        }
 
         GroupsTable.deleteWhere { GroupsTable.ownerId.eq(userId) }
         BudgetsTable.deleteWhere { BudgetsTable.userId.eq(userId) }

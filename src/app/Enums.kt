@@ -12,8 +12,8 @@ enum class LedgerRecordStrategy {
     RECORD, TRANSFER
 }
 
-enum class LedgerRecordType {
-    INCOME, EXPENSE
+enum class OperationType {
+    INCOME, EXPENSE, TRANSFER
 }
 
 enum class Permission {

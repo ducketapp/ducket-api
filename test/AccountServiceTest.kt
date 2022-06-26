@@ -2,10 +2,8 @@ package io.ducket.api
 
 import io.ducket.api.domain.controller.account.AccountDto
 import io.ducket.api.domain.repository.AccountRepository
-import io.ducket.api.domain.repository.LedgerRepository
 import io.ducket.api.domain.service.AccountService
 import io.ducket.api.domain.service.GroupService
-import io.ducket.api.domain.service.LedgerService
 import io.ducket.api.plugins.NoDataFoundException
 import io.ducket.api.test_data.AccountObjectMother
 import io.ducket.api.test_data.UserObjectMother

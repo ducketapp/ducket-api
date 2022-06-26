@@ -14,7 +14,7 @@ import java.time.Instant
 
 class OperationAttachmentRepository {
 
-    fun findAttachment(operationId: Long, attachmentId: Long): Attachment? = transaction {
+    fun findOne(operationId: Long, attachmentId: Long): Attachment? = transaction {
         val query = AttachmentsTable.select {
             AttachmentsTable.id.eq(attachmentId)
                 .and {
@@ -27,7 +27,7 @@ class OperationAttachmentRepository {
         AttachmentEntity.wrapRows(query).firstOrNull()?.toModel()
     }
 
-    fun getAttachmentsAmount(operationId: Long): Int = transaction {
+    fun getAttachmentsCount(operationId: Long): Int = transaction {
         OperationAttachmentsTable.select {
             OperationAttachmentsTable.operationId.eq(operationId)
         }.count().toInt()
