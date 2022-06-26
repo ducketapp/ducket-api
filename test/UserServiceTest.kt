@@ -7,8 +7,8 @@ import io.ducket.api.domain.repository.*
 import io.ducket.api.domain.service.AccountService
 import io.ducket.api.domain.service.UserService
 import io.ducket.api.plugins.AuthenticationException
-import io.ducket.api.plugins.DuplicateEntityException
-import io.ducket.api.plugins.NoEntityFoundException
+import io.ducket.api.plugins.DuplicateDataException
+import io.ducket.api.plugins.NoDataFoundException
 import io.ducket.api.test_data.AccountObjectMother
 import io.ducket.api.test_data.UserObjectMother
 import io.kotest.assertions.throwables.shouldThrowExactly
@@ -58,8 +58,8 @@ internal class UserServiceTest {
         val executable: () -> Unit = { cut.getUser(nonRegisteredUserId) }
 
         // then
-        shouldThrowExactly<NoEntityFoundException>(executable).also {
-            it.message shouldBe NoEntityFoundException().message
+        shouldThrowExactly<NoDataFoundException>(executable).also {
+            it.message shouldBe NoDataFoundException().message
         }
     }
 
@@ -137,7 +137,7 @@ internal class UserServiceTest {
         mockkStatic("org.jetbrains.exposed.sql.transactions.ThreadLocalTransactionManagerKt")
 
         every { userRepositoryMock.findOneByEmail(userCreateDto.email) } returns null
-        every { userRepositoryMock.create(userCreateDto) } returns user
+        every { userRepositoryMock.createOne(userCreateDto) } returns user
         every { accountServiceMock.createAccount(capture(userIdSlot), capture(accountCreateDtoSlot)) } returns accountDto
         every { transaction(any(), capture(dbTransactionSlot)) } answers { dbTransactionSlot.invoke(mockk()) }
 
@@ -161,10 +161,10 @@ internal class UserServiceTest {
         val executable: () -> Unit = { cut.createUser(newUserDto) }
 
         // then
-        shouldThrowExactly<DuplicateEntityException>(executable).also {
+        shouldThrowExactly<DuplicateDataException>(executable).also {
             it.message shouldBe "Such email has already been taken"
         }
-        verify { userRepositoryMock.create(any()) wasNot Called }
+        verify { userRepositoryMock.createOne(any()) wasNot Called }
         verify { accountServiceMock.createAccount(any(), any()) wasNot Called }
     }
 
@@ -197,8 +197,8 @@ internal class UserServiceTest {
         val executable: () -> Unit = { cut.updateUser(userId, userUpdateDto) }
 
         // then
-        shouldThrowExactly<NoEntityFoundException>(executable).also {
-            it.message shouldBe NoEntityFoundException().message
+        shouldThrowExactly<NoDataFoundException>(executable).also {
+            it.message shouldBe NoDataFoundException().message
         }
     }
 

@@ -4,10 +4,7 @@ import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
-import java.math.BigDecimal
 
-const val DEFAULT_SCALE = 4
-const val DEFAULT_ROUNDING = BigDecimal.ROUND_HALF_EVEN
 
 internal object CurrenciesTable : LongIdTable("currency") {
     val area = varchar("area", 32)

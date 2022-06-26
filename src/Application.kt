@@ -44,14 +44,13 @@ fun Application.module(testing: Boolean = false) {
     installRouting()
     installErrorHandling()
     setupScheduler()
-
     pullReferenceRatesStaticData()
 }
 
 private fun Application.pullReferenceRatesStaticData() {
     val appConfig by inject<AppConfig>()
 
-    if (appConfig.localDataConfig.dbPullRates) {
+    if (appConfig.dataConfig.pullRates) {
         val referenceRatesClient by inject<ReferenceRatesClient>()
         val currencyRateService by inject<CurrencyService>()
         val currencyService by inject<CurrencyService>()
@@ -89,7 +88,7 @@ private fun Application.setupScheduler() {
 
     val obsoleteDataCleanUpJob = JobBuilder.newJob(AppObsoleteDataCleanUpJob::class.java)
         .withIdentity("ObsoleteDataCleanUpJob", "MaintenanceGroup")
-        .usingJobData(AppObsoleteDataCleanUpJob.JOB_DATA_PATH_KEY, appConfig.localDataConfig.dbDataPath)
+        .usingJobData(AppObsoleteDataCleanUpJob.JOB_DATA_PATH_KEY, appConfig.dataConfig.dataPath)
         .build()
 
     val everyWeekdayAfternoonTrigger = TriggerBuilder.newTrigger()
@@ -145,9 +144,9 @@ private fun Application.setupAppConfig() {
             audience = hoconConfig.property("jwt.audience").getString(),
         )
 
-        this.localDataConfig = LocalDataConfig(
-            dbDataPath = dbDataPath,
-            dbPullRates = dbPullRates.toBoolean(),
+        this.dataConfig = DataConfig(
+            dataPath = dbDataPath,
+            pullRates = dbPullRates.toBoolean(),
         )
     }
 }

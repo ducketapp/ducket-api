@@ -4,8 +4,8 @@ import io.ducket.api.app.AccountPermission
 import io.ducket.api.domain.controller.group.*
 import io.ducket.api.domain.repository.*
 import io.ducket.api.plugins.BusinessLogicException
-import io.ducket.api.plugins.DuplicateEntityException
-import io.ducket.api.plugins.NoEntityFoundException
+import io.ducket.api.plugins.DuplicateDataException
+import io.ducket.api.plugins.NoDataFoundException
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class GroupService(
@@ -29,7 +29,7 @@ class GroupService(
     }
 
     fun updateGroup(userId: Long, groupId: Long, payload: GroupUpdateDto): GroupDto {
-        groupRepository.findOneByOwner(userId, groupId) ?: throw NoEntityFoundException()
+        groupRepository.findOneByOwner(userId, groupId) ?: throw NoDataFoundException()
         return groupRepository.updateOne(userId, groupId, payload.name)?.let { GroupDto(it) }!!
     }
 
@@ -43,11 +43,11 @@ class GroupService(
     }
 
     fun getGroup(userId: Long, groupId: Long): GroupDto {
-        return getGroups(userId).firstOrNull { it.id == groupId } ?: throw NoEntityFoundException()
+        return getGroups(userId).firstOrNull { it.id == groupId } ?: throw NoDataFoundException()
     }
 
     fun addGroupMember(userId: Long, groupId: Long, payload: GroupMemberCreateDto): GroupDto {
-        val group = groupRepository.findOneByOwner(userId, groupId) ?: throw NoEntityFoundException()
+        val group = groupRepository.findOneByOwner(userId, groupId) ?: throw NoDataFoundException()
 
         if (group.owner.email == payload.memberEmail) {
             throw BusinessLogicException("Group owner is not entitled to be a member of sharing group")
@@ -58,7 +58,7 @@ class GroupService(
         }
 
         groupMembershipRepository.findOneByEmailAndGroup(payload.memberEmail, groupId)?.also {
-            throw DuplicateEntityException("Such a member already added to the group")
+            throw DuplicateDataException("Such a member already added to the group")
         }
 
         // No email checks for potential member in order to not reveal the registered emails
@@ -74,7 +74,7 @@ class GroupService(
     }
 
     fun updateGroupMember(userId: Long, groupId: Long, membershipId: Long, payload: GroupMemberUpdateDto): GroupDto {
-        groupMembershipRepository.findOneByGroupOwnerAndGroup(userId, groupId, membershipId) ?: throw NoEntityFoundException()
+        groupMembershipRepository.findOneByGroupOwnerAndGroup(userId, groupId, membershipId) ?: throw NoDataFoundException()
 
         transaction {
             payload.accountPermissions.forEach {

@@ -4,5 +4,5 @@ class AppConfig {
     lateinit var serverConfig: ServerConfig
     lateinit var databaseServerConfig: DatabaseServerConfig
     lateinit var jwtConfig: JwtConfig
-    lateinit var localDataConfig: LocalDataConfig
+    lateinit var dataConfig: DataConfig
 }

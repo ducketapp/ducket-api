@@ -6,7 +6,7 @@ import io.ducket.api.domain.repository.LedgerRepository
 import io.ducket.api.domain.service.AccountService
 import io.ducket.api.domain.service.GroupService
 import io.ducket.api.domain.service.LedgerService
-import io.ducket.api.plugins.NoEntityFoundException
+import io.ducket.api.plugins.NoDataFoundException
 import io.ducket.api.test_data.AccountObjectMother
 import io.ducket.api.test_data.UserObjectMother
 import io.kotest.assertions.throwables.shouldThrowExactly
@@ -98,8 +98,8 @@ internal class AccountServiceTest {
         val executable: () -> Unit = { accountServiceSpy.getAccount(user.id, 10L) }
 
         // then
-        shouldThrowExactly<NoEntityFoundException>(executable).also {
-            it.message shouldBe NoEntityFoundException().message
+        shouldThrowExactly<NoDataFoundException>(executable).also {
+            it.message shouldBe NoDataFoundException().message
         }
         userIdSlot.captured shouldBe user.id
         verify(exactly = 1) { accountServiceSpy.getAccounts(user.id) }

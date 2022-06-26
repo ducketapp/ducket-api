@@ -7,11 +7,11 @@ import io.ducket.api.app.database.Transactional
 
 class CurrencyRepository: Transactional {
 
-    suspend fun findOne(currency: String): Currency? = transactional {
+    suspend fun findOne(currency: String): Currency? = blockingTransaction {
         CurrencyEntity.find { CurrenciesTable.isoCode.eq(currency) }.firstOrNull()?.toModel()
     }
 
-    suspend fun findAll(): List<Currency> = transactional {
+    suspend fun findAll(): List<Currency> = blockingTransaction {
         CurrencyEntity.all().map { it.toModel() }
     }
 }

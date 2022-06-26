@@ -24,9 +24,9 @@ class TagController(
     suspend fun createTag(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
 
-        ctx.receive<TagCreateDto>().apply {
-            tagService.createTag(userId, this.validate()).apply {
-                ctx.respond(HttpStatusCode.Created, this)
+        ctx.receive<TagCreateDto>().let { reqObj ->
+            tagService.createTag(userId, reqObj.validate()).let { resObj ->
+                ctx.respond(HttpStatusCode.Created, resObj)
             }
         }
     }
@@ -34,9 +34,9 @@ class TagController(
     suspend fun deleteTags(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
 
-        ctx.receive<BulkDeleteDto>().apply {
-            tagService.deleteTags(userId, this.validate()).apply {
-                ctx.respond(HttpStatusCode.NoContent, this)
+        ctx.receive<BulkDeleteDto>().let { reqObj ->
+            tagService.deleteTags(userId, reqObj.validate()).let { resObj ->
+                ctx.respond(HttpStatusCode.NoContent, resObj)
             }
         }
     }
@@ -44,8 +44,8 @@ class TagController(
     suspend fun getTag(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
         val tagId = ctx.parameters.getOrFail("tagId").toLong()
-
         val tag = tagService.getTag(userId, tagId)
+
         ctx.respond(HttpStatusCode.OK, tag)
     }
 
@@ -53,9 +53,9 @@ class TagController(
         val userId = ctx.authentication.principalOrThrow().id
         val tagId = ctx.parameters.getOrFail("tagId").toLong()
 
-        ctx.receive<TagUpdateDto>().apply {
-            tagService.updateTag(userId, tagId, this.validate()).apply {
-                ctx.respond(HttpStatusCode.OK, this)
+        ctx.receive<TagUpdateDto>().let { reqObj ->
+            tagService.updateTag(userId, tagId, reqObj.validate()).let { resObj ->
+                ctx.respond(HttpStatusCode.OK, resObj)
             }
         }
     }

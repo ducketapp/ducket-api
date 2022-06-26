@@ -62,7 +62,7 @@ object AppModule {
     }
 
     val serviceModule = module {
-        single { UserService(get(), get(), get()) }
+        single { UserService(get(), get()) }
         single { AccountService(get(), get()) }
         single { CategoryService(get()) }
         single { BudgetService(get(), get(), get(), get()) }
@@ -70,7 +70,7 @@ object AppModule {
         single { ImportRuleService(get()) }
         single { ImportService(get(), get(), get(), get(), get(), get()) }
         single { LocalFileService() }
-        single { LedgerService(get(), get(), get(), get(), get(), get()) }
+        single { LedgerService(get(), get(), get(), get(), get(), get(), get()) }
         single { GroupService(get(), get(), get(), get(), get()) }
         single { TagService(get()) }
     }

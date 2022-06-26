@@ -9,8 +9,8 @@ import io.ducket.api.domain.model.budget.Budget
 import io.ducket.api.domain.model.ledger.LedgerRecord
 import io.ducket.api.domain.repository.*
 import io.ducket.api.getLogger
-import io.ducket.api.plugins.DuplicateEntityException
-import io.ducket.api.plugins.NoEntityFoundException
+import io.ducket.api.plugins.DuplicateDataException
+import io.ducket.api.plugins.NoDataFoundException
 import io.ducket.api.utils.*
 import org.koin.java.KoinJavaComponent.inject
 import org.threeten.extra.LocalDateRange
@@ -30,7 +30,7 @@ class BudgetService(
 
     fun createBudget(userId: Long, payload: BudgetCreateDto): BudgetDto {
         budgetRepository.findOneByName(userId, payload.title)?.run {
-            throw DuplicateEntityException()
+            throw DuplicateDataException()
         }
 
         val budget = budgetRepository.create(userId, payload)
@@ -46,7 +46,7 @@ class BudgetService(
     }
 
     fun getBudget(userId: Long, budgetId: Long, period: String?): BudgetDto {
-        val budget = budgetRepository.findOne(userId, budgetId) ?: throw NoEntityFoundException()
+        val budget = budgetRepository.findOne(userId, budgetId) ?: throw NoDataFoundException()
         val budgetPeriodLimit = budget.limits
             .filter { it.period == period || it.default }
             .sortedBy { it.default }
@@ -142,7 +142,7 @@ class BudgetService(
                     return@map BigDecimal.ZERO
                 }
             } else {
-                return@map record.amountPosted
+                return@map record.clearedFunds
             }
         }.sumByDecimal { it }
     }

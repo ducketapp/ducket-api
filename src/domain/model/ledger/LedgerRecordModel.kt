@@ -20,10 +20,10 @@ internal object LedgerRecordsTable : LongIdTable("ledger_record") {
     val transferAccountId = reference("transfer_account_id", AccountsTable).nullable()
     val accountId = reference("account_id", AccountsTable)
     val type = enumerationByName("type", 32, LedgerRecordType::class)
-    val amountPosted = decimal("amount_posted", 10, 2)
-    val amountTransferred = decimal("amount_transferred", 10, 2)
-    val createdAt = timestamp("created_at")
-    val modifiedAt = timestamp("modified_at")
+    val clearedFunds = decimal("cleared_funds", 10, 2)
+    val postedFunds = decimal("posted_funds", 10, 2)
+    val createdAt = timestamp("created_at").clientDefault { Instant.now() }
+    val modifiedAt = timestamp("modified_at").clientDefault { Instant.now() }
 }
 
 class LedgerRecordEntity(id: EntityID<Long>) : LongEntity(id) {
@@ -33,8 +33,8 @@ class LedgerRecordEntity(id: EntityID<Long>) : LongEntity(id) {
     var transferAccount by AccountEntity optionalReferencedOn LedgerRecordsTable.transferAccountId
     var account by AccountEntity referencedOn LedgerRecordsTable.accountId
     var type by LedgerRecordsTable.type
-    var amountPosted by LedgerRecordsTable.amountPosted
-    var amountTransferred by LedgerRecordsTable.amountTransferred
+    var clearedFunds by LedgerRecordsTable.clearedFunds
+    var postedFunds by LedgerRecordsTable.postedFunds
     var createdAt by LedgerRecordsTable.createdAt
     var modifiedAt by LedgerRecordsTable.modifiedAt
 
@@ -44,8 +44,8 @@ class LedgerRecordEntity(id: EntityID<Long>) : LongEntity(id) {
         transferAccount = transferAccount?.toModel(),
         account = account.toModel(),
         type = type,
-        amountPosted = amountPosted,
-        amountTransferred = amountTransferred,
+        clearedFunds = clearedFunds,
+        postedFunds = postedFunds,
         createdAt = createdAt,
         modifiedAt = modifiedAt,
     )
@@ -57,8 +57,8 @@ data class LedgerRecord(
     val transferAccount: Account?,
     val account: Account,
     val type: LedgerRecordType,
-    val amountPosted: BigDecimal,
-    val amountTransferred: BigDecimal,
+    val clearedFunds: BigDecimal,
+    val postedFunds: BigDecimal,
     val createdAt: Instant,
     val modifiedAt: Instant,
 )

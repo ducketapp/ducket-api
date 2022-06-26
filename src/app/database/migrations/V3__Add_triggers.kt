@@ -6,7 +6,7 @@ import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
 
 @Suppress("unused", "ClassName")
-class V2__Add_triggers: BaseJavaMigration() {
+class V3__Add_triggers: BaseJavaMigration() {
 
     override fun migrate(context: Context?) {
         transaction {
@@ -21,10 +21,32 @@ class V2__Add_triggers: BaseJavaMigration() {
 //                END;;
 //            """.trimIndent()
 
-            val attachmentBeforeDeleteTrigger = """
-                CREATE DEFINER = CURRENT_USER TRIGGER `attachment_BEFORE_DELETE` BEFORE DELETE ON `attachment` FOR EACH ROW
+            val userBeforeUpdateTrigger = """
+                CREATE DEFINER = CURRENT_USER TRIGGER `user_before_update` BEFORE UPDATE ON `user` FOR EACH ROW
                 BEGIN
-                	DELETE FROM `operation_attachment` WHERE `operation_attachment`.`attachment_id` = OLD.`id`;
+                    SET NEW.modified_at = CURRENT_TIMESTAMP(3);
+                END;;
+            """.trimIndent()
+
+            val tagBeforeUpdateTrigger = """
+                CREATE DEFINER = CURRENT_USER TRIGGER `tag_before_update` BEFORE UPDATE ON `tag` FOR EACH ROW
+                BEGIN
+                    SET NEW.modified_at = CURRENT_TIMESTAMP(3);
+                END;;
+            """.trimIndent()
+
+            val operationBeforeDeleteTrigger = """
+                CREATE DEFINER = CURRENT_USER TRIGGER `operation_before_delete` BEFORE DELETE ON `operation` FOR EACH ROW
+                BEGIN
+                    DELETE FROM `operation_attachment` WHERE `operation_attachment`.`operation_id` = OLD.`id`;
+                    DELETE FROM `ledger_record` WHERE `ledger_record`.`operation_id` = OLD.`id`;
+                END;;
+            """.trimIndent()
+
+            val operationAttachmentAfterDeleteTrigger = """
+                CREATE DEFINER = CURRENT_USER TRIGGER `operation_attachment_after_delete` AFTER DELETE ON `operation_attachment` FOR EACH ROW
+                BEGIN
+                	DELETE FROM `attachment` WHERE `attachment`.`id` = OLD.`attachment_id`;
                 END;;
             """.trimIndent()
 
@@ -66,7 +88,12 @@ class V2__Add_triggers: BaseJavaMigration() {
             """.trimIndent()
 
             // connection.prepareStatement(budgetBeforeInsertTrigger, false).executeUpdate()
-            connection.prepareStatement(attachmentBeforeDeleteTrigger, false).executeUpdate()
+            connection.prepareStatement(userBeforeUpdateTrigger, false).executeUpdate()
+            connection.prepareStatement(tagBeforeUpdateTrigger, false).executeUpdate()
+
+            connection.prepareStatement(operationBeforeDeleteTrigger, false).executeUpdate()
+            connection.prepareStatement(operationAttachmentAfterDeleteTrigger, false).executeUpdate()
+
             connection.prepareStatement(tagBeforeDeleteTrigger, false).executeUpdate()
             connection.prepareStatement(groupBeforeDeleteTrigger, false).executeUpdate()
             connection.prepareStatement(groupMembershipBeforeDeleteTrigger, false).executeUpdate()

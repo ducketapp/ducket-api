@@ -15,17 +15,18 @@ internal object UsersTable : LongIdTable("user") {
     val name = varchar("name", 64)
     val passwordHash = varchar("password_hash", 128)
     val mainCurrencyId = reference("main_currency_id", CurrenciesTable)
-    val createdAt = timestamp("created_at")
-    val modifiedAt = timestamp("modified_at")
+    val createdAt = timestamp("created_at").clientDefault { Instant.now() }
+    val modifiedAt = timestamp("modified_at").clientDefault { Instant.now() }
 }
 
 class UserEntity(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<UserEntity>(UsersTable)
 
+    var mainCurrency by CurrencyEntity referencedOn UsersTable.mainCurrencyId
+
     var phone by UsersTable.phone
     var name by UsersTable.name
     var email by UsersTable.email
-    var mainCurrency by CurrencyEntity referencedOn UsersTable.mainCurrencyId
     var passwordHash by UsersTable.passwordHash
     var createdAt by UsersTable.createdAt
     var modifiedAt by UsersTable.modifiedAt

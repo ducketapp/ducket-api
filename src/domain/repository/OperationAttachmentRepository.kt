@@ -41,7 +41,7 @@ class OperationAttachmentRepository {
         }.also { attachment ->
             OperationAttachmentsTable.insert {
                 it[this.attachmentId] = attachment.id.value
-                it[this.operationId] = OperationEntity[operationId].id.value
+                it[this.operationId] = operationId
             }
         }
     }

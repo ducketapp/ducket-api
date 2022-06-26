@@ -9,6 +9,7 @@ import io.ducket.api.config.AppConfig
 import io.ducket.api.domain.repository.UserRepository
 import io.ducket.api.plugins.AuthenticationException
 import io.ktor.auth.jwt.*
+import kotlinx.coroutines.runBlocking
 
 class JwtManager(appConfig: AppConfig) {
     private val jwtConfig = appConfig.jwtConfig
@@ -16,7 +17,19 @@ class JwtManager(appConfig: AppConfig) {
 
     val verifier: JWTVerifier = JWT.require(algorithm).withIssuer(jwtConfig.issuer).build()
 
-    fun generateToken(userPrincipal: UserPrincipal): String {
+    fun getAuthorizationHeaderValue(userPrincipal: UserPrincipal): String = "Bearer ${generateToken(userPrincipal)}"
+
+    fun validateToken(jwtCredential: JWTCredential): UserPrincipal {
+        val userPrincipal = jacksonObjectMapper().readValue(
+            jwtCredential.payload.getClaim("user").asString(),
+            UserPrincipal::class.java
+        )
+        val foundUser = runBlocking { UserRepository().findOne(userPrincipal.id) }
+
+        return foundUser?.let { userPrincipal } ?: throw AuthenticationException("Invalid token")
+    }
+
+    private fun generateToken(userPrincipal: UserPrincipal): String {
         val userPrincipalString = jacksonObjectMapper().writeValueAsString(userPrincipal)
         return JWT.create()
             .withSubject("Authentication")
@@ -24,16 +37,4 @@ class JwtManager(appConfig: AppConfig) {
             .withClaim("user", userPrincipalString)
             .sign(algorithm)
     }
-
-    fun validateToken(jwtCredential: JWTCredential): UserPrincipal {
-        val userPrincipal = jacksonObjectMapper().readValue(
-            jwtCredential.payload.getClaim("user").asString(),
-            UserPrincipal::class.java
-        )
-        val foundUser = UserEntity.findById(userPrincipal.id)?.toModel()
-
-        return foundUser?.let { userPrincipal } ?: throw AuthenticationException("Invalid token")
-    }
-
-    fun getAuthorizationHeaderValue(userPrincipal: UserPrincipal): String = "Bearer ${generateToken(userPrincipal)}"
 }

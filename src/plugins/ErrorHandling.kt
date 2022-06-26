@@ -33,86 +33,91 @@ fun StatusPages.Configuration.applicationExceptions() {
 
     exception<Throwable> { cause ->
         getLogger().error(cause.stackTraceToString())
-        HttpStatusCode.InternalServerError.apply {
-            call.respond(this, ErrorResponse(this, "Oops, something went wrong!"))
+
+        HttpStatusCode.InternalServerError.also {
+            call.respond(status = it, message = ErrorResponse(it, "Oops, something went wrong!"))
         }
     }
 
     exception<ConstraintViolationException> { cause ->
-        HttpStatusCode.PreconditionFailed.apply {
+        HttpStatusCode.PreconditionFailed.also {
             val errors = cause.constraintViolations
                 .mapToMessage("messages", Locale.ENGLISH)
-                .map { "The '${it.property}' field ${it.message.lowercase()}" }
+                .map { err -> "The '${err.property}' field ${err.message.lowercase()}" }
 
-            call.respond(this, ErrorResponse(this, errors[0]))
+            call.respond(status = it, message = ErrorResponse(it, errors[0]))
         }
     }
 
     exception<AuthenticationException> { cause ->
-        HttpStatusCode.Unauthorized.apply {
-            call.respond(this, ErrorResponse(this, cause.localizedMessage))
+        HttpStatusCode.Unauthorized.also {
+            call.respond(status = it, message = ErrorResponse(it, cause.localizedMessage))
         }
     }
 
     exception<AuthorizationException> { cause ->
-        HttpStatusCode.Forbidden.apply {
-            call.respond(this, ErrorResponse(this, cause.localizedMessage))
+        HttpStatusCode.Forbidden.also {
+            call.respond(status = it, message = ErrorResponse(it, cause.localizedMessage))
         }
     }
 
     exception<UnrecognizedPropertyException> { cause ->
-        HttpStatusCode.BadRequest.apply {
-            call.respond(this, ErrorResponse(this, "Unrecognized property '${cause.propertyName}'"))
+        HttpStatusCode.BadRequest.also {
+            call.respond(status = it, message = ErrorResponse(it, "Unrecognized property: '${cause.propertyName}'"))
         }
     }
 
     exception<MissingKotlinParameterException> { cause ->
-        HttpStatusCode.BadRequest.apply {
-            call.respond(this, ErrorResponse(this, "Required field '${cause.parameter.name}' is missing"))
+        HttpStatusCode.BadRequest.also {
+            call.respond(status = it, message = ErrorResponse(it, "Required field '${cause.parameter.name}' is missing"))
         }
     }
 
     exception<InvalidDataException> { cause ->
         getLogger().error(cause.stackTraceToString())
-        HttpStatusCode.BadRequest.apply {
-            call.respond(this, ErrorResponse(this, cause.localizedMessage))
+
+        HttpStatusCode.BadRequest.also {
+            call.respond(status = it, message = ErrorResponse(it, cause.localizedMessage))
         }
     }
 
-    exception<DuplicateEntityException> { cause ->
+    exception<DuplicateDataException> { cause ->
         getLogger().error(cause.stackTraceToString())
-        HttpStatusCode.BadRequest.apply {
-            call.respond(this, ErrorResponse(this, cause.localizedMessage))
+
+        HttpStatusCode.BadRequest.also {
+            call.respond(status = it, message = ErrorResponse(it, cause.localizedMessage))
         }
     }
 
     exception<BusinessLogicException> { cause ->
         getLogger().error(cause.stackTraceToString())
-        HttpStatusCode.InternalServerError.apply {
-            call.respond(this, ErrorResponse(this, cause.localizedMessage))
+
+        HttpStatusCode.InternalServerError.also {
+            call.respond(status = it, message = ErrorResponse(it, cause.localizedMessage))
         }
     }
 
-    exception<UnexpectedException> { cause ->
+    exception<UnexpectedBehaviourException> { cause ->
         getLogger().error(cause.stackTraceToString())
-        HttpStatusCode.InternalServerError.apply {
-            call.respond(this, ErrorResponse(this, cause.localizedMessage))
+
+        HttpStatusCode.InternalServerError.also {
+            call.respond(status = it, message = ErrorResponse(it, cause.localizedMessage))
         }
     }
 
-    exception<NoEntityFoundException> { cause ->
-        HttpStatusCode.NotFound.apply {
-            call.respond(this, ErrorResponse(this, cause.localizedMessage))
+    exception<NoDataFoundException> { cause ->
+        HttpStatusCode.NotFound.also {
+            call.respond(status = it, message = ErrorResponse(it, cause.localizedMessage))
         }
     }
 }
 
 class AuthenticationException(message: String = "Authentication failure") : Exception(message)
 class AuthorizationException(message: String = "Access denied") : Exception(message)
-class NoEntityFoundException(message: String = "No such entity was found") : Exception(message)
-class DuplicateEntityException(message: String = "Such an entity already exists") : Exception(message)
+class NoDataFoundException(message: String = "No such entity was found") : Exception(message)
+class DuplicateDataException(message: String = "Such an entity already exists") : Exception(message)
 class InvalidDataException(message: String = "Invalid data") : Exception(message)
-class UnexpectedException(message: String = "Unexpected exception occurred") : Exception(message)
+class UnexpectedBehaviourException(message: String = "Unexpected behaviour exception occurred") : Exception(message)
 class BusinessLogicException(message: String = "Exception in business logic") : Exception(message)
 
 data class ErrorResponse(

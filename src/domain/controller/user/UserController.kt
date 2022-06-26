@@ -13,31 +13,29 @@ import io.ktor.response.*
 import io.ktor.util.*
 import org.koin.java.KoinJavaComponent.inject
 
-class UserController(
-    private val userService: UserService,
-) {
+class UserController(private val userService: UserService) {
     private val jwtManager: JwtManager by inject(JwtManager::class.java)
 
     suspend fun signUp(ctx: ApplicationCall) {
-        ctx.receive<UserCreateDto>().let { payload ->
-            userService.createUser(payload.validate()).run {
+        ctx.receive<UserCreateDto>().let { reqObj ->
+            userService.createUser(reqObj.validate()).let { resObj ->
                 ctx.response.header(
                     name = HttpHeaders.Authorization,
-                    value = jwtManager.getAuthorizationHeaderValue(UserPrincipal(id, email, UserRole.SUPER_USER)),
+                    value = jwtManager.getAuthorizationHeaderValue(UserPrincipal(resObj.id, resObj.email, UserRole.SUPER_USER)),
                 )
-                ctx.respond(HttpStatusCode.Created, this)
+                ctx.respond(HttpStatusCode.Created, resObj)
             }
         }
     }
 
     suspend fun signIn(ctx: ApplicationCall) {
-        ctx.receive<UserAuthenticateDto>().let { payload ->
-            userService.authenticateUser(payload.validate()).run {
+        ctx.receive<UserAuthenticateDto>().let { reqObj ->
+            userService.authenticateUser(reqObj.validate()).let { resObj ->
                 ctx.response.header(
                     name = HttpHeaders.Authorization,
-                    value = jwtManager.getAuthorizationHeaderValue(UserPrincipal(id, email, UserRole.SUPER_USER)),
+                    value = jwtManager.getAuthorizationHeaderValue(UserPrincipal(resObj.id, resObj.email, UserRole.SUPER_USER)),
                 )
-                ctx.respond(HttpStatusCode.OK, this)
+                ctx.respond(HttpStatusCode.OK, resObj)
             }
         }
     }
@@ -45,17 +43,17 @@ class UserController(
     suspend fun getUser(ctx: ApplicationCall) {
         val userId = ctx.parameters.getOrFail("userId").toLong()
 
-        userService.getUser(userId).apply {
-            ctx.respond(HttpStatusCode.OK, this)
+        userService.getUser(userId).let { resObj ->
+            ctx.respond(HttpStatusCode.OK, resObj)
         }
     }
 
     suspend fun updateUser(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
 
-        ctx.receive<UserUpdateDto>().apply {
-            userService.updateUser(userId, this.validate()).apply {
-                ctx.respond(HttpStatusCode.OK, this)
+        ctx.receive<UserUpdateDto>().let { reqObj ->
+            userService.updateUser(userId, reqObj.validate()).let { resObj ->
+                ctx.respond(HttpStatusCode.OK, resObj)
             }
         }
     }

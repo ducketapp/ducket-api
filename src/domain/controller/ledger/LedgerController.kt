@@ -25,8 +25,8 @@ class LedgerController(
         val userId = ctx.authentication.principalOrThrow().id
         val recordId = ctx.parameters.getOrFail("recordId").toLong()
 
-        ledgerService.getLedgerRecord(userId, recordId).apply {
-            ctx.respond(HttpStatusCode.OK, this)
+        ledgerService.getLedgerRecord(userId, recordId).let { resObj ->
+            ctx.respond(HttpStatusCode.OK, resObj)
         }
     }
 
@@ -42,9 +42,9 @@ class LedgerController(
     suspend fun createLedgerRecord(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
 
-        ctx.receive<LedgerRecordCreateDto>().apply {
-            ledgerService.createLedgerRecord(userId, this.validate()).apply {
-                ctx.respond(HttpStatusCode.Created, this)
+        ctx.receive<LedgerRecordCreateDto>().let { reqObj ->
+            ledgerService.createLedgerRecord(userId, reqObj.validate()).let { resObj ->
+                ctx.respond(HttpStatusCode.Created, resObj)
             }
         }
     }
@@ -65,9 +65,9 @@ class LedgerController(
         val operationId = ctx.parameters.getOrFail("operationId").toLong()
         val imageId = ctx.parameters.getOrFail("imageId").toLong()
 
-        ledgerService.downloadLedgerRecordAttachment(userId, recordId, operationId, imageId).apply {
-            ctx.response.header("Content-Disposition", "attachment; filename=\"${this.name}\"")
-            ctx.respondFile(this)
+        ledgerService.downloadLedgerRecordAttachment(userId, recordId, operationId, imageId).let { resFile ->
+            ctx.response.header("Content-Disposition", "attachment; filename=\"${resFile.name}\"")
+            ctx.respondFile(resFile)
         }
     }
 

@@ -19,7 +19,7 @@ abstract class MySqlDatabase(appConfig: AppConfig): AppDatabase {
     override fun connect() {
         database = Database.connect(
             datasource = dataSource,
-            databaseConfig = DatabaseConfig.invoke { useNestedTransactions = true }
+            databaseConfig = DatabaseConfig.invoke { useNestedTransactions = false }
         )
     }
 
@@ -38,7 +38,7 @@ abstract class MySqlDatabase(appConfig: AppConfig): AppDatabase {
             poolName = "${getDatabaseName()}-pool"
             username = databaseConfig.user
             password = databaseConfig.password
-            maximumPoolSize = 3
+            maximumPoolSize = 25
             isAutoCommit = false
             transactionIsolation = "TRANSACTION_REPEATABLE_READ"
 

@@ -17,6 +17,7 @@ open class MainDatabase(appConfig: AppConfig): MySqlDatabase(appConfig) {
 
         try {
             flyway.info()
+            flyway.repair()
             flyway.migrate()
         } catch (e: Exception) {
             getLogger().error("Cannot perform the migration: ${e.message}")

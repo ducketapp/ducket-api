@@ -10,7 +10,7 @@ import java.time.LocalDate
 
 class CurrencyRateRepository: Transactional {
 
-    suspend fun insert(data: CurrencyRateCreateDto) = transactional {
+    suspend fun insert(data: CurrencyRateCreateDto) = blockingTransaction {
         CurrencyRatesTable.insertIgnore {
             it[this.baseCurrencyIsoCode] = data.baseCurrency
             it[this.quoteCurrencyIsoCode] = data.quoteCurrency
@@ -20,7 +20,7 @@ class CurrencyRateRepository: Transactional {
         }
     }
 
-    suspend fun insertBatch(data: List<CurrencyRateCreateDto>) = transactional {
+    suspend fun insertBatch(data: List<CurrencyRateCreateDto>) = blockingTransaction {
         CurrencyRatesTable.batchInsert(data = data, ignore = true) { item ->
             this[CurrencyRatesTable.baseCurrencyIsoCode] = item.baseCurrency
             this[CurrencyRatesTable.quoteCurrencyIsoCode] = item.quoteCurrency
@@ -30,14 +30,14 @@ class CurrencyRateRepository: Transactional {
         }
     }
 
-    suspend fun findLatest(baseCurrency: String, quoteCurrency: String): CurrencyRate? = transactional {
+    suspend fun findLatest(baseCurrency: String, quoteCurrency: String): CurrencyRate? = blockingTransaction {
         CurrencyRateEntity.find {
             CurrencyRatesTable.baseCurrencyIsoCode.eq(baseCurrency)
                 .and(CurrencyRatesTable.quoteCurrencyIsoCode.eq(quoteCurrency))
         }.orderBy(CurrencyRatesTable.date to SortOrder.DESC).firstOrNull()?.toModel()
     }
 
-    suspend fun findOneByDate(baseCurrency: String, quoteCurrency: String, date: LocalDate): CurrencyRate? = transactional {
+    suspend fun findOneByDate(baseCurrency: String, quoteCurrency: String, date: LocalDate): CurrencyRate? = blockingTransaction {
         CurrencyRateEntity.find {
             CurrencyRatesTable.date.eq(date)
                 .and(CurrencyRatesTable.baseCurrencyIsoCode.eq(baseCurrency))
@@ -45,7 +45,7 @@ class CurrencyRateRepository: Transactional {
         }.firstOrNull()?.toModel()
     }
 
-    suspend fun deleteAll() = transactional {
+    suspend fun deleteAll() = blockingTransaction {
         CurrencyRatesTable.deleteAll()
     }
 }

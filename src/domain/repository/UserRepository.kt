@@ -17,54 +17,47 @@ import io.ducket.api.domain.model.ledger.LedgerRecordEntity
 import io.ducket.api.domain.model.ledger.LedgerRecordsTable
 import domain.model.operation.OperationAttachmentsTable
 import domain.model.operation.OperationsTable
+import io.ducket.api.app.database.Transactional
 import io.ducket.api.utils.HashUtils
 
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.time.Instant
 
-class UserRepository {
+class UserRepository: Transactional {
 
-    fun create(dto: UserCreateDto): User = transaction {
+    suspend fun createOne(data: UserCreateDto): User = blockingTransaction {
         UserEntity.new {
-            this.name = dto.name
-            this.phone = dto.phone
-            this.email = dto.email
-            this.mainCurrency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(dto.currencyIsoCode) }.first()
-            this.passwordHash = HashUtils.hash(dto.password)
-            Instant.now().also {
-                this.createdAt = it
-                this.modifiedAt = it
-            }
+            this.name = data.name
+            this.phone = data.phone
+            this.email = data.email
+            this.mainCurrency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(data.currencyIsoCode) }.first()
+            this.passwordHash = HashUtils.hash(data.password)
         }.toModel()
     }
 
-    fun findOneByEmail(email: String): User? = transaction {
+    suspend fun findOneByEmail(email: String): User? = blockingTransaction {
         UserEntity.find { UsersTable.email.eq(email) }.firstOrNull()?.toModel()
     }
 
+    // TODO suspend
     fun findOne(userId: Long): User? = transaction {
         UserEntity.findById(userId)?.toModel()
     }
 
-    fun findAll(): List<User> = transaction {
+    suspend fun findAll(): List<User> = blockingTransaction {
         UserEntity.all().map { it.toModel() }
     }
 
-    fun updateOne(userId: Long, dto: UserUpdateDto): User? = transaction {
-        UserEntity.findById(userId)?.also { found ->
-            dto.name?.let {
-                found.name = it
-                found.modifiedAt = Instant.now()
-            }
-            dto.password?.let {
-                found.passwordHash = HashUtils.hash(it)
-                found.modifiedAt = Instant.now()
-            }
+    suspend fun updateOne(userId: Long, data: UserUpdateDto): User? = blockingTransaction {
+        UserEntity.findById(userId)?.also { entity ->
+            data.name?.let { entity.name = it }
+            data.phone?.let { entity.phone = it }
+            data.password?.let { entity.passwordHash = HashUtils.hash(it) }
         }?.toModel()
     }
 
-    fun deleteData(userId: Long): Unit = transaction {
+    // TODO update
+    suspend fun deleteData(userId: Long): Unit = blockingTransaction {
         LedgerRecordEntity.wrapRows(
             LedgerRecordsTable.select {
                 exists(OperationsTable.select {
@@ -94,7 +87,7 @@ class UserRepository {
         AccountsTable.deleteWhere { AccountsTable.userId.eq(userId) }
     }
 
-    fun deleteOne(userId: Long): Unit = transaction {
+    suspend fun deleteOne(userId: Long): Unit = blockingTransaction {
         UserEntity.findById(userId)?.delete()
     }
 }

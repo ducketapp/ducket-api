@@ -6,9 +6,7 @@ import io.ducket.api.domain.controller.ledger.LedgerController
 import io.ktor.auth.*
 import io.ktor.routing.*
 
-fun Route.ledgerRecords(
-    ledgerController: LedgerController,
-) {
+fun Route.ledgerRecords(ledgerController: LedgerController) {
     authenticate {
         route("/records") {
             get { ledgerController.getLedgerRecords(this.context) }
@@ -24,9 +22,18 @@ fun Route.ledgerRecords(
                 authorize(UserRole.SUPER_USER) {
                     delete { ledgerController.deleteLedgerRecord(this.context) }
                 }
-
+                // records - get
+                // records/id - get
+                // operations - post
+                // operations/id - delete
+                // operations/id/images - post
+                // operations/id/images/id - get, delete
                 route("/operations") {
                     route("/{operationId}") {
+                        authorize(UserRole.SUPER_USER) {
+                            delete { ledgerController.deleteLedgerRecord(this.context) }
+                        }
+
                         route("/images") {
                             authorize(UserRole.SUPER_USER) {
                                 post { ledgerController.uploadLedgerRecordAttachments(this.context) }

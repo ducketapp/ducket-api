@@ -13,8 +13,8 @@ import java.time.Instant
 internal object TagsTable : LongIdTable("tag") {
     val userId = reference("user_id", UsersTable)
     val name = varchar("name", 32)
-    val createdAt = timestamp("created_at")
-    val modifiedAt = timestamp("modified_at")
+    val createdAt = timestamp("created_at").clientDefault { Instant.now() }
+    val modifiedAt = timestamp("modified_at").clientDefault { Instant.now() }
 }
 
 class TagEntity(id: EntityID<Long>) : LongEntity(id) {

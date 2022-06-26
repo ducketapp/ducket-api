@@ -32,8 +32,8 @@ internal object OperationsTable : LongIdTable("operation") {
     val latitude = decimal("latitude", 10, 7).nullable()
     val longitude = decimal("longitude", 10, 7).nullable()
     val date = timestamp("date")
-    val createdAt = timestamp("created_at")
-    val modifiedAt = timestamp("modified_at")
+    val createdAt = timestamp("created_at").clientDefault { Instant.now() }
+    val modifiedAt = timestamp("modified_at").clientDefault { Instant.now() }
 }
 
 class OperationEntity(id: EntityID<Long>) : LongEntity(id) {

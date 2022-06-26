@@ -11,14 +11,13 @@ import java.nio.file.Paths
 import java.time.Instant
 
 open class LocalFileService {
+    private val config: AppConfig by inject(AppConfig::class.java)
+
     companion object {
-        const val LOCAL_FILE_PREFIX: String = "dckt"
+        const val LOCAL_FILE_PREFIX: String = "d_"
     }
 
-    private val config: AppConfig by inject(AppConfig::class.java)
-    private val logger = getLogger()
-
-    fun extractImportData(multipartData: List<PartData>): Pair<File, ByteArray> {
+    fun extractMultipartData(multipartData: List<PartData>): Pair<File, ByteArray> {
         if (multipartData.size == 1) {
             val partData = multipartData[0]
 
@@ -40,7 +39,7 @@ open class LocalFileService {
         }
     }
 
-    fun extractImagesData(multipartData: List<PartData>): List<Pair<File, ByteArray>> {
+    fun extractMultipartImageData(multipartData: List<PartData>): List<Pair<File, ByteArray>> {
         val result = multipartData.mapIndexed { idx, part ->
             if (part is PartData.FileItem) {
                 if (part.name == "file") {
@@ -86,16 +85,16 @@ open class LocalFileService {
         return createLocalFile("images", extension, content)
     }
 
-    fun createLocalImportFile(extension: String, content: ByteArray): File {
-        return createLocalFile("imports", extension, content)
+    fun createLocalCsvFile(extension: String, content: ByteArray): File {
+        return createLocalFile("csv", extension, content)
     }
 
     private fun createLocalFile(dir: String, extension: String, content: ByteArray): File {
         val fileName = "${LOCAL_FILE_PREFIX}_${Instant.now().toEpochMilli()}.$extension"
-        val filePath = Paths.get(config.localDataConfig.dbDataPath, dir, fileName)
+        val filePath = Paths.get(config.dataConfig.dataPath, dir, fileName)
         val localFile = File(filePath.toUri())
 
-        logger.debug("Create local file: ${localFile.path}")
+        getLogger().debug("Create local file: ${localFile.path}")
 
         localFile.parentFile.mkdirs()
         localFile.writeBytes(content)

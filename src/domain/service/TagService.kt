@@ -5,42 +5,40 @@ import io.ducket.api.domain.controller.tag.TagCreateDto
 import io.ducket.api.domain.controller.tag.TagDto
 import io.ducket.api.domain.controller.tag.TagUpdateDto
 import io.ducket.api.domain.repository.TagRepository
-import io.ducket.api.plugins.DuplicateEntityException
-import io.ducket.api.plugins.NoEntityFoundException
+import io.ducket.api.plugins.DuplicateDataException
+import io.ducket.api.plugins.NoDataFoundException
 
-class TagService(
-    private val tagRepository: TagRepository,
-) {
+class TagService(private val tagRepository: TagRepository) {
 
-    fun createTag(userId: Long, payload: TagCreateDto): TagDto {
-        tagRepository.findOneByName(userId, payload.name)?.run {
-            throw DuplicateEntityException()
+    suspend fun createTag(userId: Long, reqObj: TagCreateDto): TagDto {
+        tagRepository.findOneByName(userId, reqObj.name)?.also {
+            throw DuplicateDataException()
         }
 
-        return TagDto(tagRepository.createOne(userId, payload))
+        return TagDto(tagRepository.createOne(userId, reqObj))
     }
 
-    fun updateTag(userId: Long, tagId: Long, payload: TagUpdateDto): TagDto {
-        tagRepository.findOneByName(userId, payload.name)?.run {
-            throw DuplicateEntityException()
+    suspend fun updateTag(userId: Long, tagId: Long, reqObj: TagUpdateDto): TagDto {
+        tagRepository.findOneByName(userId, reqObj.name)?.also {
+            throw DuplicateDataException()
         }
 
-        return TagDto(tagRepository.updateOne(userId, tagId, payload))
+        return tagRepository.updateOne(userId, tagId, reqObj)?.let { TagDto(it) } ?: throw NoDataFoundException()
     }
 
-    fun getTag(userId: Long, tagId: Long): TagDto {
-        return tagRepository.findOne(userId, tagId)?.let { TagDto(it) } ?: throw NoEntityFoundException()
+    suspend fun getTag(userId: Long, tagId: Long): TagDto {
+        return tagRepository.findOne(userId, tagId)?.let { TagDto(it) } ?: throw NoDataFoundException()
     }
 
-    fun getTags(userId: Long): List<TagDto> {
+    suspend fun getTags(userId: Long): List<TagDto> {
         return tagRepository.findAll(userId).map { TagDto(it) }
     }
 
-    fun deleteTag(userId: Long, tagId: Long) {
+    suspend fun deleteTag(userId: Long, tagId: Long) {
         tagRepository.delete(userId, tagId)
     }
 
-    fun deleteTags(userId: Long, payload: BulkDeleteDto) {
-        tagRepository.delete(userId, *payload.ids.toLongArray())
+    suspend fun deleteTags(userId: Long, reqObj: BulkDeleteDto) {
+        tagRepository.delete(userId, *reqObj.ids.toLongArray())
     }
 }

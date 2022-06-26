@@ -44,7 +44,7 @@ class AccountEntity(id: EntityID<Long>) : LongEntity(id) {
 
     private val balance: BigDecimal
         get() = records.sumByDecimal {
-            if (it.type == LedgerRecordType.EXPENSE) it.amountPosted.negate() else it.amountPosted
+            if (it.type == LedgerRecordType.EXPENSE) it.clearedFunds.negate() else it.clearedFunds
         }
 
     fun toModel() = Account(

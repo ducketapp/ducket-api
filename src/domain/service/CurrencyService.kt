@@ -1,7 +1,7 @@
 package io.ducket.api.domain.service
 
-import domain.model.currency.DEFAULT_ROUNDING
-import domain.model.currency.DEFAULT_SCALE
+import io.ducket.api.app.DEFAULT_ROUNDING
+import io.ducket.api.app.DEFAULT_RATE_SCALE
 import io.ducket.api.app.database.Transactional
 import io.ducket.api.domain.controller.currency.CurrencyRateCreateDto
 import io.ducket.api.clients.rates.ReferenceDto
@@ -10,8 +10,7 @@ import io.ducket.api.domain.controller.currency.CurrencyRateDto
 import io.ducket.api.domain.repository.CurrencyRateRepository
 import io.ducket.api.domain.repository.CurrencyRepository
 import io.ducket.api.getLogger
-import io.ducket.api.plugins.NoEntityFoundException
-import java.math.BigDecimal
+import io.ducket.api.plugins.NoDataFoundException
 import java.math.BigDecimal.*
 import java.time.LocalDate
 
@@ -22,13 +21,11 @@ class CurrencyService(
     private val logger = getLogger()
 
     suspend fun getCurrencyRate(baseCurrency: String, quoteCurrency: String, date: LocalDate): CurrencyRateDto {
-        val exchangeRate = if (LocalDate.now().isEqual(date)) {
+        return if (date.isEqual(LocalDate.now()) || date.isBefore(LocalDate.now())) {
             currencyRateRepository.findLatest(baseCurrency, quoteCurrency)?.let { CurrencyRateDto(it) }
         } else {
             currencyRateRepository.findOneByDate(baseCurrency, quoteCurrency, date)?.let { CurrencyRateDto(it) }
-        }
-
-        return exchangeRate ?: throw NoEntityFoundException("Cannot find rate for ${baseCurrency}/${quoteCurrency} at $date")
+        } ?: throw NoDataFoundException("Cannot find rate for ${baseCurrency}/${quoteCurrency} at $date")
     }
 
     suspend fun putCurrencyRates(references: List<ReferenceDto>, dataSource: String? = null) {
@@ -49,7 +46,7 @@ class CurrencyService(
 
         logger.info("Inserting static exchange rates data: ${completeExchangeRates.size} item(s)")
 
-        transactional {
+        blockingTransaction {
             completeExchangeRates.chunked(250).forEach {
                 logger.info("Inserting data chunk: ${it.size} item(s)")
                 currencyRateRepository.insertBatch(it)
@@ -72,7 +69,7 @@ class CurrencyService(
 
             for (r1 in rates) {
                 // add initial rate
-                set.add(r1.copy(rate = r1.rate.setScale(DEFAULT_SCALE, DEFAULT_ROUNDING)))
+                set.add(r1.copy(rate = r1.rate.setScale(DEFAULT_RATE_SCALE, DEFAULT_ROUNDING)))
 
                 for (r2 in rates) {
                     if (r1 == r2) {
@@ -80,7 +77,7 @@ class CurrencyService(
                         set.add(r1.copy(
                             baseCurrency = r1.quoteCurrency,
                             quoteCurrency = r1.baseCurrency,
-                            rate = ONE.divide(r1.rate, DEFAULT_SCALE, DEFAULT_ROUNDING),
+                            rate = ONE.divide(r1.rate, DEFAULT_RATE_SCALE, DEFAULT_ROUNDING),
                         ))
                     } else {
                         if (r1.baseCurrency == r2.baseCurrency) {
@@ -88,7 +85,7 @@ class CurrencyService(
                             set.add(r1.copy(
                                 baseCurrency = r1.quoteCurrency,
                                 quoteCurrency = r2.quoteCurrency,
-                                rate = r2.rate.divide(r1.rate, DEFAULT_SCALE, DEFAULT_ROUNDING),
+                                rate = r2.rate.divide(r1.rate, DEFAULT_RATE_SCALE, DEFAULT_ROUNDING),
                             ))
                         }
                     }

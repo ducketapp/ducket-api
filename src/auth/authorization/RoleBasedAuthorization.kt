@@ -18,10 +18,7 @@ class RoleBasedAuthorization(configuration: Configuration) {
         }
     }
 
-    fun interceptPipeline(
-        pipeline: ApplicationCallPipeline,
-        acceptableRoles: Set<UserRole>,
-    ) {
+    fun interceptPipeline(pipeline: ApplicationCallPipeline, acceptableRoles: Set<UserRole>) {
         pipeline.insertPhaseAfter(ApplicationCallPipeline.Features, Authentication.ChallengePhase)
         pipeline.insertPhaseAfter(Authentication.ChallengePhase, AuthorizePhase)
 
