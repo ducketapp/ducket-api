@@ -8,10 +8,13 @@ import io.ducket.api.app.scheduler.AppJobFactory
 import io.ducket.api.config.AppConfig
 import io.ducket.api.auth.JwtManager
 import io.ducket.api.domain.controller.account.AccountController
+import domain.controller.periodic_budget.PeriodicBudgetController
+import domain.model.imports.ImportRule
 import io.ducket.api.domain.controller.budget.BudgetController
 import io.ducket.api.domain.controller.category.CategoryController
 import io.ducket.api.domain.controller.currency.CurrencyController
 import io.ducket.api.domain.controller.group.GroupController
+import io.ducket.api.domain.controller.imports.ImportController
 import io.ducket.api.domain.controller.operation.OperationController
 import io.ducket.api.domain.controller.rule.ImportRuleController
 import io.ducket.api.domain.controller.tag.TagController
@@ -29,9 +32,6 @@ import org.koin.dsl.module
 import java.util.concurrent.TimeUnit
 
 object AppModule {
-    enum class DatabaseType {
-        MAIN_DB, SCHEDULER_DB
-    }
 
     val configurationModule = module {
         single { AppConfig() }
@@ -42,7 +42,7 @@ object AppModule {
     }
 
     val databaseModule = module {
-        single<AppDatabase>(named(DatabaseType.MAIN_DB)) { MainDatabase(get()) }
+        single<AppDatabase>() { MainDatabase(get()) }
     }
 
     val schedulerModule = module {
@@ -54,23 +54,27 @@ object AppModule {
         single { AccountController(get(), get()) }
         single { CategoryController(get()) }
         single { BudgetController(get()) }
+        single { PeriodicBudgetController(get(), get()) }
         single { CurrencyController(get()) }
+        single { ImportController(get()) }
         single { ImportRuleController(get()) }
-        single { OperationController() }
+        single { OperationController(get()) }
         single { GroupController(get()) }
         single { TagController(get()) }
     }
 
     val serviceModule = module {
         single { UserService(get(), get()) }
-        single { AccountService(get()) }
+        single { AccountService(get(), get(), get()) }
         single { CategoryService(get()) }
-        single { BudgetService(get(), get(), get(), get()) }
+        single { BudgetService(get(), get()) }
+        single { PeriodicBudgetService(get(), get(), get()) }
+        single { PeriodicBudgetLimitService(get(), get()) }
         single { CurrencyService(get(), get()) }
         single { ImportRuleService(get()) }
-        single { ImportService(get(), get(), get(), get(), get()) }
+        single { ImportService(get(), get(), get(), get()) }
         single { LocalFileService() }
-        single { OperationService(get(), get(), get(), get(), get(), get()) }
+        single { OperationService(get(), get(), get()) }
         single { GroupService(get(), get(), get(), get(), get()) }
         single { TagService(get()) }
     }
@@ -84,7 +88,10 @@ object AppModule {
         single { ImportRuleRepository() }
         single { AccountRepository() }
         single { BudgetRepository() }
-        single { BudgetPeriodLimitRepository() }
+        single { BudgetAccountRepository() }
+        single { PeriodicBudgetRepository() }
+        single { PeriodicBudgetLimitRepository() }
+        single { PeriodicBudgetAccountRepository() }
         single { OperationRepository() }
         single { OperationAttachmentRepository() }
         single { GroupRepository() }

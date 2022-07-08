@@ -3,10 +3,11 @@ package io.ducket.api.domain.service
 import io.ducket.api.app.DEFAULT_ROUNDING
 import io.ducket.api.app.DEFAULT_RATE_SCALE
 import io.ducket.api.app.database.Transactional
-import io.ducket.api.domain.controller.currency.CurrencyRateCreateDto
+import domain.mapper.CurrencyMapper
 import io.ducket.api.clients.rates.ReferenceDto
-import io.ducket.api.domain.controller.currency.CurrencyDto
-import io.ducket.api.domain.controller.currency.CurrencyRateDto
+import io.ducket.api.domain.controller.currency.dto.CurrencyDto
+import io.ducket.api.domain.controller.currency.dto.CurrencyRateDto
+import io.ducket.api.domain.model.currency.CurrencyRateCreate
 import io.ducket.api.domain.repository.CurrencyRateRepository
 import io.ducket.api.domain.repository.CurrencyRepository
 import io.ducket.api.getLogger
@@ -18,13 +19,14 @@ class CurrencyService(
     private val currencyRateRepository: CurrencyRateRepository,
     private val currencyRepository: CurrencyRepository,
 ): Transactional {
-    private val logger = getLogger()
 
     suspend fun getCurrencyRate(baseCurrency: String, quoteCurrency: String, date: LocalDate): CurrencyRateDto {
         return if (date.isEqual(LocalDate.now()) || date.isBefore(LocalDate.now())) {
-            currencyRateRepository.findLatest(baseCurrency, quoteCurrency)?.let { CurrencyRateDto(it) }
+            currencyRateRepository.findLatest(baseCurrency, quoteCurrency)
         } else {
-            currencyRateRepository.findOneByDate(baseCurrency, quoteCurrency, date)?.let { CurrencyRateDto(it) }
+            currencyRateRepository.findOneByDate(baseCurrency, quoteCurrency, date)
+        }?.let {
+            CurrencyMapper.mapModelToDto(it)
         } ?: throw NoDataFoundException("Cannot find rate for ${baseCurrency}/${quoteCurrency} at $date")
     }
 
@@ -34,7 +36,7 @@ class CurrencyService(
                 .asSequence()
                 .filter { it.value.toBigDecimalOrNull() != null && LocalDate.parse(it.date) != null }
                 .map { rate ->
-                    CurrencyRateCreateDto(
+                    CurrencyRateCreate(
                         baseCurrency = reference.baseCurrency,
                         quoteCurrency = reference.currency,
                         rate = rate.value.toBigDecimal(),
@@ -44,28 +46,27 @@ class CurrencyService(
                 }
         }.createAllCombinations()
 
-        logger.info("Inserting static exchange rates data: ${completeExchangeRates.size} item(s)")
+        getLogger().info("Inserting static exchange rates data: ${completeExchangeRates.size} item(s)")
 
         blockingTransaction {
             completeExchangeRates.chunked(250).forEach {
-                logger.info("Inserting data chunk: ${it.size} item(s)")
-                currencyRateRepository.insertBatch(it)
+                currencyRateRepository.createBatch(it)
             }
         }
     }
 
     suspend fun getCurrencies(): List<CurrencyDto> {
-        return currencyRepository.findAll().map { CurrencyDto(it) }
+        return currencyRepository.findAll().map { CurrencyMapper.mapModelToDto(it) }
     }
 
     suspend fun deleteAllCurrencyRates() {
         currencyRateRepository.deleteAll()
     }
 
-    private fun List<CurrencyRateCreateDto>.createAllCombinations(): List<CurrencyRateCreateDto> {
-        return groupBy(CurrencyRateCreateDto::date).flatMap { dateToRates ->
+    private fun List<CurrencyRateCreate>.createAllCombinations(): List<CurrencyRateCreate> {
+        return groupBy(CurrencyRateCreate::date).flatMap { dateToRates ->
             val rates = dateToRates.value
-            val set = mutableSetOf<CurrencyRateCreateDto>()
+            val set = mutableSetOf<CurrencyRateCreate>()
 
             for (r1 in rates) {
                 // add initial rate

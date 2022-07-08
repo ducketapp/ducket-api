@@ -1,15 +1,17 @@
 package io.ducket.api.app
 
+import org.threeten.extra.LocalDateRange
+
 enum class AccountType {
     GENERAL, DEBIT_CARD, CREDIT_CARD, CASH, BANK_ACCOUNT, SAVINGS
 }
 
-enum class BudgetPeriodType {
+enum class PeriodicBudgetType {
     DAILY, WEEKLY, MONTHLY, QUARTERLY, ANNUALLY,
 }
 
-enum class LedgerRecordStrategy {
-    RECORD, TRANSFER
+enum class PeriodicBudgetLimitUpdateStrategy {
+    CURRENT, CURRENT_FUTURE, CURRENT_PAST, ALL
 }
 
 enum class OperationType {

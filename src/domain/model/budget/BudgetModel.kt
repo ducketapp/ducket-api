@@ -11,8 +11,9 @@ import domain.model.currency.CurrencyEntity
 import domain.model.user.User
 import domain.model.user.UserEntity
 import domain.model.user.UsersTable
-import io.ducket.api.app.BudgetPeriodType
-import org.jetbrains.exposed.dao.*
+import io.ducket.api.app.DEFAULT_SCALE
+import org.jetbrains.exposed.dao.LongEntity
+import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.javatime.date
@@ -26,13 +27,12 @@ internal object BudgetsTable : LongIdTable("budget") {
     val currencyId = reference("currency_id", CurrenciesTable)
     val categoryId = reference("category_id", CategoriesTable)
     val title = varchar("title", 32)
-    // val defaultLimit = decimal("default_limit", 10, 2)
-    val periodType = enumerationByName("period_type", 32, BudgetPeriodType::class)
+    val limit = decimal("limit", 10, DEFAULT_SCALE)
     val startDate = date("start_date")
-    val endDate = date("end_date").nullable()
+    val endDate = date("end_date")
     val notes = varchar("notes", 128).nullable()
-    val createdAt = timestamp("created_at")
-    val modifiedAt = timestamp("modified_at")
+    val createdAt = timestamp("created_at").clientDefault { Instant.now() }
+    val modifiedAt = timestamp("modified_at").clientDefault { Instant.now() }
 }
 
 class BudgetEntity(id: EntityID<Long>) : LongEntity(id) {
@@ -42,31 +42,27 @@ class BudgetEntity(id: EntityID<Long>) : LongEntity(id) {
     var currency by CurrencyEntity referencedOn BudgetsTable.currencyId
     var category by CategoryEntity referencedOn BudgetsTable.categoryId
 
-    var periodType by BudgetsTable.periodType
     var startDate by BudgetsTable.startDate
     var endDate by BudgetsTable.endDate
     var title by BudgetsTable.title
-    // var defaultLimit by BudgetsTable.defaultLimit
+    var limit by BudgetsTable.limit
     var notes by BudgetsTable.notes
     var createdAt by BudgetsTable.createdAt
     var modifiedAt by BudgetsTable.modifiedAt
 
     val accounts by AccountEntity via BudgetAccountsTable
-    val limits by BudgetPeriodLimitEntity referrersOn BudgetPeriodLimitsTable.budgetId
 
     fun toModel() = Budget(
         id = id.value,
         title = title,
-        // defaultLimit = defaultLimit,
+        limit = limit,
         user = user.toModel(),
         category = category.toModel(),
         currency = currency.toModel(),
-        periodType = periodType,
         startDate = startDate,
         endDate = endDate,
         notes = notes,
         accounts = accounts.map { it.toModel() },
-        limits = limits.map { it.toModel() },
         createdAt = createdAt,
         modifiedAt = modifiedAt
     )
@@ -75,16 +71,35 @@ class BudgetEntity(id: EntityID<Long>) : LongEntity(id) {
 data class Budget(
     val id: Long,
     val title: String,
-    // val defaultLimit: BigDecimal,
+    val limit: BigDecimal,
     val user: User,
     val category: Category,
     val currency: Currency,
-    val periodType: BudgetPeriodType,
     val startDate: LocalDate,
-    val endDate: LocalDate?,
+    val endDate: LocalDate,
     val notes: String?,
     val accounts: List<Account>,
-    val limits: List<BudgetPeriodLimit>,
     val createdAt: Instant,
     val modifiedAt: Instant,
+)
+
+data class BudgetCreate(
+    val userId: Long,
+    val title: String,
+    val limit: BigDecimal,
+    val currency: String,
+    val categoryId: Long,
+    val startDate: LocalDate,
+    val endDate: LocalDate,
+    val notes: String?,
+)
+
+data class BudgetUpdate(
+    val title: String,
+    val limit: BigDecimal,
+    val currency: String,
+    val categoryId: Long,
+    val startDate: LocalDate,
+    val endDate: LocalDate,
+    val notes: String?,
 )

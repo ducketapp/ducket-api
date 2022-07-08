@@ -2,7 +2,7 @@ package io.ducket.api.test_data
 
 import domain.model.account.Account
 import io.ducket.api.app.AccountType
-import io.ducket.api.domain.controller.account.AccountCreateDto
+import io.ducket.api.domain.controller.account.dto.AccountCreateDto
 import java.math.BigDecimal
 import java.time.Instant
 
@@ -47,7 +47,7 @@ class AccountObjectMother {
         fun newAccount() = AccountCreateDto(
             name = "Cash USD",
             notes = "Account in United States dollar",
-            currencyIsoCode = "USD",
+            currency = "USD",
             startBalance = BigDecimal.ZERO,
             type = AccountType.CASH,
         )

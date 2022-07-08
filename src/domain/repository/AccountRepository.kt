@@ -3,67 +3,62 @@ package io.ducket.api.domain.repository
 import domain.model.account.*
 import domain.model.account.AccountsTable
 import domain.model.currency.CurrenciesTable
-import io.ducket.api.domain.controller.account.AccountCreateDto
-import io.ducket.api.domain.controller.account.AccountUpdateDto
 import domain.model.currency.CurrencyEntity
 import domain.model.user.UserEntity
+import io.ducket.api.app.database.Transactional
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.time.Instant
 
-class AccountRepository {
+class AccountRepository: Transactional {
 
-    fun create(userId: Long, dto: AccountCreateDto): Account = transaction {
+    suspend fun create(userId: Long, data: AccountCreate): Account = blockingTransaction {
         AccountEntity.new {
-            this.name = dto.name
-            this.notes = dto.notes
+            this.name = data.name
+            this.notes = data.notes
             this.user = UserEntity[userId]
-            this.currency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(dto.currencyIsoCode) }.first()
-            this.type = dto.type
-            Instant.now().also {
-                this.createdAt = it
-                this.modifiedAt = it
-            }
+            this.currency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(data.currency) }.first()
+            this.type = data.type
         }.toModel()
     }
 
-    fun findOne(userId: Long): Account? = transaction {
+    suspend fun update(userId: Long, accountId: Long, data: AccountUpdate): Account? = blockingTransaction {
+        AccountEntity.find {
+            AccountsTable.id.eq(accountId).and(AccountsTable.userId.eq(userId))
+        }.firstOrNull()?.apply {
+            this.name = data.name
+            this.notes = data.notes
+            this.type = data.type
+        }?.toModel()
+    }
+
+    suspend fun findOne(userId: Long): Account? = blockingTransaction {
         AccountEntity.find {
             AccountsTable.userId.eq(userId)
         }.firstOrNull()?.toModel()
     }
 
+    // TODO suspend
     fun findAll(userId: Long): List<Account> = transaction {
         AccountEntity.find {
             AccountsTable.userId.eq(userId)
-        }.toList().map { it.toModel() }
+        }.orderBy(AccountsTable.createdAt to SortOrder.DESC).toList().map { it.toModel() }
     }
 
-    fun findOne(userId: Long, accountId: Long): Account? = transaction {
+    suspend fun findOne(userId: Long, accountId: Long): Account? = blockingTransaction {
         AccountEntity.find {
             AccountsTable.id.eq(accountId).and(AccountsTable.userId.eq(userId))
         }.firstOrNull()?.toModel()
     }
 
-    fun findOneByName(userId: Long, name: String): Account? = transaction {
+    suspend fun findOneByName(userId: Long, name: String): Account? = blockingTransaction {
         AccountEntity.find {
             AccountsTable.name.eq(name).and(AccountsTable.userId.eq(userId))
         }.firstOrNull()?.toModel()
     }
 
-    fun updateOne(userId: Long, accountId: Long, dto: AccountUpdateDto): Account? = transaction {
-        AccountEntity.find {
-            AccountsTable.id.eq(accountId).and(AccountsTable.userId.eq(userId))
-        }.firstOrNull()?.also { found ->
-            dto.name?.let { found.name = it }
-            dto.notes?.let { found.notes = it }
-            dto.type?.let { found.type = it }
-            found.modifiedAt = Instant.now()
-        }?.toModel()
-    }
-
-    fun delete(userId: Long, vararg accountIds: Long): Unit = transaction {
+    suspend fun delete(userId: Long, vararg accountIds: Long): Unit = blockingTransaction {
         AccountsTable.deleteWhere {
             AccountsTable.id.inList(accountIds.asList()).and(AccountsTable.userId.eq(userId))
         }

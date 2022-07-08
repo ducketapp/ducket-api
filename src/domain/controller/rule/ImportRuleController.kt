@@ -1,5 +1,7 @@
 package io.ducket.api.domain.controller.rule
 
+import io.ducket.api.domain.controller.BulkDeleteDto
+import io.ducket.api.domain.controller.rule.dto.ImportRuleCreateUpdateDto
 import io.ducket.api.domain.service.ImportRuleService
 import io.ducket.api.principalOrThrow
 import io.ktor.application.*
@@ -16,9 +18,9 @@ class ImportRuleController(
     suspend fun createImportRule(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
 
-        ctx.receive<ImportRuleCreateDto>().apply {
-            importRuleService.createImportRule(userId, this.validate()).apply {
-                ctx.respond(HttpStatusCode.Created, this)
+        ctx.receive<ImportRuleCreateUpdateDto>().let { reqObj ->
+            importRuleService.createImportRule(userId, reqObj.validate()).let { resObj ->
+                ctx.respond(HttpStatusCode.Created, resObj)
             }
         }
     }
@@ -26,37 +28,45 @@ class ImportRuleController(
     suspend fun getImportRules(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
 
-        importRuleService.getImportRules(userId).apply {
-            ctx.respond(HttpStatusCode.OK, this)
+        importRuleService.getImportRules(userId).let { resObj ->
+            ctx.respond(HttpStatusCode.OK, resObj)
         }
     }
 
     suspend fun getImportRule(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
-        val importRuleId = ctx.parameters.getOrFail("ruleId").toLong()
+        val importRuleId = ctx.parameters.getOrFail("importRuleId").toLong()
 
-        importRuleService.getImportRule(userId, importRuleId).apply {
-            ctx.respond(HttpStatusCode.OK, this)
+        importRuleService.getImportRule(userId, importRuleId).let { resObj ->
+            ctx.respond(HttpStatusCode.OK, resObj)
         }
     }
 
     suspend fun updateImportRule(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
-        val importRuleId = ctx.parameters.getOrFail("ruleId").toLong()
+        val importRuleId = ctx.parameters.getOrFail("importRuleId").toLong()
 
-        ctx.receive<ImportRuleUpdateDto>().apply {
-            importRuleService.updateImportRule(userId, importRuleId, this.validate()).apply {
-                ctx.respond(HttpStatusCode.OK, this)
+        ctx.receive<ImportRuleCreateUpdateDto>().let { reqObj ->
+            importRuleService.updateImportRule(userId, importRuleId, reqObj.validate()).let { resObj ->
+                ctx.respond(HttpStatusCode.OK, resObj)
             }
+        }
+    }
+
+    suspend fun deleteImportRules(ctx: ApplicationCall) {
+        val userId = ctx.authentication.principalOrThrow().id
+
+        ctx.receive<BulkDeleteDto>().let { reqObj ->
+            importRuleService.deleteImportRules(userId, reqObj.validate())
+            ctx.respond(HttpStatusCode.NoContent)
         }
     }
 
     suspend fun deleteImportRule(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
-        val importRuleId = ctx.parameters.getOrFail("ruleId").toLong()
+        val importRuleId = ctx.parameters.getOrFail("importRuleId").toLong()
 
-        importRuleService.deleteImportRule(userId, importRuleId).apply {
-            ctx.respond(HttpStatusCode.NoContent)
-        }
+        importRuleService.deleteImportRule(userId, importRuleId)
+        ctx.respond(HttpStatusCode.NoContent)
     }
 }

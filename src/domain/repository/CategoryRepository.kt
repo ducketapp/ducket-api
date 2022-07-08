@@ -10,16 +10,17 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 class CategoryRepository: Transactional {
 
-    suspend fun findOneByGroupAndName(categoryGroup: String, category: String): Category? = blockingTransaction {
+    suspend fun findOneByName(category: String): Category? = blockingTransaction {
         CategoryEntity.find {
-            CategoriesTable.name.eq(category).and(CategoriesTable.group.eq(categoryGroup))
+            CategoriesTable.name.eq(category)
         }.firstOrNull()?.toModel()
     }
 
-    fun findOne(categoryId: Long): Category? = transaction {
+    suspend fun findOne(categoryId: Long): Category? = blockingTransaction {
         CategoryEntity.findById(categoryId)?.toModel()
     }
 
+    // TODO suspend
     fun findAll(): List<Category> = transaction {
         CategoryEntity.all().map { it.toModel() }
     }

@@ -39,13 +39,13 @@ open class LocalFileService {
         }
     }
 
-    fun extractMultipartImageData(multipartData: List<PartData>): List<Pair<File, ByteArray>> {
+    fun extractMultipartImageData(multipartData: List<PartData>): List<Pair<String, ByteArray>> {
         val result = multipartData.mapIndexed { idx, part ->
             if (part is PartData.FileItem) {
                 if (part.name == "file") {
                     val contentType = part.headers[HttpHeaders.ContentType]
                     val fileName = part.originalFileName
-                    val fileExtension = fileName?.split(".")?.last()
+                    val fileExtension = fileName?.substringAfterLast('.', "")
                     val fileBytes = part.streamProvider().readBytes()
                     val fileSize = bytesToMegabytes(fileBytes)
 
@@ -61,7 +61,7 @@ open class LocalFileService {
                         throw InvalidDataException("Unsupported file size, limit is 1MB")
                     }
 
-                    return@mapIndexed Pair(File(fileName), fileBytes)
+                    return@mapIndexed Pair(fileExtension, fileBytes)
                 } else {
                     throw InvalidDataException("Invalid multipart key name at index: $idx")
                 }
@@ -81,26 +81,26 @@ open class LocalFileService {
         return File(filePath).takeIf { it.exists() }
     }
 
-    fun createLocalImageFile(extension: String, content: ByteArray): File {
-        return createLocalFile("images", extension, content)
-    }
-
-    fun createLocalCsvFile(extension: String, content: ByteArray): File {
-        return createLocalFile("csv", extension, content)
-    }
-
-    private fun createLocalFile(dir: String, extension: String, content: ByteArray): File {
-        val fileName = "${LOCAL_FILE_PREFIX}_${Instant.now().toEpochMilli()}.$extension"
-        val filePath = Paths.get(config.dataConfig.dataPath, dir, fileName)
-        val localFile = File(filePath.toUri())
-
-        getLogger().debug("Create local file: ${localFile.path}")
-
-        localFile.parentFile.mkdirs()
-        localFile.writeBytes(content)
-
-        return localFile
-    }
+//    fun createLocalImageFile(fileExtension: String, fileContent: ByteArray): File {
+//        return createLocalFile("images", fileExtension, fileContent)
+//    }
+//
+//    fun createLocalImportFile(fileExtension: String, fileContent: ByteArray): File {
+//        return createLocalFile("imports", fileExtension, fileContent)
+//    }
+//
+//    private fun createLocalFile(dir: String, extension: String, content: ByteArray): File {
+//        val fileName = "${LOCAL_FILE_PREFIX}_${Instant.now().toEpochMilli()}.$extension"
+//        val filePath = Paths.get(config.dataConfig.dataPath, dir, fileName)
+//        val localFile = File(filePath.toUri())
+//
+//        getLogger().debug("Create local file: ${localFile.path}")
+//
+//        localFile.parentFile.mkdirs()
+//        localFile.writeBytes(content)
+//
+//        return localFile
+//    }
 
     private fun bytesToMegabytes(byteArray: ByteArray): Double {
         return (byteArray.size.toDouble() / 1024) / 1024

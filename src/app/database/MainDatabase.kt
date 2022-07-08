@@ -26,6 +26,6 @@ open class MainDatabase(appConfig: AppConfig): MySqlDatabase(appConfig) {
     }
 
     override fun getDatabaseName(): String {
-        return databaseConfig.schema.main
+        return databaseConfig.name
     }
 }

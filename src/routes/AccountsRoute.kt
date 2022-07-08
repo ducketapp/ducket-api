@@ -24,10 +24,6 @@ fun Route.accounts(accountController: AccountController) {
                     put { accountController.updateAccount(this.context) }
                     delete { accountController.deleteAccount(this.context) }
                 }
-
-//                route("/import") {
-//                    post { accountController.importAccountTransactions(this.context) }
-//                }
             }
         }
     }

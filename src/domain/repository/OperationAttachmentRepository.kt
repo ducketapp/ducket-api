@@ -4,8 +4,6 @@ import io.ducket.api.domain.model.attachment.Attachment
 import io.ducket.api.domain.model.attachment.AttachmentEntity
 import io.ducket.api.domain.model.attachment.AttachmentsTable
 import domain.model.operation.OperationAttachmentsTable
-import domain.model.operation.OperationEntity
-import domain.model.operation.OperationsTable
 import domain.model.user.UserEntity
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -27,13 +25,13 @@ class OperationAttachmentRepository {
         AttachmentEntity.wrapRows(query).firstOrNull()?.toModel()
     }
 
-    fun getAttachmentsCount(operationId: Long): Int = transaction {
+    fun getCount(operationId: Long): Long = transaction {
         OperationAttachmentsTable.select {
             OperationAttachmentsTable.operationId.eq(operationId)
-        }.count().toInt()
+        }.count()
     }
 
-    fun createAttachment(userId: Long, operationId: Long, newFile: File): Unit = transaction {
+    fun createOne(userId: Long, operationId: Long, newFile: File): Unit = transaction {
         AttachmentEntity.new {
             user = UserEntity[userId]
             filePath = newFile.absolutePath
@@ -46,13 +44,9 @@ class OperationAttachmentRepository {
         }
     }
 
-    fun deleteAttachments(operationId: Long, vararg attachmentIds: Long): Unit = transaction {
+    fun delete(operationId: Long, vararg attachmentIds: Long): Unit = transaction {
         OperationAttachmentsTable.deleteWhere {
             OperationAttachmentsTable.operationId.eq(operationId).and(OperationAttachmentsTable.attachmentId.inList(attachmentIds.toList()))
-        }
-
-        AttachmentsTable.deleteWhere {
-            AttachmentsTable.id.inList(attachmentIds.toList())
         }
     }
 }

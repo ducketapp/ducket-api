@@ -56,7 +56,7 @@ private fun Application.pullReferenceRatesStaticData() {
         val currencyService by inject<CurrencyService>()
 
         runBlocking {
-            log.info("Starting operation to cache static exchange rates from external client...")
+            log.info("Starting to cache static exchange rates from external client...")
 
             measureTimeMillis {
                 val currencies = currencyService.getCurrencies().map { it.isoCode }
@@ -72,23 +72,17 @@ private fun Application.pullReferenceRatesStaticData() {
 }
 
 private fun Application.setupDatabases() {
-    val mainDatabase by inject<AppDatabase>(named(AppModule.DatabaseType.MAIN_DB))
+    val mainDatabase by inject<AppDatabase>()
 
     mainDatabase.connect()
     TransactionManager.defaultDatabase = mainDatabase.database
 }
 
 private fun Application.setupScheduler() {
-    val appConfig by inject<AppConfig>()
     val jobFactory by inject<AppJobFactory>()
 
     val currencyRatesPullJob = JobBuilder.newJob(AppCurrencyRatesPullJob::class.java)
         .withIdentity("CurrencyRatesPullJob", "RegularGroup")
-        .build()
-
-    val obsoleteDataCleanUpJob = JobBuilder.newJob(AppObsoleteDataCleanUpJob::class.java)
-        .withIdentity("ObsoleteDataCleanUpJob", "MaintenanceGroup")
-        .usingJobData(AppObsoleteDataCleanUpJob.JOB_DATA_PATH_KEY, appConfig.dataConfig.dataPath)
         .build()
 
     val everyWeekdayAfternoonTrigger = TriggerBuilder.newTrigger()
@@ -96,16 +90,10 @@ private fun Application.setupScheduler() {
         .withSchedule(CronScheduleBuilder.cronSchedule("0 0 15 ? * MON-FRI *").inTimeZone(TimeZone.getDefault()))
         .build()
 
-    val everyOneHourTrigger = TriggerBuilder.newTrigger()
-        .withIdentity("EveryOneHourTrigger", "MaintenanceGroup")
-        .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInHours(1).repeatForever())
-        .build()
-
     with(StdSchedulerFactory().scheduler) {
         start()
         setJobFactory(jobFactory)
         scheduleJob(currencyRatesPullJob, everyWeekdayAfternoonTrigger)
-        scheduleJob(obsoleteDataCleanUpJob, everyOneHourTrigger)
     }
 }
 
@@ -115,9 +103,7 @@ private fun Application.setupAppConfig() {
     System.setProperty("handlers", "org.slf4j.bridge.SLF4JBridgeHandler")
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 
-    val dbDataPath = System.getProperty("db.dataPath", "resources/database/data")
     val dbPullRates = System.getProperty("db.pullRates", "true")
-
     val hoconConfig = environment.config.config("ktor")
 
     appConfig.apply {
@@ -127,10 +113,7 @@ private fun Application.setupAppConfig() {
         )
 
         this.databaseServerConfig = DatabaseServerConfig(
-            schema = DatabaseServerSchemaConfig(
-                main = hoconConfig.property("database.schema.main").getString(),
-                scheduler = hoconConfig.property("database.schema.scheduler").getString(),
-            ),
+            name = hoconConfig.property("database.name").getString(),
             driver = hoconConfig.property("database.driver").getString(),
             host = hoconConfig.property("database.host").getString(),
             port = hoconConfig.property("database.port").getString().toInt(),
@@ -145,7 +128,6 @@ private fun Application.setupAppConfig() {
         )
 
         this.dataConfig = DataConfig(
-            dataPath = dbDataPath,
             pullRates = dbPullRates.toBoolean(),
         )
     }

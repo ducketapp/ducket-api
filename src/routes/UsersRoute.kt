@@ -12,9 +12,10 @@ fun Route.users(userController: UserController) {
         post("/sign-up") { userController.signUp(this.context) }
 
         authenticate {
-            authorize(UserRole.SUPER_USER) {
-                route("/{userId}") {
-                    get { userController.getUser(this.context) }
+            route("/{userId}") {
+                get { userController.getUser(this.context) }
+
+                authorize(UserRole.SUPER_USER) {
                     put { userController.updateUser(this.context) }
                     delete { userController.deleteUser(this.context) }
 

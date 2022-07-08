@@ -1,9 +1,9 @@
 package io.ducket.api.test_data
 
 import domain.model.user.User
-import io.ducket.api.domain.controller.user.UserAuthenticateDto
-import io.ducket.api.domain.controller.user.UserCreateDto
-import io.ducket.api.domain.controller.user.UserUpdateDto
+import io.ducket.api.domain.controller.user.dto.UserAuthenticateDto
+import io.ducket.api.domain.controller.user.dto.UserCreateDto
+import io.ducket.api.domain.controller.user.dto.UserUpdateDto
 import java.math.BigDecimal
 import java.time.Instant
 
@@ -14,7 +14,7 @@ class UserObjectMother {
             name = "",
             phone = "",
             email = "",
-            mainCurrency = CurrencyObjectMother.default(),
+            currency = CurrencyObjectMother.default(),
             passwordHash = "",
             createdAt = Instant.ofEpochSecond(1642708900),
             modifiedAt = Instant.ofEpochSecond(1642708900),
@@ -25,7 +25,7 @@ class UserObjectMother {
             name = "John Wick",
             phone = "+12025550115",
             email = "johnwick@test.com",
-            mainCurrency = CurrencyObjectMother.usd(),
+            currency = CurrencyObjectMother.usd(),
             passwordHash = "hash",
             createdAt = Instant.ofEpochSecond(1642708900),
             modifiedAt = Instant.ofEpochSecond(1642708900),
@@ -37,7 +37,7 @@ class UserObjectMother {
             email = "johnwick@test.com",
             startBalance = BigDecimal.ZERO,
             password = "1234",
-            currencyIsoCode = "USD",
+            currency = "USD",
         )
 
         fun authUser(): UserAuthenticateDto = UserAuthenticateDto(

@@ -1,7 +1,7 @@
 package io.ducket.api.domain.controller.group
 
 import io.ducket.api.app.AccountPermission
-import io.ducket.api.domain.controller.account.AccountDto
+import io.ducket.api.domain.controller.account.dto.AccountDto
 import io.ducket.api.domain.model.group.GroupMemberAccountPermission
 
 data class GroupMemberAccountPermissionDto(

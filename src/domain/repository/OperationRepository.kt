@@ -3,28 +3,39 @@ package io.ducket.api.domain.repository
 import domain.model.account.AccountEntity
 import domain.model.category.CategoryEntity
 import domain.model.imports.ImportEntity
-import domain.model.operation.OperationCreateModel
-import domain.model.operation.OperationModel
-import domain.model.user.UserEntity
-import domain.model.operation.OperationEntity
+import domain.model.operation.*
 import domain.model.operation.OperationsTable
+import domain.model.user.UserEntity
 import io.ducket.api.app.database.Transactional
+import io.ducket.api.domain.model.currency.CurrencyRateCreate
+import io.ducket.api.domain.model.currency.CurrencyRatesTable
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.deleteWhere
 
 class OperationRepository: Transactional {
 
-    suspend fun findOne(userId: Long, operationId: Long): OperationModel? = blockingTransaction {
-        OperationEntity.find {
-            OperationsTable.userId.eq(userId).and(OperationsTable.id.eq(operationId))
-        }.firstOrNull()?.toModel()
+    suspend fun createBatch(dataList: List<OperationCreate>) = blockingTransaction {
+        OperationsTable.batchInsert(data = dataList, ignore = true) { data ->
+            this[OperationsTable.userId] = data.userId
+            this[OperationsTable.categoryId] = data.categoryId
+            this[OperationsTable.importId] = data.importId
+            this[OperationsTable.transferAccountId] = data.transferAccountId
+            this[OperationsTable.accountId] = data.accountId
+            this[OperationsTable.type] = data.type
+            this[OperationsTable.clearedAmount] = data.clearedAmount
+            this[OperationsTable.postedAmount] = data.postedAmount
+            this[OperationsTable.date] = data.date
+            this[OperationsTable.description] = data.description
+            this[OperationsTable.subject] = data.subject
+            this[OperationsTable.notes] = data.notes
+            this[OperationsTable.latitude] = data.latitude
+            this[OperationsTable.longitude] = data.longitude
+        }
     }
 
-    suspend fun findAll(userId: Long): List<OperationModel> = blockingTransaction {
-        OperationEntity.find { OperationsTable.userId.eq(userId) }.toList().map { it.toModel() }
-    }
-
-    suspend fun createOne(data: OperationCreateModel): OperationModel = blockingTransaction {
+    suspend fun createOne(data: OperationCreate): Operation = blockingTransaction {
         OperationEntity.new {
             this.user = UserEntity[data.userId]
             this.category = data.categoryId?.let { CategoryEntity[it] }
@@ -32,8 +43,8 @@ class OperationRepository: Transactional {
             this.transferAccount = data.transferAccountId?.let { AccountEntity[it] }
             this.account = AccountEntity[data.accountId]
             this.type = data.type
-            this.clearedFunds = data.clearedFunds
-            this.postedFunds = data.postedFunds
+            this.clearedAmount = data.clearedAmount
+            this.postedAmount = data.postedAmount
             this.date = data.date
             this.description = data.description
             this.subject = data.subject
@@ -41,6 +52,40 @@ class OperationRepository: Transactional {
             this.latitude = data.latitude
             this.longitude = data.longitude
         }.toModel()
+    }
+
+    suspend fun updateOne(userId: Long, operationId: Long, data: OperationUpdate): Operation? = blockingTransaction {
+        OperationEntity.find {
+            OperationsTable.userId.eq(userId).and(OperationsTable.id.eq(operationId))
+        }.firstOrNull()?.apply {
+            this.category = data.categoryId?.let { CategoryEntity[it] }
+            this.transferAccount = data.transferAccountId?.let { AccountEntity[it] }
+            this.account = AccountEntity[data.accountId]
+            this.type = data.type
+            this.clearedAmount = data.clearedAmount
+            this.postedAmount = data.postedAmount
+            this.date = data.date
+            this.description = data.description
+            this.subject = data.subject
+            this.notes = data.notes
+            this.latitude = data.latitude
+            this.longitude = data.longitude
+        }?.toModel()
+    }
+
+    suspend fun findOne(userId: Long, operationId: Long): Operation? = blockingTransaction {
+        OperationEntity.find {
+            OperationsTable.userId.eq(userId).and(OperationsTable.id.eq(operationId))
+        }.firstOrNull()?.toModel()
+    }
+
+    suspend fun findAll(userId: Long): List<Operation> = blockingTransaction {
+        OperationEntity.find {
+            OperationsTable.userId.eq(userId)
+        }.orderBy(
+            OperationsTable.date to SortOrder.DESC,
+            OperationsTable.id to SortOrder.DESC,
+        ).toList().map { it.toModel() }
     }
 
     suspend fun delete(userId: Long, vararg operationId: Long): Unit = blockingTransaction {

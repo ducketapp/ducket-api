@@ -9,6 +9,7 @@ import io.ktor.http.*
 import io.ktor.response.*
 import org.valiktor.ConstraintViolationException
 import org.valiktor.i18n.mapToMessage
+import java.sql.BatchUpdateException
 import java.time.Instant
 import java.util.*
 
@@ -40,11 +41,11 @@ fun StatusPages.Configuration.applicationExceptions() {
     }
 
     exception<ConstraintViolationException> { cause ->
-        HttpStatusCode.PreconditionFailed.also {
-            val errors = cause.constraintViolations
-                .mapToMessage("messages", Locale.ENGLISH)
-                .map { err -> "The '${err.property}' field ${err.message.lowercase()}" }
+        val errors = cause.constraintViolations
+            .mapToMessage("messages", Locale.ENGLISH)
+            .map { err -> "The '${err.property}' field ${err.message.lowercase()}" }
 
+        HttpStatusCode.PreconditionFailed.also {
             call.respond(status = it, message = ErrorResponse(it, errors[0]))
         }
     }
@@ -86,6 +87,14 @@ fun StatusPages.Configuration.applicationExceptions() {
 
         HttpStatusCode.BadRequest.also {
             call.respond(status = it, message = ErrorResponse(it, cause.localizedMessage))
+        }
+    }
+
+    exception<BatchUpdateException> { cause ->
+        getLogger().error(cause.stackTraceToString())
+
+        HttpStatusCode.BadRequest.also {
+            call.respond(status = it, message = ErrorResponse(it, DuplicateDataException().localizedMessage))
         }
     }
 

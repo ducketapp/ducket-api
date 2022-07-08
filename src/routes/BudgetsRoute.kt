@@ -5,7 +5,6 @@ import io.ducket.api.auth.authorization.authorize
 import io.ducket.api.domain.controller.budget.BudgetController
 import io.ktor.auth.*
 import io.ktor.routing.*
-import java.time.LocalDate
 
 fun Route.budgets(budgetController: BudgetController) {
     authenticate {
@@ -21,7 +20,7 @@ fun Route.budgets(budgetController: BudgetController) {
                 get { budgetController.getBudget(this.context) }
 
                 authorize(UserRole.SUPER_USER) {
-                    // put { budgetController.updateBudget(this.context) }
+                    put { budgetController.updateBudget(this.context) }
                     delete { budgetController.deleteBudget(this.context) }
                 }
             }

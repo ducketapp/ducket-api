@@ -1,6 +1,8 @@
 package io.ducket.api.domain.controller.account
 
 import io.ducket.api.domain.controller.BulkDeleteDto
+import io.ducket.api.domain.controller.account.dto.AccountCreateDto
+import io.ducket.api.domain.controller.account.dto.AccountUpdateDto
 import io.ducket.api.domain.service.AccountService
 import io.ducket.api.domain.service.ImportService
 import io.ducket.api.principalOrThrow
@@ -20,23 +22,25 @@ class AccountController(
         val userId = ctx.authentication.principalOrThrow().id
         val accountId = ctx.parameters.getOrFail("accountId").toLong()
 
-        val account = accountService.getAccount(userId, accountId)
-        ctx.respond(HttpStatusCode.OK, account)
+        accountService.getAccount(userId, accountId).let { resObj ->
+            ctx.respond(HttpStatusCode.OK, resObj)
+        }
     }
 
     suspend fun getAccounts(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
-        val accounts = accountService.getAccounts(userId)
 
-        ctx.respond(HttpStatusCode.OK, accounts)
+        accountService.getAccounts(userId).let { resObj ->
+            ctx.respond(HttpStatusCode.OK, resObj)
+        }
     }
 
     suspend fun createAccount(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
 
-        ctx.receive<AccountCreateDto>().apply {
-            accountService.createAccount(userId, this.validate()).apply {
-                ctx.respond(HttpStatusCode.Created, this)
+        ctx.receive<AccountCreateDto>().let { reqObj ->
+            accountService.createAccount(userId, reqObj.validate()).let { resObj ->
+                ctx.respond(HttpStatusCode.Created, resObj)
             }
         }
     }
@@ -45,9 +49,9 @@ class AccountController(
         val userId = ctx.authentication.principalOrThrow().id
         val accountId = ctx.parameters.getOrFail("accountId").toLong()
 
-        ctx.receive<AccountUpdateDto>().apply {
-            accountService.updateAccount(userId, accountId, this.validate()).apply {
-                ctx.respond(HttpStatusCode.OK, this)
+        ctx.receive<AccountUpdateDto>().let { reqObj ->
+            accountService.updateAccount(userId, accountId, reqObj.validate()).let { resObj ->
+                ctx.respond(HttpStatusCode.OK, resObj)
             }
         }
     }
@@ -55,10 +59,9 @@ class AccountController(
     suspend fun deleteAccounts(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
 
-        ctx.receive<BulkDeleteDto>().apply {
-            accountService.deleteAccounts(userId, this.validate()).apply {
-                ctx.respond(HttpStatusCode.NoContent)
-            }
+        ctx.receive<BulkDeleteDto>().let { reqObj ->
+            accountService.deleteAccounts(userId, reqObj.validate())
+            ctx.respond(HttpStatusCode.NoContent)
         }
     }
 
@@ -69,15 +72,4 @@ class AccountController(
         accountService.deleteAccount(userId, accountId)
         ctx.respond(HttpStatusCode.NoContent)
     }
-
-//    suspend fun importAccountTransactions(ctx: ApplicationCall) {
-//        val userId = ctx.authentication.principalOrThrow().id
-//        val accountId = ctx.parameters.getOrFail("accountId").toLong()
-//
-//        val payloadMultiparts = ctx.receiveMultipart().readAllParts()
-//
-//        importService.importAccountLedgerRecords(userId, accountId,  payloadMultiparts).apply {
-//            ctx.respond(HttpStatusCode.OK, this)
-//        }
-//    }
 }

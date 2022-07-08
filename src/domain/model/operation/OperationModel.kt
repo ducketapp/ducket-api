@@ -14,8 +14,6 @@ import domain.model.user.UserEntity
 import domain.model.user.UsersTable
 import io.ducket.api.app.DEFAULT_SCALE
 import io.ducket.api.app.OperationType
-import io.ducket.api.domain.model.attachment.Attachment
-import io.ducket.api.domain.model.attachment.AttachmentEntity
 import io.ducket.api.domain.model.operation.OperationTagsTable
 import io.ducket.api.domain.model.tag.Tag
 import io.ducket.api.domain.model.tag.TagEntity
@@ -34,8 +32,8 @@ internal object OperationsTable : LongIdTable("operation") {
     val transferAccountId = reference("transfer_account_id", AccountsTable).nullable()
     val accountId = reference("account_id", AccountsTable)
     val type = enumerationByName("type", 32, OperationType::class)
-    val clearedFunds = decimal("cleared_funds", 10, DEFAULT_SCALE)
-    val postedFunds = decimal("posted_funds", 10, DEFAULT_SCALE)
+    val clearedAmount = decimal("cleared_amount", 10, DEFAULT_SCALE)
+    val postedAmount = decimal("posted_amount", 10, DEFAULT_SCALE)
     val date = timestamp("date")
     val description = varchar("description", 64).nullable()
     val subject = varchar("subject", 64).nullable()
@@ -56,8 +54,8 @@ class OperationEntity(id: EntityID<Long>) : LongEntity(id) {
     var account by AccountEntity referencedOn OperationsTable.accountId
 
     var type by OperationsTable.type
-    var clearedFunds by OperationsTable.clearedFunds
-    var postedFunds by OperationsTable.postedFunds
+    var clearedAmount by OperationsTable.clearedAmount
+    var postedAmount by OperationsTable.postedAmount
     var date by OperationsTable.date
     var description by OperationsTable.description
     var subject by OperationsTable.subject
@@ -67,10 +65,10 @@ class OperationEntity(id: EntityID<Long>) : LongEntity(id) {
     var createdAt by OperationsTable.createdAt
     var modifiedAt by OperationsTable.modifiedAt
 
-    var attachments by AttachmentEntity via OperationAttachmentsTable
+    // var attachments by AttachmentEntity via OperationAttachmentsTable
     var tags by TagEntity via OperationTagsTable
 
-    fun toModel() = OperationModel(
+    fun toModel() = Operation(
         id = id.value,
         user = user.toModel(),
         category = category?.toModel(),
@@ -78,8 +76,8 @@ class OperationEntity(id: EntityID<Long>) : LongEntity(id) {
         transferAccount = transferAccount?.toModel(),
         account = account.toModel(),
         type = type,
-        clearedFunds = clearedFunds,
-        postedFunds = postedFunds,
+        clearedAmount = clearedAmount,
+        postedAmount = postedAmount,
         date = date,
         description = description,
         subject = subject,
@@ -87,13 +85,12 @@ class OperationEntity(id: EntityID<Long>) : LongEntity(id) {
         latitude = latitude,
         longitude = longitude,
         tags = tags.toList().map { it.toModel() },
-        attachments = attachments.toList().map { it.toModel() },
         createdAt = createdAt,
         modifiedAt = modifiedAt,
     )
 }
 
-data class OperationModel(
+data class Operation(
     val id: Long,
     val user: User,
     val category: Category?,
@@ -101,8 +98,8 @@ data class OperationModel(
     val transferAccount: Account?,
     val account: Account,
     val type: OperationType,
-    val clearedFunds: BigDecimal,
-    val postedFunds: BigDecimal,
+    val clearedAmount: BigDecimal,
+    val postedAmount: BigDecimal,
     val date: Instant,
     val description: String?,
     val subject: String?,
@@ -110,20 +107,19 @@ data class OperationModel(
     val latitude: BigDecimal?,
     val longitude: BigDecimal?,
     val tags: List<Tag>,
-    val attachments: List<Attachment>,
     val createdAt: Instant,
     val modifiedAt: Instant,
 )
 
-data class OperationCreateModel(
+data class OperationCreate(
     val userId: Long,
     val categoryId: Long?,
     val importId: Long?,
     val transferAccountId: Long?,
     val accountId: Long,
     val type: OperationType,
-    val clearedFunds: BigDecimal,
-    val postedFunds: BigDecimal,
+    val clearedAmount: BigDecimal,
+    val postedAmount: BigDecimal,
     val date: Instant,
     val description: String?,
     val subject: String?,
@@ -132,15 +128,14 @@ data class OperationCreateModel(
     val longitude: BigDecimal?,
 )
 
-data class OperationUpdateModel(
+data class OperationUpdate(
     val categoryId: Long?,
-    val importId: Long?,
     val transferAccountId: Long?,
-    val accountId: Long?,
-    val type: OperationType?,
-    val clearedFunds: BigDecimal?,
-    val postedFunds: BigDecimal?,
-    val date: Instant?,
+    val accountId: Long,
+    val type: OperationType,
+    val clearedAmount: BigDecimal,
+    val postedAmount: BigDecimal,
+    val date: Instant,
     val description: String?,
     val subject: String?,
     val notes: String?,

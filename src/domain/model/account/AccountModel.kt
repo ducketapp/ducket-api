@@ -25,8 +25,12 @@ internal object AccountsTable : LongIdTable("account") {
     val type = enumerationByName("type", 32, AccountType::class)
     val name = varchar("name", 64)
     val notes = varchar("notes", 128).nullable()
-    val createdAt = timestamp("created_at")
-    val modifiedAt = timestamp("modified_at")
+    val createdAt = timestamp("created_at").clientDefault { Instant.now() }
+    val modifiedAt = timestamp("modified_at").clientDefault { Instant.now() }
+
+    init {
+        uniqueIndex("name_unique_index", userId, name)
+    }
 }
 
 class AccountEntity(id: EntityID<Long>) : LongEntity(id) {
@@ -40,22 +44,15 @@ class AccountEntity(id: EntityID<Long>) : LongEntity(id) {
     var createdAt by AccountsTable.createdAt
     var modifiedAt by AccountsTable.modifiedAt
 
-    private val records by OperationEntity referrersOn OperationsTable.accountId
+    private val operations by OperationEntity referrersOn OperationsTable.accountId
+    private val incomingTransfers by OperationEntity optionalReferrersOn OperationsTable.transferAccountId
 
     private val balance: BigDecimal
-        get() = records.sumByDecimal {
-            if (it.type == OperationType.EXPENSE) {
-                it.clearedFunds.negate()
-            } else if (it.type == OperationType.TRANSFER) {
-                if (it.account.id.value == this.id.value) {
-                    it.clearedFunds.negate()
-                } else {
-                    it.clearedFunds
-                }
-            } else {
-                it.clearedFunds
-            }
-        }
+        get() = operations.sumByDecimal {
+            if (it.type == OperationType.INCOME) it.postedAmount else it.postedAmount.negate()
+        }.plus(incomingTransfers.sumByDecimal {
+            it.clearedAmount
+        })
 
     fun toModel() = Account(
         id.value,
@@ -80,4 +77,18 @@ data class Account(
     val type: AccountType,
     val createdAt: Instant,
     val modifiedAt: Instant,
+)
+
+data class AccountCreate(
+    val name: String,
+    val notes: String?,
+    val userId: Long,
+    val currency: String,
+    val type: AccountType,
+)
+
+data class AccountUpdate(
+    val name: String,
+    val notes: String?,
+    val type: AccountType,
 )

@@ -3,6 +3,9 @@ package io.ducket.api.domain.controller.user
 import io.ducket.api.auth.JwtManager
 import io.ducket.api.auth.UserPrincipal
 import io.ducket.api.auth.UserRole
+import io.ducket.api.domain.controller.user.dto.UserAuthenticateDto
+import io.ducket.api.domain.controller.user.dto.UserCreateDto
+import io.ducket.api.domain.controller.user.dto.UserUpdateDto
 import io.ducket.api.domain.service.*
 import io.ducket.api.principalOrThrow
 import io.ktor.application.*
@@ -62,7 +65,7 @@ class UserController(private val userService: UserService) {
         val userId = ctx.authentication.principalOrThrow().id
 
         userService.deleteUser(userId)
-        ctx.respond(HttpStatusCode.NoContent)
+        ctx.respond(HttpStatusCode.OK)
     }
 
     suspend fun deleteUserData(ctx: ApplicationCall) {

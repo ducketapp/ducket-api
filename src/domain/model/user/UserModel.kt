@@ -14,7 +14,7 @@ internal object UsersTable : LongIdTable("user") {
     val email = varchar("email", 64).uniqueIndex()
     val name = varchar("name", 64)
     val passwordHash = varchar("password_hash", 128)
-    val mainCurrencyId = reference("main_currency_id", CurrenciesTable)
+    val currencyId = reference("currency_id", CurrenciesTable)
     val createdAt = timestamp("created_at").clientDefault { Instant.now() }
     val modifiedAt = timestamp("modified_at").clientDefault { Instant.now() }
 }
@@ -22,7 +22,7 @@ internal object UsersTable : LongIdTable("user") {
 class UserEntity(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<UserEntity>(UsersTable)
 
-    var mainCurrency by CurrencyEntity referencedOn UsersTable.mainCurrencyId
+    var currency by CurrencyEntity referencedOn UsersTable.currencyId
 
     var phone by UsersTable.phone
     var name by UsersTable.name
@@ -36,7 +36,7 @@ class UserEntity(id: EntityID<Long>) : LongEntity(id) {
         phone,
         name,
         email,
-        mainCurrency.toModel(),
+        currency.toModel(),
         passwordHash,
         createdAt,
         modifiedAt
@@ -48,8 +48,22 @@ data class User(
     val phone: String?,
     val name: String,
     val email: String,
-    val mainCurrency: Currency,
+    val currency: Currency,
     val passwordHash: String,
     val createdAt: Instant,
     val modifiedAt: Instant,
+)
+
+data class UserCreate(
+    val phone: String?,
+    val name: String,
+    val email: String,
+    val currency: String,
+    val passwordHash: String,
+)
+
+data class UserUpdate(
+    val phone: String?,
+    val name: String,
+    val passwordHash: String,
 )

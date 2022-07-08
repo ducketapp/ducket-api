@@ -4,57 +4,58 @@ import domain.model.category.CategoryEntity
 import domain.model.currency.CurrenciesTable
 import domain.model.currency.CurrencyEntity
 import domain.model.user.UserEntity
-import io.ducket.api.domain.controller.budget.BudgetCreateDto
+import io.ducket.api.app.database.Transactional
 import io.ducket.api.domain.model.budget.*
 import io.ducket.api.domain.model.budget.BudgetsTable
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.transactions.transaction
-import java.time.Instant
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
 
-class BudgetRepository {
+class BudgetRepository: Transactional {
 
-    fun create(userId: Long, dto: BudgetCreateDto): Budget = transaction {
+    suspend fun createBudget(data: BudgetCreate): Budget = blockingTransaction {
         BudgetEntity.new {
-            this.currency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(dto.currencyIsoCode) }.first()
-            this.category = CategoryEntity[dto.categoryId]
-            this.user = UserEntity[userId]
-            this.title = dto.title
-            // this.defaultLimit = dto.defaultLimit
-            this.startDate = dto.startDate
-            this.endDate = null
-            Instant.now().also {
-                this.createdAt = it
-                this.modifiedAt = it
-            }
-        }.also { budget ->
-            dto.accountIds.forEach { accountId ->
-                BudgetAccountsTable.insert {
-                    it[this.budgetId] = budget.id
-                    it[this.accountId] = accountId
-                }
-            }
+            this.currency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(data.currency) }.first()
+            this.category = CategoryEntity[data.categoryId]
+            this.user = UserEntity[data.userId]
+            this.title = data.title
+            this.limit = data.limit
+            this.startDate = data.startDate
+            this.endDate = data.endDate
         }.toModel()
     }
 
-    fun findOne(userId: Long, budgetId: Long): Budget? = transaction {
+    suspend fun updateBudget(userId: Long, budgetId: Long, data: BudgetUpdate): Budget? = blockingTransaction {
+        BudgetEntity.find {
+            BudgetsTable.userId.eq(userId).and(BudgetsTable.id.eq(budgetId))
+        }.firstOrNull()?.apply {
+            this.currency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(data.currency) }.first()
+            this.category = CategoryEntity[data.categoryId]
+            this.title = data.title
+            this.limit = data.limit
+            this.startDate = data.startDate
+            this.endDate = data.endDate
+        }?.toModel()
+    }
+
+    suspend fun findAll(userId: Long): List<Budget> = blockingTransaction {
+        BudgetEntity.find {
+            BudgetsTable.userId.eq(userId)
+        }.toList().map { it.toModel() }
+    }
+
+    suspend fun findOne(userId: Long, budgetId: Long): Budget? = blockingTransaction {
         BudgetEntity.find {
             BudgetsTable.userId.eq(userId).and(BudgetsTable.id.eq(budgetId))
         }.firstOrNull()?.toModel()
     }
 
-    fun findOneByName(userId: Long, name: String): Budget? = transaction {
+    suspend fun findOneByTitle(userId: Long, title: String): Budget? = blockingTransaction {
         BudgetEntity.find {
-            BudgetsTable.userId.eq(userId).and(BudgetsTable.title.eq(name))
+            BudgetsTable.userId.eq(userId).and(BudgetsTable.title.eq(title))
         }.firstOrNull()?.toModel()
     }
 
-    fun findAll(vararg userIds: Long): List<Budget> = transaction {
-        BudgetEntity.find {
-            BudgetsTable.userId.inList(userIds.asList())
-        }.toList().map { it.toModel() }
-    }
-
-    fun delete(userId: Long, vararg budgetIds: Long) = transaction {
+    suspend fun delete(userId: Long, vararg budgetIds: Long) = blockingTransaction {
         BudgetsTable.deleteWhere {
             BudgetsTable.id.inList(budgetIds.asList()).and(BudgetsTable.userId.eq(userId))
         }

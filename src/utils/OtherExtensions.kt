@@ -1,10 +1,12 @@
 package io.ducket.api.utils
 
+import io.ducket.api.app.PeriodicBudgetType
+import org.threeten.extra.LocalDateRange
+import org.threeten.extra.YearQuarter
 import java.math.BigDecimal
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
-import kotlin.reflect.full.declaredMemberProperties
+import java.time.*
+import java.time.temporal.IsoFields
+import java.time.temporal.TemporalAdjusters
 
 fun String.trimWhitespaces() = replace("[\\p{Zs}\\s]+".toRegex(), " ").trim()
 
@@ -34,23 +36,29 @@ fun Instant.isAfterInclusive(other: Instant?): Boolean {
     return other != null && this.isAfter(other) || this == other
 }
 
-fun Any.declaredMemberPropertiesNull(): Boolean {
-    if (this::class.declaredMemberProperties.any { !it.returnType.isMarkedNullable }) return false
-    return this::class.declaredMemberProperties.none { it.getter.call(this) != null }
-}
-
 fun Instant.toLocalDate(): LocalDate {
     return this.atZone(ZoneId.systemDefault()).toLocalDate()
 }
 
-fun BigDecimal.gt(that: BigDecimal): Boolean {
-    return this.compareTo(that) > 0
-}
-
-fun BigDecimal.lt(that: BigDecimal): Boolean {
-    return this.compareTo(that) < 0
-}
-
-fun BigDecimal.eq(that: BigDecimal): Boolean {
-    return this.compareTo(that) == 0
+fun LocalDate.getPeriodDateRange(periodType: PeriodicBudgetType): LocalDateRange {
+    return when(periodType) {
+        PeriodicBudgetType.DAILY -> {
+            LocalDateRange.of(this, this)
+        }
+        PeriodicBudgetType.WEEKLY -> {
+            LocalDateRange.of(with(DayOfWeek.MONDAY), with(DayOfWeek.SUNDAY))
+        }
+        PeriodicBudgetType.MONTHLY -> {
+            LocalDateRange.of(with(TemporalAdjusters.firstDayOfMonth()), with(TemporalAdjusters.lastDayOfMonth()))
+        }
+        PeriodicBudgetType.QUARTERLY -> {
+            LocalDateRange.of(
+                YearQuarter.of(year, get(IsoFields.QUARTER_OF_YEAR)).atDay(1),
+                YearQuarter.of(year, get(IsoFields.QUARTER_OF_YEAR)).atEndOfQuarter(),
+            )
+        }
+        PeriodicBudgetType.ANNUALLY -> {
+            LocalDateRange.of(with(TemporalAdjusters.firstDayOfYear()), with(TemporalAdjusters.lastDayOfYear()))
+        }
+    }
 }

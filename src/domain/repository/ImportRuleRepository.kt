@@ -4,60 +4,53 @@ import domain.model.category.CategoryEntity
 import domain.model.imports.*
 import domain.model.imports.ImportRulesTable
 import domain.model.user.UserEntity
-import io.ducket.api.domain.controller.rule.ImportRuleCreateDto
-import io.ducket.api.domain.controller.rule.ImportRuleUpdateDto
+import io.ducket.api.app.database.Transactional
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.transactions.transaction
-import java.time.Instant
 
-class ImportRuleRepository {
+class ImportRuleRepository: Transactional {
 
-    fun create(userId: Long, dto: ImportRuleCreateDto): ImportRule = transaction {
+    suspend fun create(userId: Long, data: ImportRuleCreate): ImportRule = blockingTransaction {
         ImportRuleEntity.new {
-            this.name = dto.name
-            this.category = CategoryEntity[dto.categoryId]
+            this.title = data.title
+            this.category = CategoryEntity[data.categoryId]
             this.user = UserEntity[userId]
-            this.lookupType = dto.lookupType
-            this.keywords = dto.keywords.joinToString(KEYWORDS_DELIMITER)
-            Instant.now().also {
-                this.createdAt = it
-                this.modifiedAt = it
-            }
+            this.lookupType = data.lookupType
+            this.keywords = data.keywords.joinToString(KEYWORDS_DELIMITER)
         }.toModel()
     }
 
-    fun findAll(userId: Long): List<ImportRule> = transaction {
-        ImportRuleEntity.find { ImportRulesTable.userId.eq(userId) }.toList().map { it.toModel() }
-    }
-
-    fun findOneByName(userId: Long, ruleName: String): ImportRule? = transaction {
+    suspend fun updateOne(userId: Long, importRuleId: Long, data: ImportRuleUpdate): ImportRule? = blockingTransaction {
         ImportRuleEntity.find {
-            ImportRulesTable.userId.eq(userId).and(ImportRulesTable.name.eq(ruleName))
-        }.firstOrNull()?.toModel()
-    }
-
-    fun findOne(userId: Long, ruleId: Long): ImportRule? = transaction {
-        ImportRuleEntity.find {
-            ImportRulesTable.userId.eq(userId).and(ImportRulesTable.id.eq(ruleId))
-        }.firstOrNull()?.toModel()
-    }
-
-    fun updateOne(userId: Long, ruleId: Long, dto: ImportRuleUpdateDto): ImportRule? = transaction {
-        ImportRuleEntity.find {
-            ImportRulesTable.id.eq(ruleId).and(ImportRulesTable.userId.eq(userId))
-        }.firstOrNull()?.also { found ->
-            dto.name?.let { found.name = it }
-            dto.lookupType?.let { found.lookupType = it }
-            dto.keywords?.let { found.keywords = it.joinToString(KEYWORDS_DELIMITER) }
-            dto.categoryId?.let { found.category = CategoryEntity[it] }
-            found.modifiedAt = Instant.now()
+            ImportRulesTable.id.eq(importRuleId).and(ImportRulesTable.userId.eq(userId))
+        }.firstOrNull()?.apply {
+            this.title = data.title
+            this.category = CategoryEntity[data.categoryId]
+            this.user = UserEntity[userId]
+            this.lookupType = data.lookupType
+            this.keywords = data.keywords.joinToString(KEYWORDS_DELIMITER)
         }?.toModel()
     }
 
-    fun delete(userId: Long, vararg ruleIds: Long): Unit = transaction {
+    suspend fun findAll(userId: Long): List<ImportRule> = blockingTransaction {
+        ImportRuleEntity.find { ImportRulesTable.userId.eq(userId) }.toList().map { it.toModel() }
+    }
+
+    suspend fun findOneByTitle(userId: Long, title: String): ImportRule? = blockingTransaction {
+        ImportRuleEntity.find {
+            ImportRulesTable.userId.eq(userId).and(ImportRulesTable.title.eq(title))
+        }.firstOrNull()?.toModel()
+    }
+
+    suspend fun findOne(userId: Long, importRuleId: Long): ImportRule? = blockingTransaction {
+        ImportRuleEntity.find {
+            ImportRulesTable.userId.eq(userId).and(ImportRulesTable.id.eq(importRuleId))
+        }.firstOrNull()?.toModel()
+    }
+
+    suspend fun delete(userId: Long, vararg importRuleIds: Long): Unit = blockingTransaction {
         ImportRulesTable.deleteWhere {
-            ImportRulesTable.id.inList(ruleIds.asList()).and(ImportRulesTable.userId.eq(userId))
+            ImportRulesTable.id.inList(importRuleIds.asList()).and(ImportRulesTable.userId.eq(userId))
         }
     }
 }

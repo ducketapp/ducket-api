@@ -16,15 +16,4 @@ interface AppDatabase {
     fun connect()
     fun getHikariConfig(): HikariConfig
     fun getDatabaseName(): String
-
-    @Deprecated("Use Transactional interface instead")
-    suspend fun <T> newTransaction(block: suspend () -> T): T {
-        return newSuspendedTransaction(
-            db = database,
-            context = Dispatchers.IO,
-            transactionIsolation = Connection.TRANSACTION_REPEATABLE_READ
-        ) {
-            block()
-        }
-    }
 }

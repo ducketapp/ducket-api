@@ -26,6 +26,6 @@ class TestMainDatabase(appConfig: AppConfig): MainDatabase(appConfig) {
     }
 
     override fun getDatabaseName(): String {
-        return databaseConfig.schema.main
+        return databaseConfig.name
     }
 }

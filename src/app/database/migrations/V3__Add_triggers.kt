@@ -12,15 +12,6 @@ class V3__Add_triggers: BaseJavaMigration() {
         transaction {
             val connection = TransactionManager.current().connection
 
-//            val budgetBeforeInsertTrigger = """
-//                CREATE DEFINER = CURRENT_USER TRIGGER `budget_BEFORE_INSERT` BEFORE INSERT ON `budget` FOR EACH ROW
-//                BEGIN
-//                    IF (NEW.recurrence_type IS NULL AND NEW.end_date IS NULL) THEN
-//                        SET NEW.end_date := NEW.start_date;
-//                    END IF;
-//                END;;
-//            """.trimIndent()
-
             val userBeforeUpdateTrigger = """
                 CREATE DEFINER = CURRENT_USER TRIGGER `user_before_update` BEFORE UPDATE ON `user` FOR EACH ROW
                 BEGIN
@@ -35,70 +26,94 @@ class V3__Add_triggers: BaseJavaMigration() {
                 END;;
             """.trimIndent()
 
+            val operationBeforeUpdateTrigger = """
+                CREATE DEFINER = CURRENT_USER TRIGGER `operation_before_update` BEFORE UPDATE ON `operation` FOR EACH ROW
+                BEGIN
+                    SET NEW.modified_at = CURRENT_TIMESTAMP(3);
+                END;;
+            """.trimIndent()
+
+            val accountBeforeUpdateTrigger = """
+                CREATE DEFINER = CURRENT_USER TRIGGER `account_before_update` BEFORE UPDATE ON `account` FOR EACH ROW
+                BEGIN
+                    SET NEW.modified_at = CURRENT_TIMESTAMP(3);
+                END;;
+            """.trimIndent()
+
             val operationBeforeDeleteTrigger = """
                 CREATE DEFINER = CURRENT_USER TRIGGER `operation_before_delete` BEFORE DELETE ON `operation` FOR EACH ROW
                 BEGIN
-                    DELETE FROM `operation_attachment` WHERE `operation_attachment`.`operation_id` = OLD.`id`;
-                    DELETE FROM `ledger_record` WHERE `ledger_record`.`operation_id` = OLD.`id`;
+                    DELETE FROM `operation_tag` WHERE `operation_tag`.`operation_id` = OLD.`id`;
                 END;;
             """.trimIndent()
 
-            val operationAttachmentAfterDeleteTrigger = """
-                CREATE DEFINER = CURRENT_USER TRIGGER `operation_attachment_after_delete` AFTER DELETE ON `operation_attachment` FOR EACH ROW
+            val operationTagAfterDeleteTrigger = """
+                CREATE DEFINER = CURRENT_USER TRIGGER `operation_tag_after_delete` AFTER DELETE ON `operation_tag` FOR EACH ROW
                 BEGIN
-                	DELETE FROM `attachment` WHERE `attachment`.`id` = OLD.`attachment_id`;
-                END;;
-            """.trimIndent()
-
-            val tagBeforeDeleteTrigger = """
-                CREATE DEFINER = CURRENT_USER TRIGGER `tag_BEFORE_DELETE` BEFORE DELETE ON `tag` FOR EACH ROW
-                BEGIN
-                	DELETE FROM `operation_tag` WHERE `operation_tag`.`tag_id` = OLD.`id`;
+                	DELETE FROM `tag` WHERE `tag`.`id` = OLD.`tag_id`;
                 END;;
             """.trimIndent()
 
             val groupBeforeDeleteTrigger = """
-                CREATE DEFINER = CURRENT_USER TRIGGER `group_BEFORE_DELETE` BEFORE DELETE ON `group` FOR EACH ROW
+                CREATE DEFINER = CURRENT_USER TRIGGER `group_before_delete` BEFORE DELETE ON `group` FOR EACH ROW
                 BEGIN
                 	DELETE FROM `group_membership` WHERE `group_membership`.`group_id` = OLD.`id`;
                 END;;
             """.trimIndent()
 
             val groupMembershipBeforeDeleteTrigger = """
-                CREATE DEFINER = CURRENT_USER TRIGGER `group_membership_BEFORE_DELETE` BEFORE DELETE ON `group_membership` FOR EACH ROW
+                CREATE DEFINER = CURRENT_USER TRIGGER `group_membership_before_delete` BEFORE DELETE ON `group_membership` FOR EACH ROW
                 BEGIN
                 	DELETE FROM `group_member_account_permission` WHERE `group_member_account_permission`.`membership_id` = OLD.`id`;
                 END;;
             """.trimIndent()
 
             val budgetBeforeDeleteTrigger = """
-                CREATE DEFINER = CURRENT_USER TRIGGER `budget_BEFORE_DELETE` BEFORE DELETE ON `budget` FOR EACH ROW
+                CREATE DEFINER = CURRENT_USER TRIGGER `budget_before_delete` BEFORE DELETE ON `budget` FOR EACH ROW
                 BEGIN
                 	DELETE FROM `budget_account` WHERE `budget_account`.`budget_id` = OLD.`id`;
-                    DELETE FROM `budget_category` WHERE `budget_category`.`budget_id` = OLD.`id`;
-                    DELETE FROM `budget_period_limit` WHERE `budget_period_limit`.`budget_id` = OLD.`id`;
+                END;;
+            """.trimIndent()
+
+            val periodicBudgetBeforeDeleteTrigger = """
+                CREATE DEFINER = CURRENT_USER TRIGGER `periodic_budget_before_delete` BEFORE DELETE ON `periodic_budget` FOR EACH ROW
+                BEGIN
+                	DELETE FROM `periodic_budget_account` WHERE `periodic_budget_account`.`budget_id` = OLD.`id`;
+                    DELETE FROM `periodic_budget_limit` WHERE `periodic_budget_limit`.`budget_id` = OLD.`id`;
                 END;;
             """.trimIndent()
 
             val accountBeforeDeleteTrigger = """
-                CREATE DEFINER = CURRENT_USER TRIGGER `account_BEFORE_DELETE` BEFORE DELETE ON `account` FOR EACH ROW
+                CREATE DEFINER = CURRENT_USER TRIGGER `account_before_delete` BEFORE DELETE ON `account` FOR EACH ROW
                 BEGIN
                 	DELETE FROM `group_member_account_permission` WHERE `group_member_account_permission`.`account_id` = OLD.`id`;
                 END;;
             """.trimIndent()
 
-            // connection.prepareStatement(budgetBeforeInsertTrigger, false).executeUpdate()
+            val importBeforeDeleteTrigger = """
+                CREATE DEFINER = CURRENT_USER TRIGGER `import_before_delete` BEFORE DELETE ON `import` FOR EACH ROW
+                BEGIN
+                	DELETE FROM `operation` WHERE `operation`.`import_id` = OLD.`id`;
+                END;;
+            """.trimIndent()
+
+            // Before update
             connection.prepareStatement(userBeforeUpdateTrigger, false).executeUpdate()
             connection.prepareStatement(tagBeforeUpdateTrigger, false).executeUpdate()
+            connection.prepareStatement(operationBeforeUpdateTrigger, false).executeUpdate()
+            connection.prepareStatement(accountBeforeUpdateTrigger, false).executeUpdate()
 
+            // Before delete
             connection.prepareStatement(operationBeforeDeleteTrigger, false).executeUpdate()
-            connection.prepareStatement(operationAttachmentAfterDeleteTrigger, false).executeUpdate()
-
-            connection.prepareStatement(tagBeforeDeleteTrigger, false).executeUpdate()
             connection.prepareStatement(groupBeforeDeleteTrigger, false).executeUpdate()
             connection.prepareStatement(groupMembershipBeforeDeleteTrigger, false).executeUpdate()
             connection.prepareStatement(budgetBeforeDeleteTrigger, false).executeUpdate()
+            connection.prepareStatement(periodicBudgetBeforeDeleteTrigger, false).executeUpdate()
             connection.prepareStatement(accountBeforeDeleteTrigger, false).executeUpdate()
+            connection.prepareStatement(importBeforeDeleteTrigger, false).executeUpdate()
+
+            // After delete
+            connection.prepareStatement(operationTagAfterDeleteTrigger, false).executeUpdate()
         }
     }
 }

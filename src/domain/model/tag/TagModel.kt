@@ -12,23 +12,27 @@ import java.time.Instant
 
 internal object TagsTable : LongIdTable("tag") {
     val userId = reference("user_id", UsersTable)
-    val name = varchar("name", 32)
+    val title = varchar("name", 32)
     val createdAt = timestamp("created_at").clientDefault { Instant.now() }
     val modifiedAt = timestamp("modified_at").clientDefault { Instant.now() }
+
+    init {
+        uniqueIndex("name_unique_index", userId, title)
+    }
 }
 
 class TagEntity(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<TagEntity>(TagsTable)
 
     var user by UserEntity referencedOn TagsTable.userId
-    var name by TagsTable.name
+    var title by TagsTable.title
     var createdAt by TagsTable.createdAt
     var modifiedAt by TagsTable.modifiedAt
 
     fun toModel() = Tag(
         id.value,
         user.toModel(),
-        name,
+        title,
         createdAt,
         modifiedAt,
     )
@@ -37,7 +41,16 @@ class TagEntity(id: EntityID<Long>) : LongEntity(id) {
 data class Tag(
     val id: Long,
     val user: User,
-    val name: String,
+    val title: String,
     val createdAt: Instant,
     val modifiedAt: Instant,
+)
+
+data class TagCreate(
+    val userId: Long,
+    val title: String,
+)
+
+data class TagUpdate(
+    val title: String,
 )

@@ -1,6 +1,6 @@
 package io.ducket.api
 
-import io.ducket.api.domain.controller.account.AccountDto
+import io.ducket.api.domain.controller.account.dto.AccountDto
 import io.ducket.api.domain.repository.AccountRepository
 import io.ducket.api.domain.service.AccountService
 import io.ducket.api.domain.service.GroupService

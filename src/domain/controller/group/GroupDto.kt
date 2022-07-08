@@ -1,6 +1,6 @@
 package io.ducket.api.domain.controller.group
 
-import io.ducket.api.domain.controller.user.UserDto
+import io.ducket.api.domain.controller.user.dto.UserDto
 import io.ducket.api.domain.model.group.Group
 
 data class GroupDto(

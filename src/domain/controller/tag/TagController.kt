@@ -1,6 +1,7 @@
 package io.ducket.api.domain.controller.tag
 
 import io.ducket.api.domain.controller.BulkDeleteDto
+import io.ducket.api.domain.controller.tag.dto.TagCreateUpdateDto
 import io.ducket.api.domain.service.TagService
 import io.ducket.api.principalOrThrow
 import io.ktor.application.*
@@ -16,15 +17,17 @@ class TagController(
 
     suspend fun getTags(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
-        val tags = tagService.getTags(userId)
 
-        ctx.respond(HttpStatusCode.OK, tags)
+        tagService.getTags(userId).let { resObj ->
+            ctx.respond(HttpStatusCode.OK, resObj)
+
+        }
     }
 
     suspend fun createTag(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
 
-        ctx.receive<TagCreateDto>().let { reqObj ->
+        ctx.receive<TagCreateUpdateDto>().let { reqObj ->
             tagService.createTag(userId, reqObj.validate()).let { resObj ->
                 ctx.respond(HttpStatusCode.Created, resObj)
             }
@@ -44,16 +47,17 @@ class TagController(
     suspend fun getTag(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
         val tagId = ctx.parameters.getOrFail("tagId").toLong()
-        val tag = tagService.getTag(userId, tagId)
 
-        ctx.respond(HttpStatusCode.OK, tag)
+        tagService.getTag(userId, tagId).let { resObj ->
+            ctx.respond(HttpStatusCode.OK, resObj)
+        }
     }
 
     suspend fun updateTag(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id
         val tagId = ctx.parameters.getOrFail("tagId").toLong()
 
-        ctx.receive<TagUpdateDto>().let { reqObj ->
+        ctx.receive<TagCreateUpdateDto>().let { reqObj ->
             tagService.updateTag(userId, tagId, reqObj.validate()).let { resObj ->
                 ctx.respond(HttpStatusCode.OK, resObj)
             }

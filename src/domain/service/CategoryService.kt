@@ -1,22 +1,17 @@
 package io.ducket.api.domain.service
 
-import io.ducket.api.domain.controller.category.TypedCategoryDto
-import io.ducket.api.domain.controller.category.GroupedCategoryDto
-import io.ducket.api.domain.controller.category.TypelessCategoryDto
+import domain.mapper.CategoryMapper
+import io.ducket.api.domain.controller.category.dto.CategoryDto
 import io.ducket.api.domain.repository.CategoryRepository
 import io.ducket.api.plugins.NoDataFoundException
 
 class CategoryService(private val categoryRepository: CategoryRepository) {
 
-    fun getCategories(): List<GroupedCategoryDto> {
-        return categoryRepository.findAll()
-            .groupByTo(LinkedHashMap()) { it.group }
-            .map { grouped ->
-                GroupedCategoryDto(grouped.key,  grouped.value.map { TypelessCategoryDto(it) })
-            }
+    suspend fun getCategories(): List<CategoryDto> {
+        return categoryRepository.findAll().map { CategoryMapper.mapModelToDto(it) }
     }
 
-    fun getCategory(id: Long): TypedCategoryDto {
-        return categoryRepository.findOne(id)?.let { TypedCategoryDto(it) } ?: throw NoDataFoundException()
+    suspend fun getCategory(id: Long): CategoryDto {
+        return categoryRepository.findOne(id)?.let { CategoryMapper.mapModelToDto(it) } ?: throw NoDataFoundException()
     }
 }
