@@ -44,7 +44,7 @@ internal object OperationsTable : LongIdTable("operation") {
     val modifiedAt = timestamp("modified_at").clientDefault { Instant.now() }
 
     init {
-        uniqueIndex("unique_index", extId, userId)
+        uniqueIndex("operation_unique_index", extId, userId)
     }
 }
 

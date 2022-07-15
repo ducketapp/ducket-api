@@ -32,7 +32,7 @@ internal object AccountsTable : LongIdTable("account") {
     val modifiedAt = timestamp("modified_at").clientDefault { Instant.now() }
 
     init {
-        uniqueIndex("unique_index", userId, title, extId)
+        uniqueIndex("account_unique_index", userId, title, extId)
     }
 }
 

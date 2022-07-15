@@ -17,7 +17,7 @@ internal object TagsTable : LongIdTable("tag") {
     val modifiedAt = timestamp("modified_at").clientDefault { Instant.now() }
 
     init {
-        uniqueIndex("name_unique_index", userId, title)
+        uniqueIndex("tag_unique_index", userId, title)
     }
 }
 

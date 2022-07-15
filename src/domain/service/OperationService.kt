@@ -74,35 +74,4 @@ class OperationService(
             }
         }
     }
-
-//    suspend fun uploadOperationAttachments(userId: Long, operationId: Long, multipartData: List<PartData>) {
-//        operationRepository.findOne(userId, operationId) ?: throw NoDataFoundException()
-//
-//        val actualAttachmentsCount = operationAttachmentRepository.getCount(operationId)
-//        val contentPairList = localFileService.extractMultipartImageData(multipartData)
-//
-//        if (contentPairList.size + actualAttachmentsCount > 3) throw InvalidDataException("Attachments limit exceeded, max 3")
-//
-//        contentPairList.forEach { pair ->
-//            localFileService.createLocalImageFile(pair.first, pair.second).also { newFile ->
-//                operationAttachmentRepository.createOne(userId, operationId, newFile)
-//            }
-//        }
-//    }
-//
-//    suspend fun downloadOperationAttachment(userId: Long, operationId: Long, attachmentId: Long): File {
-//        operationRepository.findOne(userId, operationId) ?: throw NoDataFoundException()
-//
-//        return operationAttachmentRepository.findOne(operationId, attachmentId)?.let {
-//            localFileService.getLocalFile(it.filePath) ?: throw NoDataFoundException("File not found")
-//        } ?: throw NoDataFoundException("No such attachment was found")
-//    }
-//
-//    suspend fun deleteOperationAttachment(userId: Long, operationId: Long, attachmentId: Long) {
-//        operationRepository.findOne(userId, operationId) ?: throw NoDataFoundException()
-//
-//        operationAttachmentRepository.findOne(operationId, attachmentId)?.also {
-//            operationAttachmentRepository.delete(operationId, attachmentId)
-//        } ?: throw NoDataFoundException("No such attachment was found")
-//    }
 }

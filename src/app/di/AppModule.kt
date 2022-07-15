@@ -40,11 +40,11 @@ object AppModule {
     }
 
     val databaseModule = module {
-        single<AppDatabase>() { MainDatabase(get()) }
+        single<AppDatabase> { MainDatabase(get()) }
     }
 
     val schedulerModule = module {
-        single { AppJobFactory(get(), get(), get()) }
+        single { AppJobFactory(get(), get()) }
     }
 
     val controllerModule = module {
@@ -71,7 +71,6 @@ object AppModule {
         single { CurrencyService(get(), get()) }
         single { ImportRuleService(get()) }
         single { ImportService(get(), get(), get(), get()) }
-        single { LocalFileService() }
         single { OperationService(get(), get(), get()) }
         single { GroupService(get(), get(), get(), get(), get()) }
         single { TagService(get()) }
@@ -91,11 +90,9 @@ object AppModule {
         single { PeriodicBudgetLimitRepository() }
         single { PeriodicBudgetAccountRepository() }
         single { OperationRepository() }
-        single { OperationAttachmentRepository() }
         single { GroupRepository() }
         single { GroupMembershipRepository() }
         single { GroupMemberAccountPermissionRepository() }
-        single { AttachmentRepository() }
         single { TagRepository() }
     }
 

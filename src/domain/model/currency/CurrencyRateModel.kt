@@ -16,7 +16,7 @@ internal object CurrencyRatesTable : LongIdTable("currency_rate") {
     val dataSource = varchar("data_source", 64).nullable()
 
     init {
-        uniqueIndex("base_quote_date_unique_index", baseCurrencyIsoCode, quoteCurrencyIsoCode, date)
+        uniqueIndex("currency_unique_index", baseCurrencyIsoCode, quoteCurrencyIsoCode, date)
     }
 }
 

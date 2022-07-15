@@ -13,16 +13,16 @@ class V2__Set_timezone: BaseJavaMigration() {
 
     override fun migrate(context: Context?) {
         // creates timezone offset in +00:00 format
-        val timezoneOffset = DateTimeFormatter.ofPattern("xxx").format(
-            TimeZone.getDefault().toZoneId().rules.getOffset(Instant.now())
-        )
-
-        val setGlobalTimezoneStatement = "SET @@global.time_zone = `$timezoneOffset`;"
-        val setSessionTimezoneStatement = "SET @@session.time_zone = `$timezoneOffset`;"
-
-        transaction {
-            TransactionManager.current().connection.prepareStatement(setGlobalTimezoneStatement, false).executeUpdate()
-            TransactionManager.current().connection.prepareStatement(setSessionTimezoneStatement, false).executeUpdate()
-        }
+//        val timezoneOffset = DateTimeFormatter.ofPattern("xxx").format(
+//            TimeZone.getDefault().toZoneId().rules.getOffset(Instant.now())
+//        )
+//
+//        val setGlobalTimezoneStatement = "SET @@global.time_zone = `$timezoneOffset`;"
+//        val setSessionTimezoneStatement = "SET @@session.time_zone = `$timezoneOffset`;"
+//
+//        transaction {
+//            TransactionManager.current().connection.prepareStatement(setGlobalTimezoneStatement, false).executeUpdate()
+//            TransactionManager.current().connection.prepareStatement(setSessionTimezoneStatement, false).executeUpdate()
+//        }
     }
 }
