@@ -1,9 +1,9 @@
 package io.ducket.api.domain.repository
 
-import domain.model.category.CategoryEntity
-import domain.model.imports.*
-import domain.model.imports.ImportRulesTable
-import domain.model.user.UserEntity
+import io.ducket.api.domain.model.category.CategoryEntity
+import io.ducket.api.domain.model.imports.*
+import io.ducket.api.domain.model.imports.ImportRulesTable
+import io.ducket.api.domain.model.user.UserEntity
 import io.ducket.api.app.database.Transactional
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere

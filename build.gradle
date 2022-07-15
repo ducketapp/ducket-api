@@ -79,15 +79,16 @@ tasks.named("shadowJar") {
     dependsOn tasks.named("test")
 }
 
-test.finalizedBy(jacocoTestReport)
+test {
+    finalizedBy jacocoTestReport
+}
 
 jacoco {
-    // You may modify the Jacoco version here
     toolVersion = "0.8.2"
 }
 
 jacocoTestReport {
-    // Adjust the output of the test report
+    dependsOn test
     reports {
         xml.enabled true
         csv.enabled false

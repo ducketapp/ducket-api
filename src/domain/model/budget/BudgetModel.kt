@@ -1,16 +1,16 @@
 package io.ducket.api.domain.model.budget
 
-import domain.model.account.Account
-import domain.model.account.AccountEntity
-import domain.model.category.CategoriesTable
-import domain.model.category.Category
-import domain.model.category.CategoryEntity
-import domain.model.currency.CurrenciesTable
-import domain.model.currency.Currency
-import domain.model.currency.CurrencyEntity
-import domain.model.user.User
-import domain.model.user.UserEntity
-import domain.model.user.UsersTable
+import io.ducket.api.domain.model.account.Account
+import io.ducket.api.domain.model.account.AccountEntity
+import io.ducket.api.domain.model.category.CategoriesTable
+import io.ducket.api.domain.model.category.Category
+import io.ducket.api.domain.model.category.CategoryEntity
+import io.ducket.api.domain.model.currency.CurrenciesTable
+import io.ducket.api.domain.model.currency.Currency
+import io.ducket.api.domain.model.currency.CurrencyEntity
+import io.ducket.api.domain.model.user.User
+import io.ducket.api.domain.model.user.UserEntity
+import io.ducket.api.domain.model.user.UsersTable
 import io.ducket.api.app.DEFAULT_SCALE
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass

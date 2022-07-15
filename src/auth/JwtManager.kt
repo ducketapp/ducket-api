@@ -4,7 +4,6 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import domain.model.user.UserEntity
 import io.ducket.api.config.AppConfig
 import io.ducket.api.domain.repository.UserRepository
 import io.ducket.api.plugins.AuthenticationException

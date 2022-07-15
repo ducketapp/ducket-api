@@ -1,10 +1,9 @@
 package io.ducket.api.domain.mapper
 
-import domain.mapper.DataClassMapper
-import domain.model.category.Category
-import domain.model.imports.ImportRule
-import domain.model.imports.ImportRuleCreate
-import domain.model.imports.ImportRuleUpdate
+import io.ducket.api.domain.model.category.Category
+import io.ducket.api.domain.model.imports.ImportRule
+import io.ducket.api.domain.model.imports.ImportRuleCreate
+import io.ducket.api.domain.model.imports.ImportRuleUpdate
 import io.ducket.api.domain.controller.category.dto.CategoryDto
 import io.ducket.api.domain.controller.rule.dto.ImportRuleCreateUpdateDto
 import io.ducket.api.domain.controller.rule.dto.ImportRuleDto

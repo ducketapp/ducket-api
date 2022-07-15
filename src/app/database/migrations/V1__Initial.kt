@@ -1,15 +1,15 @@
 package io.ducket.api.app.database.migrations
 
-import domain.model.account.AccountsTable
-import domain.model.category.CategoriesTable
-import domain.model.currency.CurrenciesTable
-import domain.model.imports.ImportRulesTable
-import domain.model.imports.ImportsTable
-import domain.model.user.UsersTable
-import domain.model.periodic_budget.PeriodicBudgetAccountsTable
-import domain.model.periodic_budget.PeriodicBudgetsTable
-import domain.model.operation.OperationsTable
-import domain.model.periodic_budget.PeriodicBudgetLimitsTable
+import io.ducket.api.domain.model.account.AccountsTable
+import io.ducket.api.domain.model.category.CategoriesTable
+import io.ducket.api.domain.model.currency.CurrenciesTable
+import io.ducket.api.domain.model.imports.ImportRulesTable
+import io.ducket.api.domain.model.imports.ImportsTable
+import io.ducket.api.domain.model.user.UsersTable
+import io.ducket.api.domain.model.periodic_budget.PeriodicBudgetAccountsTable
+import io.ducket.api.domain.model.periodic_budget.PeriodicBudgetsTable
+import io.ducket.api.domain.model.operation.OperationsTable
+import io.ducket.api.domain.model.periodic_budget.PeriodicBudgetLimitsTable
 import io.ducket.api.domain.model.budget.BudgetAccountsTable
 import io.ducket.api.domain.model.budget.BudgetsTable
 import io.ducket.api.domain.model.currency.CurrencyRatesTable
@@ -20,7 +20,6 @@ import io.ducket.api.domain.model.operation.OperationTagsTable
 import io.ducket.api.domain.model.tag.TagsTable
 import org.flywaydb.core.api.migration.BaseJavaMigration
 import org.flywaydb.core.api.migration.Context
-import org.jetbrains.exposed.sql.Schema
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 

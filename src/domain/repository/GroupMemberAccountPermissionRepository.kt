@@ -1,6 +1,6 @@
 package io.ducket.api.domain.repository
 
-import domain.model.account.AccountEntity
+import io.ducket.api.domain.model.account.AccountEntity
 import io.ducket.api.app.AccountPermission
 import io.ducket.api.domain.model.group.*
 import io.ducket.api.domain.model.group.GroupMemberAccountPermissionsTable

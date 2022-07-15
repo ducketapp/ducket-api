@@ -1,6 +1,5 @@
 package io.ducket.api.domain.model.operation
 
-import domain.model.operation.OperationsTable
 import io.ducket.api.domain.model.tag.TagsTable
 import org.jetbrains.exposed.sql.Table
 

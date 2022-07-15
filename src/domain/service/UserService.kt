@@ -2,7 +2,7 @@ package io.ducket.api.domain.service
 
 import io.ducket.api.app.AccountType
 import io.ducket.api.app.database.Transactional
-import domain.mapper.UserMapper
+import io.ducket.api.domain.mapper.UserMapper
 import io.ducket.api.utils.HashUtils
 import io.ducket.api.domain.controller.account.dto.AccountCreateDto
 import io.ducket.api.domain.controller.user.dto.UserAuthenticateDto
@@ -23,18 +23,18 @@ class UserService(
     }
 
     suspend fun authenticateUser(dto: UserAuthenticateDto): UserDto {
-        return userRepository.findOneByEmail(dto.email).let { user ->
-            if (user != null && HashUtils.check(dto.password, user.passwordHash)) {
+        return userRepository.findOneByEmail(dto.email)?.let { user ->
+            if (HashUtils.check(dto.password, user.passwordHash)) {
                 UserMapper.mapModelToDto(user)
             } else {
                 throw AuthenticationException("Either password or email is incorrect")
             }
-        }
+        } ?: throw AuthenticationException()
     }
 
     suspend fun createUser(dto: UserCreateDto): UserDto {
         userRepository.findOneByEmail(dto.email)?.also {
-            throw AuthenticationException("Such email has already been taken")
+            throw DuplicateDataException("Such email has already been taken")
         }
 
         return blockingTransaction {
@@ -42,14 +42,14 @@ class UserService(
                 accountService.createAccount(
                     userId = user.id,
                     dto = AccountCreateDto(
-                        name = "Cash ${user.currency.isoCode}",
+                        title = "Cash ${user.currency.isoCode}",
                         notes = "Account in ${user.currency.name}",
                         startBalance = dto.startBalance,
                         currency = user.currency.isoCode,
                         type = AccountType.CASH,
                     )
                 )
-                return@blockingTransaction UserMapper.mapModelToDto(user)
+                UserMapper.mapModelToDto(user)
             }
         }
     }
@@ -61,13 +61,13 @@ class UserService(
     }
 
     suspend fun deleteUser(userId: Long) {
-        return blockingTransaction {
+        blockingTransaction {
             userRepository.deleteData(userId)
             userRepository.deleteOne(userId)
         }
     }
 
     suspend fun deleteUserData(userId: Long) {
-        return userRepository.deleteData(userId)
+        userRepository.deleteData(userId)
     }
 }

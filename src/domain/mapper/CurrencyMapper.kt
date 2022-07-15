@@ -1,6 +1,6 @@
-package domain.mapper
+package io.ducket.api.domain.mapper
 
-import domain.model.currency.Currency
+import io.ducket.api.domain.model.currency.Currency
 import io.ducket.api.domain.controller.currency.dto.CurrencyDto
 import io.ducket.api.domain.controller.currency.dto.CurrencyRateDto
 import io.ducket.api.domain.model.currency.CurrencyRate

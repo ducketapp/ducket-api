@@ -3,8 +3,8 @@ package io.ducket.api.domain.repository
 import io.ducket.api.domain.model.attachment.Attachment
 import io.ducket.api.domain.model.attachment.AttachmentEntity
 import io.ducket.api.domain.model.attachment.AttachmentsTable
-import domain.model.operation.OperationAttachmentsTable
-import domain.model.user.UserEntity
+import io.ducket.api.domain.model.operation.OperationAttachmentsTable
+import io.ducket.api.domain.model.user.UserEntity
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File

@@ -1,11 +1,11 @@
 package io.ducket.api.domain.controller.rule.dto
 
-import io.ducket.api.app.ImportRuleLookupType
+import io.ducket.api.app.ImportRuleApplyType
 import org.valiktor.functions.*
 
 data class ImportRuleCreateUpdateDto(
     val title: String,
-    val lookupType: ImportRuleLookupType,
+    val lookupType: ImportRuleApplyType,
     val keywords: List<String>,
     val categoryId: Long,
 ) {

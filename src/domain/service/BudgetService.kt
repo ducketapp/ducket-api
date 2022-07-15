@@ -1,7 +1,7 @@
 package io.ducket.api.domain.service
 
 import io.ducket.api.app.database.Transactional
-import domain.mapper.BudgetMapper
+import io.ducket.api.domain.mapper.BudgetMapper
 import io.ducket.api.domain.controller.BulkDeleteDto
 import io.ducket.api.domain.controller.budget.dto.BudgetCreateDto
 import io.ducket.api.domain.controller.budget.dto.BudgetDto

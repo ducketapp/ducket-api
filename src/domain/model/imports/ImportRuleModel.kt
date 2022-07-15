@@ -1,12 +1,12 @@
-package domain.model.imports
+package io.ducket.api.domain.model.imports
 
-import domain.model.category.CategoriesTable
-import domain.model.category.Category
-import domain.model.category.CategoryEntity
-import domain.model.user.User
-import domain.model.user.UserEntity
-import domain.model.user.UsersTable
-import io.ducket.api.app.ImportRuleLookupType
+import io.ducket.api.domain.model.user.User
+import io.ducket.api.domain.model.user.UserEntity
+import io.ducket.api.domain.model.user.UsersTable
+import io.ducket.api.app.ImportRuleApplyType
+import io.ducket.api.domain.model.category.CategoriesTable
+import io.ducket.api.domain.model.category.Category
+import io.ducket.api.domain.model.category.CategoryEntity
 import org.jetbrains.exposed.dao.*
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
@@ -19,7 +19,7 @@ internal object ImportRulesTable : LongIdTable("import_rule") {
     val userId = reference("user_id", UsersTable)
     val categoryId = reference("category_id", CategoriesTable)
     val title = varchar("title", 64)
-    val lookupType = enumerationByName("lookup_type", 32, ImportRuleLookupType::class)
+    val lookupType = enumerationByName("lookup_type", 32, ImportRuleApplyType::class)
     val keywords = varchar("keywords", 512)
     val createdAt = timestamp("created_at").clientDefault { Instant.now() }
     val modifiedAt = timestamp("modified_at").clientDefault { Instant.now() }
@@ -53,7 +53,7 @@ class ImportRule(
     val user: User,
     val category: Category,
     val title: String,
-    val lookupType: ImportRuleLookupType,
+    val lookupType: ImportRuleApplyType,
     val keywords: List<String>,
     val createdAt: Instant,
     val modifiedAt: Instant,
@@ -63,13 +63,13 @@ class ImportRuleCreate(
     val userId: Long,
     val categoryId: Long,
     val title: String,
-    val lookupType: ImportRuleLookupType,
+    val lookupType: ImportRuleApplyType,
     val keywords: List<String>,
 )
 
 class ImportRuleUpdate(
     val categoryId: Long,
     val title: String,
-    val lookupType: ImportRuleLookupType,
+    val lookupType: ImportRuleApplyType,
     val keywords: List<String>,
 )

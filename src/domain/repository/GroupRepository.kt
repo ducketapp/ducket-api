@@ -1,6 +1,6 @@
 package io.ducket.api.domain.repository
 
-import domain.model.user.UserEntity
+import io.ducket.api.domain.model.user.UserEntity
 import io.ducket.api.domain.model.group.Group
 import io.ducket.api.domain.model.group.GroupEntity
 import io.ducket.api.domain.model.group.GroupMembershipsTable

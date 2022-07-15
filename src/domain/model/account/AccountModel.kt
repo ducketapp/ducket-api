@@ -1,14 +1,15 @@
-package domain.model.account
+package io.ducket.api.domain.model.account
 
-import domain.model.currency.CurrenciesTable
-import domain.model.currency.Currency
-import domain.model.currency.CurrencyEntity
-import domain.model.operation.OperationEntity
-import domain.model.operation.OperationsTable
-import domain.model.user.User
-import domain.model.user.UserEntity
-import domain.model.user.UsersTable
+import io.ducket.api.domain.model.currency.CurrenciesTable
+import io.ducket.api.domain.model.currency.Currency
+import io.ducket.api.domain.model.currency.CurrencyEntity
+import io.ducket.api.domain.model.operation.OperationEntity
+import io.ducket.api.domain.model.operation.OperationsTable
+import io.ducket.api.domain.model.user.User
+import io.ducket.api.domain.model.user.UserEntity
+import io.ducket.api.domain.model.user.UsersTable
 import io.ducket.api.app.AccountType
+import io.ducket.api.app.DEFAULT_SCALE
 import io.ducket.api.app.OperationType
 import io.ducket.api.utils.sumByDecimal
 import org.jetbrains.exposed.dao.LongEntity
@@ -20,23 +21,27 @@ import java.math.BigDecimal
 import java.time.Instant
 
 internal object AccountsTable : LongIdTable("account") {
+    val extId = varchar("ext_id", 128).nullable()
     val userId = reference("user_id", UsersTable)
     val currencyId = reference("currency_id", CurrenciesTable)
     val type = enumerationByName("type", 32, AccountType::class)
-    val name = varchar("name", 64)
+    val title = varchar("title", 64)
+    val startBalance = decimal("start_balance", 10, DEFAULT_SCALE).clientDefault { BigDecimal.ZERO }
     val notes = varchar("notes", 128).nullable()
     val createdAt = timestamp("created_at").clientDefault { Instant.now() }
     val modifiedAt = timestamp("modified_at").clientDefault { Instant.now() }
 
     init {
-        uniqueIndex("name_unique_index", userId, name)
+        uniqueIndex("unique_index", userId, title, extId)
     }
 }
 
 class AccountEntity(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<AccountEntity>(AccountsTable)
 
-    var name by AccountsTable.name
+    var extId by AccountsTable.extId
+    var title by AccountsTable.title
+    var startBalance by AccountsTable.startBalance
     var notes by AccountsTable.notes
     var user by UserEntity referencedOn AccountsTable.userId
     var currency by CurrencyEntity referencedOn AccountsTable.currencyId
@@ -47,17 +52,17 @@ class AccountEntity(id: EntityID<Long>) : LongEntity(id) {
     private val operations by OperationEntity referrersOn OperationsTable.accountId
     private val incomingTransfers by OperationEntity optionalReferrersOn OperationsTable.transferAccountId
 
-    private val balance: BigDecimal
-        get() = operations.sumByDecimal {
-            if (it.type == OperationType.INCOME) it.postedAmount else it.postedAmount.negate()
-        }.plus(incomingTransfers.sumByDecimal {
-            it.clearedAmount
-        })
+    private val totalBalance: BigDecimal
+        get() = startBalance.plus()
+            .plus(operations.sumByDecimal { if (it.type == OperationType.INCOME) it.postedAmount else it.postedAmount.negate() })
+            .plus(incomingTransfers.sumByDecimal { it.clearedAmount })
 
     fun toModel() = Account(
         id.value,
-        name,
-        balance,
+        extId,
+        title,
+        startBalance,
+        totalBalance,
         notes,
         user.toModel(),
         currency.toModel(),
@@ -69,8 +74,10 @@ class AccountEntity(id: EntityID<Long>) : LongEntity(id) {
 
 data class Account(
     val id: Long,
-    val name: String,
-    val balance: BigDecimal,
+    val extId: String?,
+    val title: String,
+    val startBalance: BigDecimal,
+    val totalBalance: BigDecimal,
     val notes: String?,
     val user: User,
     val currency: Currency,
@@ -80,7 +87,9 @@ data class Account(
 )
 
 data class AccountCreate(
-    val name: String,
+    val extId: String?,
+    val title: String,
+    val startBalance: BigDecimal,
     val notes: String?,
     val userId: Long,
     val currency: String,
@@ -88,7 +97,8 @@ data class AccountCreate(
 )
 
 data class AccountUpdate(
-    val name: String,
+    val title: String,
+    val startBalance: BigDecimal,
     val notes: String?,
     val type: AccountType,
 )

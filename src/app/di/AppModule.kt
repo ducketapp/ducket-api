@@ -1,15 +1,14 @@
 package io.ducket.api.app.di
 
-import clients.rates.ReferenceRatesClient
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import io.ducket.api.app.database.*
 import io.ducket.api.app.scheduler.AppJobFactory
 import io.ducket.api.config.AppConfig
 import io.ducket.api.auth.JwtManager
+import io.ducket.api.clients.rates.ReferenceRatesClient
 import io.ducket.api.domain.controller.account.AccountController
-import domain.controller.periodic_budget.PeriodicBudgetController
-import domain.model.imports.ImportRule
+import io.ducket.api.domain.controller.periodic_budget.PeriodicBudgetController
 import io.ducket.api.domain.controller.budget.BudgetController
 import io.ducket.api.domain.controller.category.CategoryController
 import io.ducket.api.domain.controller.currency.CurrencyController
@@ -27,7 +26,6 @@ import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.logging.*
 import io.ktor.http.*
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import java.util.concurrent.TimeUnit
 
@@ -65,7 +63,7 @@ object AppModule {
 
     val serviceModule = module {
         single { UserService(get(), get()) }
-        single { AccountService(get(), get(), get()) }
+        single { AccountService(get()) }
         single { CategoryService(get()) }
         single { BudgetService(get(), get()) }
         single { PeriodicBudgetService(get(), get(), get()) }

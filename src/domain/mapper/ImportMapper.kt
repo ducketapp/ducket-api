@@ -1,8 +1,7 @@
 package io.ducket.api.domain.mapper
 
-import domain.mapper.DataClassMapper
-import domain.model.imports.Import
-import domain.model.imports.ImportUpdate
+import io.ducket.api.domain.model.imports.Import
+import io.ducket.api.domain.model.imports.ImportUpdate
 import io.ducket.api.domain.controller.imports.dto.ImportDto
 import io.ducket.api.domain.controller.imports.dto.ImportUpdateDto
 

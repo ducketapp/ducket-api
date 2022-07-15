@@ -1,9 +1,8 @@
 package io.ducket.api.domain.repository
 
-import domain.model.periodic_budget.*
-import domain.model.periodic_budget.PeriodicBudgetLimitsTable
+import io.ducket.api.domain.model.periodic_budget.*
+import io.ducket.api.domain.model.periodic_budget.PeriodicBudgetLimitsTable
 import io.ducket.api.app.database.Transactional
-import io.ducket.api.domain.model.budget.*
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.exists
 import org.jetbrains.exposed.sql.select

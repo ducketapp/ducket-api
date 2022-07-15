@@ -1,13 +1,12 @@
-package domain.mapper
+package io.ducket.api.domain.mapper
 
-import domain.model.account.Account
-import domain.model.category.Category
-import domain.model.currency.Currency
-import domain.model.imports.Import
-import domain.model.operation.Operation
-import domain.model.operation.OperationCreate
-import domain.model.operation.OperationUpdate
-import domain.mapper.DataClassMapper.Companion.collectionMapper
+import io.ducket.api.domain.model.account.Account
+import io.ducket.api.domain.model.category.Category
+import io.ducket.api.domain.model.currency.Currency
+import io.ducket.api.domain.model.imports.Import
+import io.ducket.api.domain.model.operation.Operation
+import io.ducket.api.domain.model.operation.OperationCreate
+import io.ducket.api.domain.model.operation.OperationUpdate
 import io.ducket.api.app.OperationType
 import io.ducket.api.domain.controller.account.dto.AccountDto
 import io.ducket.api.domain.controller.category.dto.CategoryDto
@@ -19,6 +18,7 @@ import io.ducket.api.domain.controller.operation.dto.OperationLocationDto
 import io.ducket.api.domain.controller.operation.dto.OperationCreateUpdateDto
 import io.ducket.api.domain.controller.operation.dto.OperationDto
 import io.ducket.api.domain.controller.tag.dto.TagDto
+import io.ducket.api.domain.mapper.DataClassMapper.Companion.collectionMapper
 import io.ducket.api.domain.model.tag.Tag
 import java.math.BigDecimal
 import java.util.*

@@ -1,8 +1,8 @@
 package io.ducket.api.domain.model.group
 
-import domain.model.account.Account
-import domain.model.account.AccountEntity
-import domain.model.account.AccountsTable
+import io.ducket.api.domain.model.account.Account
+import io.ducket.api.domain.model.account.AccountEntity
+import io.ducket.api.domain.model.account.AccountsTable
 import io.ducket.api.app.AccountPermission
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass

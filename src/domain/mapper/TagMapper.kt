@@ -1,4 +1,4 @@
-package domain.mapper
+package io.ducket.api.domain.mapper
 
 import io.ducket.api.domain.controller.tag.dto.TagCreateUpdateDto
 import io.ducket.api.domain.controller.tag.dto.TagDto

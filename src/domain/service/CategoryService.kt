@@ -1,6 +1,6 @@
 package io.ducket.api.domain.service
 
-import domain.mapper.CategoryMapper
+import io.ducket.api.domain.mapper.CategoryMapper
 import io.ducket.api.domain.controller.category.dto.CategoryDto
 import io.ducket.api.domain.repository.CategoryRepository
 import io.ducket.api.plugins.NoDataFoundException

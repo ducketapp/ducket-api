@@ -1,6 +1,6 @@
 package io.ducket.api.domain.repository
 
-import domain.model.user.UserEntity
+import io.ducket.api.domain.model.user.UserEntity
 import io.ducket.api.app.database.Transactional
 import io.ducket.api.domain.model.tag.*
 import io.ducket.api.domain.model.tag.TagsTable

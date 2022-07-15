@@ -1,14 +1,12 @@
 package io.ducket.api.domain.repository
 
-import domain.model.account.AccountEntity
-import domain.model.category.CategoryEntity
-import domain.model.imports.ImportEntity
-import domain.model.operation.*
-import domain.model.operation.OperationsTable
-import domain.model.user.UserEntity
+import io.ducket.api.domain.model.account.AccountEntity
+import io.ducket.api.domain.model.category.CategoryEntity
+import io.ducket.api.domain.model.imports.ImportEntity
+import io.ducket.api.domain.model.operation.*
+import io.ducket.api.domain.model.operation.OperationsTable
+import io.ducket.api.domain.model.user.UserEntity
 import io.ducket.api.app.database.Transactional
-import io.ducket.api.domain.model.currency.CurrencyRateCreate
-import io.ducket.api.domain.model.currency.CurrencyRatesTable
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.batchInsert
@@ -18,6 +16,7 @@ class OperationRepository: Transactional {
 
     suspend fun createBatch(dataList: List<OperationCreate>) = blockingTransaction {
         OperationsTable.batchInsert(data = dataList, ignore = true) { data ->
+            this[OperationsTable.extId] = data.extId
             this[OperationsTable.userId] = data.userId
             this[OperationsTable.categoryId] = data.categoryId
             this[OperationsTable.importId] = data.importId
@@ -37,6 +36,7 @@ class OperationRepository: Transactional {
 
     suspend fun createOne(data: OperationCreate): Operation = blockingTransaction {
         OperationEntity.new {
+            this.extId = data.extId
             this.user = UserEntity[data.userId]
             this.category = data.categoryId?.let { CategoryEntity[it] }
             this.import = data.importId?.let { ImportEntity[it] }

@@ -1,9 +1,9 @@
-package domain.mapper
+package io.ducket.api.domain.mapper
 
-import domain.model.account.Account
-import domain.model.category.Category
-import domain.model.currency.Currency
-import domain.model.periodic_budget.PeriodicBudgetCreate
+import io.ducket.api.domain.model.account.Account
+import io.ducket.api.domain.model.category.Category
+import io.ducket.api.domain.model.currency.Currency
+import io.ducket.api.domain.model.periodic_budget.PeriodicBudgetCreate
 import io.ducket.api.domain.controller.account.dto.AccountDto
 import io.ducket.api.domain.controller.budget.dto.BudgetCreateDto
 import io.ducket.api.domain.controller.budget.dto.BudgetDto

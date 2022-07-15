@@ -2,7 +2,7 @@ package io.ducket.api.routes
 
 import io.ducket.api.auth.UserRole
 import io.ducket.api.auth.authorization.authorize
-import domain.controller.periodic_budget.PeriodicBudgetController
+import io.ducket.api.domain.controller.periodic_budget.PeriodicBudgetController
 import io.ktor.auth.*
 import io.ktor.routing.*
 

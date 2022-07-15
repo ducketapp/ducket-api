@@ -1,54 +1,70 @@
 package io.ducket.api.test_data
 
-import domain.model.user.User
+import io.ducket.api.domain.model.user.User
+import io.ducket.api.domain.model.user.UserCreate
+import io.ducket.api.domain.model.user.UserUpdate
 import io.ducket.api.domain.controller.user.dto.UserAuthenticateDto
 import io.ducket.api.domain.controller.user.dto.UserCreateDto
+import io.ducket.api.domain.controller.user.dto.UserDto
 import io.ducket.api.domain.controller.user.dto.UserUpdateDto
+import io.ducket.api.utils.toLocalDate
 import java.math.BigDecimal
 import java.time.Instant
 
 class UserObjectMother {
     companion object {
-        fun default(): User = User(
-            id = 1,
-            name = "",
-            phone = "",
-            email = "",
-            currency = CurrencyObjectMother.default(),
-            passwordHash = "",
-            createdAt = Instant.ofEpochSecond(1642708900),
-            modifiedAt = Instant.ofEpochSecond(1642708900),
-        )
-
         fun user(): User = User(
-            id = 2,
+            id = 1L,
             name = "John Wick",
-            phone = "+12025550115",
+            phone = "+48123456789",
             email = "johnwick@test.com",
-            currency = CurrencyObjectMother.usd(),
             passwordHash = "hash",
+            currency = CurrencyObjectMother.currency(),
             createdAt = Instant.ofEpochSecond(1642708900),
             modifiedAt = Instant.ofEpochSecond(1642708900),
         )
 
-        fun newUser(): UserCreateDto = UserCreateDto(
+        fun userCreate(): UserCreate = UserCreate(
             name = "John Wick",
-            phone = "+12025550115",
+            phone = "+48123456789",
             email = "johnwick@test.com",
-            startBalance = BigDecimal.ZERO,
-            password = "1234",
-            currency = "USD",
+            passwordHash = "hash",
+            currency = CurrencyObjectMother.currency().isoCode
         )
 
-        fun authUser(): UserAuthenticateDto = UserAuthenticateDto(
-            email = "johnwick@test.com",
-            password = "1234",
-        )
-
-        fun updateUser(): UserUpdateDto = UserUpdateDto(
+        fun userUpdate(): UserUpdate = UserUpdate(
             name = "John Quick",
-            phone = "+15236112350",
+            phone = "+48987654321",
+            passwordHash = "hash",
+        )
+
+        fun userCreateDto(): UserCreateDto = UserCreateDto(
+            name = "John Wick",
+            phone = "+48123456789",
+            email = "johnwick@test.com",
+            password = "1234",
+            startBalance = BigDecimal.ZERO,
+            currency = CurrencyObjectMother.currency().isoCode,
+        )
+
+        fun userAuthDto(): UserAuthenticateDto = UserAuthenticateDto(
+            email = "johnwick@test.com",
+            password = "1234",
+        )
+
+        fun userUpdateDto(): UserUpdateDto = UserUpdateDto(
+            name = "John Quick",
+            phone = "+48987654321",
             password = "4321",
+        )
+
+        fun userDto(): UserDto = UserDto(
+            id = 1L,
+            name = "John Wick",
+            phone = "+48123456789",
+            email = "johnwick@test.com",
+            currency = CurrencyObjectMother.currencyDto(),
+            sinceDate = Instant.ofEpochSecond(1642708900).toLocalDate(),
         )
     }
 }

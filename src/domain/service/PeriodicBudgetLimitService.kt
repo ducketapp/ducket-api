@@ -1,10 +1,10 @@
 package io.ducket.api.domain.service
 
 import io.ducket.api.app.PeriodicBudgetType
-import domain.mapper.PeriodicBudgetLimitMapper
-import domain.controller.periodic_budget.dto.PeriodicBudgetLimitCreateDto
-import domain.controller.periodic_budget.dto.PeriodicBudgetLimitDto
-import domain.controller.periodic_budget.dto.PeriodicBudgetLimitUpdateDto
+import io.ducket.api.domain.mapper.PeriodicBudgetLimitMapper
+import io.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetLimitCreateDto
+import io.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetLimitDto
+import io.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetLimitUpdateDto
 import io.ducket.api.domain.repository.PeriodicBudgetLimitRepository
 import io.ducket.api.domain.repository.PeriodicBudgetRepository
 import io.ducket.api.plugins.DuplicateDataException

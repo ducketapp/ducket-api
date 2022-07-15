@@ -1,7 +1,7 @@
 package io.ducket.api.plugins
 
 import io.ducket.api.domain.controller.account.AccountController
-import domain.controller.periodic_budget.PeriodicBudgetController
+import io.ducket.api.domain.controller.periodic_budget.PeriodicBudgetController
 import io.ducket.api.domain.controller.budget.BudgetController
 import io.ducket.api.domain.controller.category.CategoryController
 import io.ducket.api.domain.controller.currency.CurrencyController

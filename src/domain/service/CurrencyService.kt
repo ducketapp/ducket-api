@@ -3,7 +3,7 @@ package io.ducket.api.domain.service
 import io.ducket.api.app.DEFAULT_ROUNDING
 import io.ducket.api.app.DEFAULT_RATE_SCALE
 import io.ducket.api.app.database.Transactional
-import domain.mapper.CurrencyMapper
+import io.ducket.api.domain.mapper.CurrencyMapper
 import io.ducket.api.clients.rates.ReferenceDto
 import io.ducket.api.domain.controller.currency.dto.CurrencyDto
 import io.ducket.api.domain.controller.currency.dto.CurrencyRateDto

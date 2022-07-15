@@ -1,14 +1,14 @@
 package io.ducket.api.domain.repository
 
-import domain.model.account.AccountsTable
-import domain.model.currency.CurrenciesTable
-import domain.model.currency.CurrencyEntity
-import domain.model.imports.ImportRulesTable
-import domain.model.imports.ImportsTable
-import domain.model.operation.OperationsTable
-import domain.model.user.*
-import domain.model.user.UsersTable
-import domain.model.periodic_budget.PeriodicBudgetsTable
+import io.ducket.api.domain.model.account.AccountsTable
+import io.ducket.api.domain.model.currency.CurrenciesTable
+import io.ducket.api.domain.model.currency.CurrencyEntity
+import io.ducket.api.domain.model.imports.ImportRulesTable
+import io.ducket.api.domain.model.imports.ImportsTable
+import io.ducket.api.domain.model.operation.OperationsTable
+import io.ducket.api.domain.model.user.*
+import io.ducket.api.domain.model.user.UsersTable
+import io.ducket.api.domain.model.periodic_budget.PeriodicBudgetsTable
 import io.ducket.api.domain.model.group.GroupsTable
 import io.ducket.api.app.database.Transactional
 import io.ducket.api.domain.model.budget.BudgetsTable

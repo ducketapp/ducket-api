@@ -1,6 +1,6 @@
-package domain.mapper
+package io.ducket.api.domain.mapper
 
-import domain.model.category.Category
+import io.ducket.api.domain.model.category.Category
 import io.ducket.api.domain.controller.category.dto.CategoryDto
 
 object CategoryMapper {

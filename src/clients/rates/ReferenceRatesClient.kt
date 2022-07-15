@@ -1,6 +1,5 @@
-package clients.rates
+package io.ducket.api.clients.rates
 
-import io.ducket.api.clients.rates.DataStructureDto
 import io.ktor.client.*
 import io.ktor.client.request.*
 import org.koin.core.component.KoinComponent

@@ -1,4 +1,4 @@
-package domain.controller.periodic_budget.dto
+package io.ducket.api.domain.controller.periodic_budget.dto
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import io.ducket.api.app.PeriodicBudgetType

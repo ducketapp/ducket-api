@@ -1,6 +1,6 @@
 package io.ducket.api.app.scheduler
 
-import clients.rates.ReferenceRatesClient
+import io.ducket.api.clients.rates.ReferenceRatesClient
 import io.ducket.api.domain.repository.AttachmentRepository
 import io.ducket.api.domain.service.CurrencyService
 import org.quartz.Job

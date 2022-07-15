@@ -1,7 +1,7 @@
 package io.ducket.api.domain.repository
 
 import io.ducket.api.app.database.Transactional
-import domain.model.periodic_budget.PeriodicBudgetAccountsTable
+import io.ducket.api.domain.model.periodic_budget.PeriodicBudgetAccountsTable
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert

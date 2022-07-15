@@ -13,6 +13,7 @@ import java.time.Instant
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class OperationDto(
     val id: Long,
+    val extId: String?,
     val import: ImportDto?,
     val transferAccount: AccountDto?,
     val account: AccountDto,

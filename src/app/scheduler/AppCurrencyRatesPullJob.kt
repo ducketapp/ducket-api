@@ -1,6 +1,6 @@
 package io.ducket.api.app.scheduler
 
-import clients.rates.ReferenceRatesClient
+import io.ducket.api.clients.rates.ReferenceRatesClient
 import io.ducket.api.domain.service.CurrencyService
 import io.ducket.api.getLogger
 import kotlinx.coroutines.runBlocking

@@ -1,8 +1,8 @@
-package domain.mapper
+package io.ducket.api.domain.mapper
 
-import domain.model.account.Account
-import domain.model.currency.Currency
-import domain.model.user.User
+import io.ducket.api.domain.model.account.Account
+import io.ducket.api.domain.model.currency.Currency
+import io.ducket.api.domain.model.user.User
 import io.ducket.api.domain.controller.account.dto.AccountDto
 import io.ducket.api.domain.controller.currency.dto.CurrencyDto
 import io.ducket.api.domain.controller.group.GroupDto

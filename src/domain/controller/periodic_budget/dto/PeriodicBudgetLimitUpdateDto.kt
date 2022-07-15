@@ -1,4 +1,4 @@
-package domain.controller.periodic_budget.dto
+package io.ducket.api.domain.controller.periodic_budget.dto
 
 import io.ducket.api.app.DEFAULT_SCALE
 import io.ducket.api.utils.scaleBetween

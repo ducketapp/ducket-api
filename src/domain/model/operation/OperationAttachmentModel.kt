@@ -1,4 +1,4 @@
-package domain.model.operation
+package io.ducket.api.domain.model.operation
 
 import io.ducket.api.domain.model.attachment.AttachmentsTable
 import org.jetbrains.exposed.sql.Table

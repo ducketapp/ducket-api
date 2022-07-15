@@ -1,6 +1,6 @@
 package io.ducket.api.domain.service
 
-import domain.mapper.OperationMapper
+import io.ducket.api.domain.mapper.OperationMapper
 import io.ducket.api.app.OperationType
 import io.ducket.api.app.database.Transactional
 import io.ducket.api.domain.controller.operation.dto.OperationCreateUpdateDto

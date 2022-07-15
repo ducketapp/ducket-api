@@ -1,11 +1,11 @@
 package io.ducket.api.domain.service
 
-import domain.mapper.OperationMapper
-import domain.model.category.Category
-import domain.model.imports.ImportCreate
-import domain.model.imports.ImportRule
-import domain.model.operation.OperationCreate
-import io.ducket.api.app.ImportRuleLookupType
+import io.ducket.api.domain.mapper.OperationMapper
+import io.ducket.api.domain.model.category.Category
+import io.ducket.api.domain.model.imports.ImportCreate
+import io.ducket.api.domain.model.imports.ImportRule
+import io.ducket.api.domain.model.operation.OperationCreate
+import io.ducket.api.app.ImportRuleApplyType
 import io.ducket.api.app.OperationType
 import io.ducket.api.app.database.Transactional
 import io.ducket.api.domain.controller.imports.dto.OperationImportDto
@@ -82,8 +82,8 @@ class ImportService(
         return rules.asSequence()
             .filter {
                 when (it.lookupType) {
-                    ImportRuleLookupType.EXPENSE_ONLY -> operation.type == OperationType.EXPENSE
-                    ImportRuleLookupType.INCOME_ONLY -> operation.type == OperationType.INCOME
+                    ImportRuleApplyType.EXPENSE_ONLY -> operation.type == OperationType.EXPENSE
+                    ImportRuleApplyType.INCOME_ONLY -> operation.type == OperationType.INCOME
                     else -> true
                 }
             }.map {

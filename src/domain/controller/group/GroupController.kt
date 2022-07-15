@@ -13,9 +13,7 @@ import io.ktor.response.*
 import io.ktor.util.*
 import org.koin.java.KoinJavaComponent.inject
 
-class GroupController(
-    private val groupService: GroupService
-) {
+class GroupController(private val groupService: GroupService) {
     private val jwtManager: JwtManager by inject(JwtManager::class.java)
 
     suspend fun addGroup(ctx: ApplicationCall) {

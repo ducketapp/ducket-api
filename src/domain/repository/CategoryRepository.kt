@@ -1,11 +1,9 @@
 package io.ducket.api.domain.repository
 
-import domain.model.category.CategoriesTable
-import domain.model.category.Category
-import domain.model.category.CategoryEntity
+import io.ducket.api.domain.model.category.CategoriesTable
+import io.ducket.api.domain.model.category.Category
+import io.ducket.api.domain.model.category.CategoryEntity
 import io.ducket.api.app.database.Transactional
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class CategoryRepository: Transactional {

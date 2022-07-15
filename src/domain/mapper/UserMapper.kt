@@ -1,10 +1,10 @@
-package domain.mapper
+package io.ducket.api.domain.mapper
 
-import domain.model.currency.Currency
-import domain.model.user.User
-import domain.model.user.UserCreate
-import domain.model.user.UserEntity
-import domain.model.user.UserUpdate
+import io.ducket.api.domain.model.currency.Currency
+import io.ducket.api.domain.model.user.User
+import io.ducket.api.domain.model.user.UserCreate
+import io.ducket.api.domain.model.user.UserEntity
+import io.ducket.api.domain.model.user.UserUpdate
 import io.ducket.api.domain.controller.currency.dto.CurrencyDto
 import io.ducket.api.domain.controller.user.dto.UserCreateDto
 import io.ducket.api.domain.controller.user.dto.UserDto
@@ -30,12 +30,5 @@ object UserMapper {
             .register(UserDto::currency, DataClassMapper<Currency, CurrencyDto>())
             .provide(UserDto::sinceDate) { it.createdAt.toLocalDate() }
             .invoke(model)
-    }
-
-    fun mapEntityToModel(entity: UserEntity): User {
-        return DataClassMapper<UserEntity, User>()
-            .map("id.value", User::id)
-            .provide(User::currency, entity.currency.toModel())
-            .invoke(entity)
     }
 }

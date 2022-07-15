@@ -3,7 +3,7 @@ package io.ducket.api.domain.controller.user.dto
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import io.ducket.api.domain.controller.currency.dto.CurrencyDto
-import domain.model.user.User
+import io.ducket.api.domain.model.user.User
 import io.ducket.api.utils.LocalDateSerializer
 import io.ducket.api.utils.toLocalDate
 import java.time.LocalDate

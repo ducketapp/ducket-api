@@ -1,10 +1,9 @@
-package domain.model.currency
+package io.ducket.api.domain.model.currency
 
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
-
 
 internal object CurrenciesTable : LongIdTable("currency") {
     val area = varchar("area", 32)

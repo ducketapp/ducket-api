@@ -1,10 +1,10 @@
-package domain.controller.periodic_budget
+package  io.ducket.api.domain.controller.periodic_budget
 
 import io.ducket.api.domain.controller.BulkDeleteDto
-import domain.controller.periodic_budget.dto.PeriodicBudgetCreateDto
-import domain.controller.periodic_budget.dto.PeriodicBudgetLimitCreateDto
-import domain.controller.periodic_budget.dto.PeriodicBudgetLimitUpdateDto
-import domain.controller.periodic_budget.dto.PeriodicBudgetUpdateDto
+import io.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetCreateDto
+import io.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetLimitCreateDto
+import io.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetLimitUpdateDto
+import io.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetUpdateDto
 import io.ducket.api.domain.service.PeriodicBudgetLimitService
 import io.ducket.api.domain.service.PeriodicBudgetService
 import io.ducket.api.principalOrThrow

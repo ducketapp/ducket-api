@@ -1,6 +1,6 @@
 package io.ducket.api.domain.service
 
-import domain.mapper.TagMapper
+import io.ducket.api.domain.mapper.TagMapper
 import io.ducket.api.domain.controller.BulkDeleteDto
 import io.ducket.api.domain.controller.tag.dto.TagCreateUpdateDto
 import io.ducket.api.domain.controller.tag.dto.TagDto

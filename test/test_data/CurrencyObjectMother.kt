@@ -1,15 +1,16 @@
 package io.ducket.api.test_data
 
-import domain.model.currency.Currency
+import io.ducket.api.domain.model.currency.Currency
+import io.ducket.api.domain.controller.currency.dto.CurrencyDto
 
 class CurrencyObjectMother {
     companion object {
-        fun default(): Currency = Currency(
+        fun currency(): Currency = Currency(
             id = 1,
-            area = "",
-            name = "",
-            symbol = "",
-            isoCode = "",
+            area = "United States",
+            name = "United States dollar",
+            symbol = "$",
+            isoCode = "USD",
         )
 
         fun eur(): Currency = Currency(
@@ -20,8 +21,8 @@ class CurrencyObjectMother {
             isoCode = "EUR",
         )
 
-        fun usd(): Currency = Currency(
-            id = 3,
+        fun currencyDto(): CurrencyDto = CurrencyDto(
+            id = 1,
             area = "United States",
             name = "United States dollar",
             symbol = "$",

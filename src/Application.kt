@@ -1,12 +1,10 @@
 package io.ducket.api
 
-import clients.rates.ReferenceRatesClient
 import io.ducket.api.app.database.AppDatabase
-import io.ducket.api.app.di.AppModule
 import io.ducket.api.app.scheduler.AppCurrencyRatesPullJob
 import io.ducket.api.app.scheduler.AppJobFactory
-import io.ducket.api.app.scheduler.AppObsoleteDataCleanUpJob
 import io.ducket.api.auth.UserPrincipal
+import io.ducket.api.clients.rates.ReferenceRatesClient
 import io.ducket.api.config.*
 import io.ducket.api.domain.service.CurrencyService
 import io.ducket.api.plugins.*
@@ -16,7 +14,6 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import kotlinx.coroutines.*
 import org.jetbrains.exposed.sql.transactions.TransactionManager
-import org.koin.core.qualifier.named
 import org.koin.ktor.ext.inject
 import org.quartz.*
 import org.quartz.impl.StdSchedulerFactory
@@ -30,7 +27,7 @@ fun main(args: Array<String>) {
 }
 
 @Suppress("unused")
-@kotlin.jvm.JvmOverloads
+@JvmOverloads
 fun Application.module(testing: Boolean = false) {
     installDependencyInjection()
     setupAppConfig()

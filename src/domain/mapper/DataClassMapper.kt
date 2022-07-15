@@ -1,4 +1,4 @@
-package domain.mapper
+package io.ducket.api.domain.mapper
 
 import java.lang.IllegalArgumentException
 import kotlin.reflect.KClass
@@ -9,7 +9,6 @@ import kotlin.reflect.full.primaryConstructor
 
 typealias Mapper<I, O> = (I) -> O
 typealias ParameterProvider<I, O> = (I) -> O
-typealias SourceTransformer<I, O> = (I) -> O
 
 /**
  * Mapper that can convert one data class into another data class.
@@ -17,8 +16,10 @@ typealias SourceTransformer<I, O> = (I) -> O
  * @param <I> sourceType (convert from)
  * @param <O> targetType (convert to)
  */
-class DataClassMapper<I : Any, O : Any>(private val sourceType: KClass<I>, private val targetType: KClass<O>) :
-    Mapper<I, O> {
+class DataClassMapper<I : Any, O : Any>(
+    private val sourceType: KClass<I>,
+    private val targetType: KClass<O>,
+) : Mapper<I, O> {
 
     companion object {
         // reified constructor that does not require passing of KClass attributes
@@ -29,26 +30,20 @@ class DataClassMapper<I : Any, O : Any>(private val sourceType: KClass<I>, priva
         }
     }
 
-    val fieldMappers = mutableMapOf<String, Mapper<Any, Any>>()              // special mappers for target parameters
-    val fieldMappings = mutableMapOf<String, String>()                       // source and target parameters names mapping
-    val fieldTransformers = mutableMapOf<String, ParameterProvider<I, Any?>>()                       // source and target parameters names mapping
-    val fieldProviders = mutableMapOf<String, ParameterProvider<I, Any?>>()  // helps to specify target parameters which are not in source
+    val fieldMappers = mutableMapOf<String, Mapper<Any, Any>>()                 // special mappers for target parameters
+    val fieldMappings = mutableMapOf<String, String>()                          // source and target parameters names mapping
+    val fieldTransformers = mutableMapOf<String, ParameterProvider<I, Any?>>()  // source and target parameters names mapping
+    val fieldProviders = mutableMapOf<String, ParameterProvider<I, Any?>>()     // helps to specify target parameters which are not in source
     private val targetConstructor = targetType.primaryConstructor!!
 
-    @Deprecated("Use getParameterValue(String)")
-    private val sourceProperties by lazy { sourceType.memberProperties.associateBy { it.name } }
-
     /**
-     * @throws java.lang.reflect.InvocationTargetException if
+     * @throws java.lang.reflect.InvocationTargetException if types don't match
      */
     override fun invoke(data: I): O = with(targetConstructor) {
         val args = parameters.associateWith {
             argFor(it, data)
         }
-        println()
-        args.forEach {
-            println("${it.key.name}: ${it.key.type} -> ${it.value}")
-        }
+
         callBy(args)
     }
 
@@ -90,60 +85,63 @@ class DataClassMapper<I : Any, O : Any>(private val sourceType: KClass<I>, priva
         }
     }
 
-    inline fun <reified S : Any, reified T : Any> register(
-        target: String,
-        crossinline mapper: Mapper<S, T>
-    ): DataClassMapper<I, O> = apply {
-        this.fieldMappers[target] = object : Mapper<Any, Any> {
-            override fun invoke(data: Any): Any = mapper.invoke(data as S)
+    inline fun <reified S : Any, reified T : Any> register(target: String, crossinline mapper: Mapper<S, T>): DataClassMapper<I, O> {
+        return apply {
+            this.fieldMappers[target] = object : Mapper<Any, Any> {
+                override fun invoke(data: Any): Any = mapper.invoke(data as S)
+            }
         }
     }
 
-    inline fun <reified S : Any, reified T : Any> register(
-        target: KProperty1<O, T?>,
-        crossinline mapper: Mapper<S, T>
-    ): DataClassMapper<I, O> = apply {
-        this.fieldMappers[target.name] = object : Mapper<Any, Any> {
-            override fun invoke(data: Any): Any = mapper.invoke(data as S)
+    inline fun <reified S : Any, reified T : Any> register(target: KProperty1<O, T?>, crossinline mapper: Mapper<S, T>): DataClassMapper<I, O> {
+        return apply {
+            this.fieldMappers[target.name] = object : Mapper<Any, Any> {
+                override fun invoke(data: Any): Any = mapper.invoke(data as S)
+            }
         }
     }
 
-    fun map(source: String, target: String): DataClassMapper<I, O> = apply {
-        this.fieldMappings[target] = source
-    }
-
-    fun <S : Any> map(source: String, target: KProperty1<S, Any?>): DataClassMapper<I, O> = apply {
-        this.fieldMappings[target.name] = source
-    }
-
-    inline fun <S : Any> map(source: String, target: KProperty1<S, Any?>, crossinline transformer: SourceTransformer<I, Any?>): DataClassMapper<I, O> = apply {
-        this.fieldMappings[target.name] = source
-        this.fieldTransformers[source] = object : SourceTransformer<I, Any?> {
-            override fun invoke(data: I): Any? = transformer.invoke(data)
+    fun map(source: String, target: String): DataClassMapper<I, O> {
+        return apply {
+            this.fieldMappings[target] = source
         }
     }
 
-    fun provide(target: String, value: Any?): DataClassMapper<I, O> = apply {
-        this.fieldProviders[target] = object : ParameterProvider<I, Any?> {
-            override fun invoke(data: I): Any? = value
+    fun <S : Any> map(source: String, target: KProperty1<S, Any?>): DataClassMapper<I, O> {
+        return apply {
+            this.fieldMappings[target.name] = source
         }
     }
 
-    fun <S : Any> provide(target: KProperty1<S, Any?>, value: Any?): DataClassMapper<I, O> = apply {
-        this.fieldProviders[target.name] = object : ParameterProvider<I, Any?> {
-            override fun invoke(data: I): Any? = value
+    fun provide(target: String, value: Any?): DataClassMapper<I, O> {
+        return apply {
+            this.fieldProviders[target] = object : ParameterProvider<I, Any?> {
+                override fun invoke(data: I): Any? = value
+            }
         }
     }
 
-    inline fun provide(target: String, crossinline provider: ParameterProvider<I, Any?>): DataClassMapper<I, O> = apply {
-        this.fieldProviders[target] = object : ParameterProvider<I, Any?> {
-            override fun invoke(data: I): Any? = provider.invoke(data)
+    fun <S : Any> provide(target: KProperty1<S, Any?>, value: Any?): DataClassMapper<I, O> {
+        return apply {
+            this.fieldProviders[target.name] = object : ParameterProvider<I, Any?> {
+                override fun invoke(data: I): Any? = value
+            }
         }
     }
 
-    inline fun <S : Any> provide(target: KProperty1<S, Any?>, crossinline provider: ParameterProvider<I, Any?>): DataClassMapper<I, O> = apply {
-        this.fieldProviders[target.name] = object : ParameterProvider<I, Any?> {
-            override fun invoke(data: I): Any? = provider.invoke(data)
+    inline fun provide(target: String, crossinline provider: ParameterProvider<I, Any?>): DataClassMapper<I, O> {
+        return apply {
+            this.fieldProviders[target] = object : ParameterProvider<I, Any?> {
+                override fun invoke(data: I): Any? = provider.invoke(data)
+            }
+        }
+    }
+
+    inline fun <S : Any> provide(target: KProperty1<S, Any?>, crossinline provider: ParameterProvider<I, Any?>): DataClassMapper<I, O> {
+        return apply {
+            this.fieldProviders[target.name] = object : ParameterProvider<I, Any?> {
+                override fun invoke(data: I): Any? = provider.invoke(data)
+            }
         }
     }
 

@@ -1,8 +1,8 @@
 package io.ducket.api.domain.repository
 
-import domain.model.currency.CurrenciesTable
-import domain.model.currency.Currency
-import domain.model.currency.CurrencyEntity
+import io.ducket.api.domain.model.currency.CurrenciesTable
+import io.ducket.api.domain.model.currency.Currency
+import io.ducket.api.domain.model.currency.CurrencyEntity
 import io.ducket.api.app.database.Transactional
 
 class CurrencyRepository: Transactional {
