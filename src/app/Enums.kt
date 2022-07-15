@@ -15,11 +15,6 @@ enum class OperationType {
 }
 
 @Suppress("unused")
-enum class DebtType {
-    BORROW, LEND
-}
-
-@Suppress("unused")
 enum class AccountPermission {
     TRACK_AND_READ, READ_ONLY, NOT_PERMITTED
 }
