@@ -1,4 +1,4 @@
-ARG VERSION=8u151
+ARG VERSION=11
 
 FROM openjdk:${VERSION}-jdk as build
 RUN mkdir /app
