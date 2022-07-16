@@ -1,12 +1,12 @@
-package io.ducket.api.domain.repository
+package dev.ducket.api.domain.repository
 
-import io.ducket.api.domain.model.category.CategoryEntity
-import io.ducket.api.domain.model.currency.CurrenciesTable
-import io.ducket.api.domain.model.currency.CurrencyEntity
-import io.ducket.api.domain.model.user.UserEntity
-import io.ducket.api.app.database.Transactional
-import io.ducket.api.domain.model.budget.*
-import io.ducket.api.domain.model.budget.BudgetsTable
+import dev.ducket.api.domain.model.category.CategoryEntity
+import dev.ducket.api.domain.model.currency.CurrenciesTable
+import dev.ducket.api.domain.model.currency.CurrencyEntity
+import dev.ducket.api.domain.model.user.UserEntity
+import dev.ducket.api.app.database.Transactional
+import dev.ducket.api.domain.model.budget.*
+import dev.ducket.api.domain.model.budget.BudgetsTable
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 

@@ -1,18 +1,18 @@
-package io.ducket.api.domain.mapper
+package dev.ducket.api.domain.mapper
 
-import io.ducket.api.domain.model.account.Account
-import io.ducket.api.domain.model.category.Category
-import io.ducket.api.domain.model.currency.Currency
-import io.ducket.api.domain.model.periodic_budget.PeriodicBudgetCreate
-import io.ducket.api.domain.controller.account.dto.AccountDto
-import io.ducket.api.domain.controller.budget.dto.BudgetCreateDto
-import io.ducket.api.domain.controller.budget.dto.BudgetDto
-import io.ducket.api.domain.controller.budget.dto.BudgetUpdateDto
-import io.ducket.api.domain.controller.category.dto.CategoryDto
-import io.ducket.api.domain.controller.currency.dto.CurrencyDto
-import io.ducket.api.domain.model.budget.Budget
-import io.ducket.api.domain.model.budget.BudgetCreate
-import io.ducket.api.domain.model.budget.BudgetUpdate
+import dev.ducket.api.domain.model.account.Account
+import dev.ducket.api.domain.model.category.Category
+import dev.ducket.api.domain.model.currency.Currency
+import dev.ducket.api.domain.model.periodic_budget.PeriodicBudgetCreate
+import dev.ducket.api.domain.controller.account.dto.AccountDto
+import dev.ducket.api.domain.controller.budget.dto.BudgetCreateDto
+import dev.ducket.api.domain.controller.budget.dto.BudgetDto
+import dev.ducket.api.domain.controller.budget.dto.BudgetUpdateDto
+import dev.ducket.api.domain.controller.category.dto.CategoryDto
+import dev.ducket.api.domain.controller.currency.dto.CurrencyDto
+import dev.ducket.api.domain.model.budget.Budget
+import dev.ducket.api.domain.model.budget.BudgetCreate
+import dev.ducket.api.domain.model.budget.BudgetUpdate
 
 object BudgetMapper {
 

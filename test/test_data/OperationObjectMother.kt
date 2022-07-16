@@ -1,7 +1,7 @@
-package io.ducket.api.test_data
+package dev.ducket.api.test_data
 
-import io.ducket.api.domain.model.operation.Operation
-import io.ducket.api.app.OperationType
+import dev.ducket.api.domain.model.operation.Operation
+import dev.ducket.api.app.OperationType
 import java.math.BigDecimal
 import java.time.Instant
 

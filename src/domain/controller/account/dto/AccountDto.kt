@@ -1,9 +1,9 @@
-package io.ducket.api.domain.controller.account.dto
+package dev.ducket.api.domain.controller.account.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import io.ducket.api.domain.model.account.Account
-import io.ducket.api.app.AccountType
-import io.ducket.api.domain.controller.currency.dto.CurrencyDto
+import dev.ducket.api.domain.model.account.Account
+import dev.ducket.api.app.AccountType
+import dev.ducket.api.domain.controller.currency.dto.CurrencyDto
 import java.math.BigDecimal
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

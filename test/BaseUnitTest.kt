@@ -1,6 +1,6 @@
-package io.ducket.api
+package dev.ducket.api
 
-import io.ducket.api.test_data.UserObjectMother
+import dev.ducket.api.test_data.UserObjectMother
 import io.mockk.clearAllMocks
 import org.junit.jupiter.api.BeforeEach
 

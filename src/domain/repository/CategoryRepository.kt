@@ -1,25 +1,16 @@
-package io.ducket.api.domain.repository
+package dev.ducket.api.domain.repository
 
-import io.ducket.api.domain.model.category.CategoriesTable
-import io.ducket.api.domain.model.category.Category
-import io.ducket.api.domain.model.category.CategoryEntity
-import io.ducket.api.app.database.Transactional
-import org.jetbrains.exposed.sql.transactions.transaction
+import dev.ducket.api.domain.model.category.Category
+import dev.ducket.api.domain.model.category.CategoryEntity
+import dev.ducket.api.app.database.Transactional
 
 class CategoryRepository: Transactional {
-
-    suspend fun findOneByName(category: String): Category? = blockingTransaction {
-        CategoryEntity.find {
-            CategoriesTable.name.eq(category)
-        }.firstOrNull()?.toModel()
-    }
 
     suspend fun findOne(categoryId: Long): Category? = blockingTransaction {
         CategoryEntity.findById(categoryId)?.toModel()
     }
 
-    // TODO suspend
-    fun findAll(): List<Category> = transaction {
+    suspend fun findAll(): List<Category> = blockingTransaction {
         CategoryEntity.all().map { it.toModel() }
     }
 }

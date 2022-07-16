@@ -1,22 +1,19 @@
-package io.ducket.api.domain.controller.account
+package dev.ducket.api.domain.controller.account
 
-import io.ducket.api.domain.controller.BulkDeleteDto
-import io.ducket.api.domain.controller.account.dto.AccountCreateDto
-import io.ducket.api.domain.controller.account.dto.AccountUpdateDto
-import io.ducket.api.domain.service.AccountService
-import io.ducket.api.domain.service.ImportService
-import io.ducket.api.principalOrThrow
-import io.ktor.application.*
-import io.ktor.auth.*
+import dev.ducket.api.domain.controller.BulkDeleteDto
+import dev.ducket.api.domain.controller.account.dto.AccountCreateDto
+import dev.ducket.api.domain.controller.account.dto.AccountUpdateDto
+import dev.ducket.api.domain.service.AccountService
+import dev.ducket.api.domain.service.ImportService
+import dev.ducket.api.principalOrThrow
 import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.util.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.util.*
 
-class AccountController(
-    private val accountService: AccountService,
-    private val importService: ImportService,
-) {
+class AccountController(private val accountService: AccountService) {
 
     suspend fun getAccount(ctx: ApplicationCall) {
         val userId = ctx.authentication.principalOrThrow().id

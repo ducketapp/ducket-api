@@ -1,4 +1,4 @@
-package io.ducket.api.domain.controller.operation.dto
+package dev.ducket.api.domain.controller.operation.dto
 
 import java.math.BigDecimal
 

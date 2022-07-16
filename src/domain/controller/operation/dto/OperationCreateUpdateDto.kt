@@ -1,10 +1,8 @@
-package io.ducket.api.domain.controller.operation.dto
+package dev.ducket.api.domain.controller.operation.dto
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import io.ducket.api.app.DEFAULT_SCALE
-import io.ducket.api.app.OperationType
-import io.ducket.api.utils.InstantDeserializer
-import io.ducket.api.utils.scaleBetween
+import dev.ducket.api.app.DEFAULT_SCALE
+import dev.ducket.api.app.OperationType
+import dev.ducket.api.utils.scaleBetween
 import org.valiktor.functions.*
 import java.time.Instant
 
@@ -18,7 +16,7 @@ data class OperationCreateUpdateDto(
     val description: String? = null,
     val subject: String? = null,
     val notes: String? = null,
-    @JsonDeserialize(using = InstantDeserializer::class) val date: Instant,
+    val date: Instant,
 ) {
     fun validate(): OperationCreateUpdateDto {
         org.valiktor.validate(this) {

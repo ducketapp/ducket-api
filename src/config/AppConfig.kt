@@ -1,4 +1,4 @@
-package io.ducket.api.config
+package dev.ducket.api.config
 
 class AppConfig {
     lateinit var serverConfig: ServerConfig

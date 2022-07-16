@@ -1,10 +1,8 @@
-package io.ducket.api.domain.controller.periodic_budget.dto
+package dev.ducket.api.domain.controller.periodic_budget.dto
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import io.ducket.api.app.PeriodicBudgetType
-import io.ducket.api.app.DEFAULT_SCALE
-import io.ducket.api.utils.LocalDateDeserializer
-import io.ducket.api.utils.scaleBetween
+import dev.ducket.api.app.PeriodicBudgetType
+import dev.ducket.api.app.DEFAULT_SCALE
+import dev.ducket.api.utils.scaleBetween
 import org.valiktor.functions.*
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -17,8 +15,8 @@ data class PeriodicBudgetUpdateDto(
     val currency: String,
     val categoryId: Long,
     val accountIds: List<Long>,
-    @JsonDeserialize(using = LocalDateDeserializer::class) val startDate: LocalDate,
-    @JsonDeserialize(using = LocalDateDeserializer::class) val closeDate: LocalDate?,
+    val startDate: LocalDate,
+    val closeDate: LocalDate?,
 ) {
     fun validate(): PeriodicBudgetUpdateDto {
         org.valiktor.validate(this) {

@@ -1,7 +1,7 @@
-package io.ducket.api.app.database
+package dev.ducket.api.app.database
 
 import com.zaxxer.hikari.HikariConfig
-import io.ducket.api.config.AppConfig
+import dev.ducket.api.config.AppConfig
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 
 class TestMainDatabase(appConfig: AppConfig): MainDatabase(appConfig) {

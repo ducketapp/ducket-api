@@ -1,14 +1,14 @@
-package io.ducket.api.unit.service
+package dev.ducket.api.unit.service
 
-import io.ducket.api.BaseUnitTest
-import io.ducket.api.domain.controller.BulkDeleteDto
-import io.ducket.api.domain.model.account.AccountCreate
-import io.ducket.api.domain.model.account.AccountUpdate
-import io.ducket.api.domain.repository.AccountRepository
-import io.ducket.api.domain.service.AccountService
-import io.ducket.api.plugins.DuplicateDataException
-import io.ducket.api.plugins.NoDataFoundException
-import io.ducket.api.test_data.AccountObjectMother
+import dev.ducket.api.BaseUnitTest
+import dev.ducket.api.domain.controller.BulkDeleteDto
+import dev.ducket.api.domain.model.account.AccountCreate
+import dev.ducket.api.domain.model.account.AccountUpdate
+import dev.ducket.api.domain.repository.AccountRepository
+import dev.ducket.api.domain.service.AccountService
+import dev.ducket.api.plugins.DuplicateDataException
+import dev.ducket.api.plugins.NoDataFoundException
+import dev.ducket.api.test_data.AccountObjectMother
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.matchers.shouldBe
 import io.mockk.*

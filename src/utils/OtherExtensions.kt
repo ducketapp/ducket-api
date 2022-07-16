@@ -1,6 +1,6 @@
-package io.ducket.api.utils
+package dev.ducket.api.utils
 
-import io.ducket.api.app.PeriodicBudgetType
+import dev.ducket.api.app.PeriodicBudgetType
 import org.threeten.extra.LocalDateRange
 import org.threeten.extra.YearQuarter
 import java.math.BigDecimal

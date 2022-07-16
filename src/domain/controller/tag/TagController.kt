@@ -1,15 +1,15 @@
-package io.ducket.api.domain.controller.tag
+package dev.ducket.api.domain.controller.tag
 
-import io.ducket.api.domain.controller.BulkDeleteDto
-import io.ducket.api.domain.controller.tag.dto.TagCreateUpdateDto
-import io.ducket.api.domain.service.TagService
-import io.ducket.api.principalOrThrow
-import io.ktor.application.*
-import io.ktor.auth.*
+import dev.ducket.api.domain.controller.BulkDeleteDto
+import dev.ducket.api.domain.controller.tag.dto.TagCreateUpdateDto
+import dev.ducket.api.domain.service.TagService
+import dev.ducket.api.principalOrThrow
 import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.util.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.util.*
 
 class TagController(
     private val tagService: TagService

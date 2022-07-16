@@ -1,14 +1,14 @@
-package io.ducket.api.domain.controller.operation
+package dev.ducket.api.domain.controller.operation
 
-import io.ducket.api.domain.controller.operation.dto.OperationCreateUpdateDto
-import io.ducket.api.domain.service.OperationService
-import io.ducket.api.principalOrThrow
-import io.ktor.application.*
-import io.ktor.auth.*
+import dev.ducket.api.domain.controller.operation.dto.OperationCreateUpdateDto
+import dev.ducket.api.domain.service.OperationService
+import dev.ducket.api.principalOrThrow
 import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.util.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.util.*
 
 class OperationController(private val operationService: OperationService) {
 

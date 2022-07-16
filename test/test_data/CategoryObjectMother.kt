@@ -1,6 +1,6 @@
-package io.ducket.api.test_data
+package dev.ducket.api.test_data
 
-import io.ducket.api.domain.model.category.Category
+import dev.ducket.api.domain.model.category.Category
 
 class CategoryObjectMother {
     companion object {

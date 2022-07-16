@@ -1,13 +1,13 @@
-package io.ducket.api.test_data
+package dev.ducket.api.test_data
 
-import io.ducket.api.domain.model.user.User
-import io.ducket.api.domain.model.user.UserCreate
-import io.ducket.api.domain.model.user.UserUpdate
-import io.ducket.api.domain.controller.user.dto.UserAuthenticateDto
-import io.ducket.api.domain.controller.user.dto.UserCreateDto
-import io.ducket.api.domain.controller.user.dto.UserDto
-import io.ducket.api.domain.controller.user.dto.UserUpdateDto
-import io.ducket.api.utils.toLocalDate
+import dev.ducket.api.domain.model.user.User
+import dev.ducket.api.domain.model.user.UserCreate
+import dev.ducket.api.domain.model.user.UserUpdate
+import dev.ducket.api.domain.controller.user.dto.UserAuthenticateDto
+import dev.ducket.api.domain.controller.user.dto.UserCreateDto
+import dev.ducket.api.domain.controller.user.dto.UserDto
+import dev.ducket.api.domain.controller.user.dto.UserUpdateDto
+import dev.ducket.api.utils.toLocalDate
 import java.math.BigDecimal
 import java.time.Instant
 

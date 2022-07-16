@@ -1,10 +1,10 @@
-package io.ducket.api.domain.controller.category
+package dev.ducket.api.domain.controller.category
 
-import io.ducket.api.domain.service.CategoryService
-import io.ktor.application.*
+import dev.ducket.api.domain.service.CategoryService
 import io.ktor.http.*
-import io.ktor.response.*
-import io.ktor.util.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.util.*
 
 class CategoryController(
     private val categoryService: CategoryService,

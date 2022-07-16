@@ -1,11 +1,11 @@
-package io.ducket.api.routes
+package dev.ducket.api.routes
 
 
-import io.ducket.api.auth.UserRole
-import io.ducket.api.auth.authorization.authorize
-import io.ducket.api.domain.controller.account.AccountController
-import io.ktor.auth.*
-import io.ktor.routing.*
+import dev.ducket.api.auth.authentication.UserRole
+import dev.ducket.api.auth.authorization.authorize
+import dev.ducket.api.domain.controller.account.AccountController
+import io.ktor.server.auth.*
+import io.ktor.server.routing.*
 
 fun Route.accounts(accountController: AccountController) {
     authenticate {

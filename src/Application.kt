@@ -1,15 +1,15 @@
-package io.ducket.api
+package dev.ducket.api
 
-import io.ducket.api.app.database.AppDatabase
-import io.ducket.api.app.scheduler.AppCurrencyRatesPullJob
-import io.ducket.api.app.scheduler.AppJobFactory
-import io.ducket.api.auth.UserPrincipal
-import io.ducket.api.clients.rates.ReferenceRatesClient
-import io.ducket.api.config.*
-import io.ducket.api.domain.service.CurrencyService
-import io.ducket.api.plugins.*
-import io.ktor.application.*
-import io.ktor.auth.*
+import dev.ducket.api.app.database.AppDatabase
+import dev.ducket.api.app.scheduler.AppCurrencyRatesPullJob
+import dev.ducket.api.app.scheduler.AppJobFactory
+import dev.ducket.api.auth.authentication.UserPrincipal
+import dev.ducket.api.clients.rates.ReferenceRatesClient
+import dev.ducket.api.config.*
+import dev.ducket.api.domain.service.CurrencyService
+import dev.ducket.api.plugins.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import kotlinx.coroutines.*
@@ -29,17 +29,17 @@ fun main(args: Array<String>) {
 @Suppress("unused")
 @JvmOverloads
 fun Application.module(testing: Boolean = false) {
-    installDependencyInjection()
+    installDependencyInjectionPlugin()
     setupAppConfig()
     setupDatabases()
-    installCallLogging()
-    installMetrics()
-    installAuthentication()
-    installAuthorization()
-    installDefaultHeaders()
-    installSerialization()
-    installRouting()
-    installErrorHandling()
+    installCallLoggingPlugin()
+    installMetricsPlugin()
+    installAuthenticationPlugin()
+    installAuthorizationPlugin()
+    installDefaultHeadersPlugin()
+    installContentNegotiationPlugin()
+    installRoutingPlugin()
+    installErrorHandlingPlugin()
     setupScheduler()
     pullReferenceRatesStaticData()
 }

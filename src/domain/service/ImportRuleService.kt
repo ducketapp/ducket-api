@@ -1,12 +1,12 @@
-package io.ducket.api.domain.service
+package dev.ducket.api.domain.service
 
-import io.ducket.api.domain.controller.BulkDeleteDto
-import io.ducket.api.domain.controller.rule.dto.ImportRuleCreateUpdateDto
-import io.ducket.api.domain.controller.rule.dto.ImportRuleDto
-import io.ducket.api.domain.mapper.ImportRuleMapper
-import io.ducket.api.domain.repository.ImportRuleRepository
-import io.ducket.api.plugins.DuplicateDataException
-import io.ducket.api.plugins.NoDataFoundException
+import dev.ducket.api.domain.controller.BulkDeleteDto
+import dev.ducket.api.domain.controller.rule.dto.ImportRuleCreateUpdateDto
+import dev.ducket.api.domain.controller.rule.dto.ImportRuleDto
+import dev.ducket.api.domain.mapper.ImportRuleMapper
+import dev.ducket.api.domain.repository.ImportRuleRepository
+import dev.ducket.api.plugins.DuplicateDataException
+import dev.ducket.api.plugins.NoDataFoundException
 
 class ImportRuleService(
     private val importRuleRepository: ImportRuleRepository,

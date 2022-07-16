@@ -1,12 +1,12 @@
-package io.ducket.api.domain.service
+package dev.ducket.api.domain.service
 
-import io.ducket.api.domain.mapper.TagMapper
-import io.ducket.api.domain.controller.BulkDeleteDto
-import io.ducket.api.domain.controller.tag.dto.TagCreateUpdateDto
-import io.ducket.api.domain.controller.tag.dto.TagDto
-import io.ducket.api.domain.repository.TagRepository
-import io.ducket.api.plugins.DuplicateDataException
-import io.ducket.api.plugins.NoDataFoundException
+import dev.ducket.api.domain.mapper.TagMapper
+import dev.ducket.api.domain.controller.BulkDeleteDto
+import dev.ducket.api.domain.controller.tag.dto.TagCreateUpdateDto
+import dev.ducket.api.domain.controller.tag.dto.TagDto
+import dev.ducket.api.domain.repository.TagRepository
+import dev.ducket.api.plugins.DuplicateDataException
+import dev.ducket.api.plugins.NoDataFoundException
 
 class TagService(private val tagRepository: TagRepository) {
 

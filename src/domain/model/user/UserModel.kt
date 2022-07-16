@@ -1,8 +1,8 @@
-package io.ducket.api.domain.model.user
+package dev.ducket.api.domain.model.user
 
-import io.ducket.api.domain.model.currency.CurrenciesTable
-import io.ducket.api.domain.model.currency.Currency
-import io.ducket.api.domain.model.currency.CurrencyEntity
+import dev.ducket.api.domain.model.currency.CurrenciesTable
+import dev.ducket.api.domain.model.currency.Currency
+import dev.ducket.api.domain.model.currency.CurrencyEntity
 import org.jetbrains.exposed.dao.*
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable

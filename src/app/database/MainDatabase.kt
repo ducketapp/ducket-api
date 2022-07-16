@@ -1,9 +1,8 @@
-package io.ducket.api.app.database
+package dev.ducket.api.app.database
 
-import io.ducket.api.config.AppConfig
-import io.ducket.api.getLogger
+import dev.ducket.api.config.AppConfig
+import dev.ducket.api.getLogger
 import org.flywaydb.core.Flyway
-import org.flywaydb.core.api.Location
 
 open class MainDatabase(appConfig: AppConfig): MySqlDatabase(appConfig) {
 
@@ -12,7 +11,7 @@ open class MainDatabase(appConfig: AppConfig): MySqlDatabase(appConfig) {
 
         val flyway = Flyway.configure()
             .dataSource(dataSource)
-            .locations("classpath:io/ducket/api/app/database/migrations")
+            .locations("classpath:dev/ducket/api/app/database/migrations")
             .load()
 
         try {

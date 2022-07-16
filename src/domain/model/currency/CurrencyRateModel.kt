@@ -1,4 +1,4 @@
-package io.ducket.api.domain.model.currency
+package dev.ducket.api.domain.model.currency
 
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass

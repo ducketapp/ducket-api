@@ -1,8 +1,8 @@
-package io.ducket.api.app.database
+package dev.ducket.api.app.database
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import io.ducket.api.config.AppConfig
+import dev.ducket.api.config.AppConfig
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.DatabaseConfig
 
@@ -43,16 +43,16 @@ abstract class MySqlDatabase(appConfig: AppConfig): AppDatabase {
             transactionIsolation = "TRANSACTION_REPEATABLE_READ"
 
             // https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
-            addDataSourceProperty("cachePrepStmts", "true");
-            addDataSourceProperty("prepStmtCacheSize", "250");
-            addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-            addDataSourceProperty("useServerPrepStmts", "true");
-            addDataSourceProperty("useLocalSessionState", "true");
-            addDataSourceProperty("rewriteBatchedStatements", "true");
-            addDataSourceProperty("cacheResultSetMetadata", "true");
-            addDataSourceProperty("cacheServerConfiguration", "true");
-            addDataSourceProperty("elideSetAutoCommits", "true");
-            addDataSourceProperty("maintainTimeStats", "false");
+            addDataSourceProperty("cachePrepStmts", "true")
+            addDataSourceProperty("prepStmtCacheSize", "250")
+            addDataSourceProperty("prepStmtCacheSqlLimit", "2048")
+            addDataSourceProperty("useServerPrepStmts", "true")
+            addDataSourceProperty("useLocalSessionState", "true")
+            addDataSourceProperty("rewriteBatchedStatements", "true")
+            addDataSourceProperty("cacheResultSetMetadata", "true")
+            addDataSourceProperty("cacheServerConfiguration", "true")
+            addDataSourceProperty("elideSetAutoCommits", "true")
+            addDataSourceProperty("maintainTimeStats", "false")
         }
     }
 }

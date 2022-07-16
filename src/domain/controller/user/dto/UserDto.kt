@@ -1,11 +1,9 @@
-package io.ducket.api.domain.controller.user.dto
+package dev.ducket.api.domain.controller.user.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import io.ducket.api.domain.controller.currency.dto.CurrencyDto
-import io.ducket.api.domain.model.user.User
-import io.ducket.api.utils.LocalDateSerializer
-import io.ducket.api.utils.toLocalDate
+import dev.ducket.api.domain.controller.currency.dto.CurrencyDto
+import dev.ducket.api.domain.model.user.User
+import dev.ducket.api.utils.toLocalDate
 import java.time.LocalDate
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -15,7 +13,7 @@ data class UserDto(
     val name: String,
     val email: String,
     val currency: CurrencyDto,
-    @JsonSerialize(using = LocalDateSerializer::class) val sinceDate: LocalDate
+    val sinceDate: LocalDate
 ) {
     constructor(user: User): this(
         id = user.id,

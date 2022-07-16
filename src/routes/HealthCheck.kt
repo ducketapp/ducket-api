@@ -1,8 +1,8 @@
-package io.ducket.api.routes
+package dev.ducket.api.routes
 
 import io.ktor.http.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 
 fun Route.healthCheck() {
     route("/health-check") {

@@ -1,8 +1,8 @@
-package io.ducket.api.domain.controller.user.dto
+package dev.ducket.api.domain.controller.user.dto
 
-import io.ducket.api.app.DEFAULT_SCALE
-import io.ducket.api.utils.hasLength
-import io.ducket.api.utils.scaleBetween
+import dev.ducket.api.app.DEFAULT_SCALE
+import dev.ducket.api.utils.hasLength
+import dev.ducket.api.utils.scaleBetween
 import org.valiktor.functions.*
 import java.math.BigDecimal
 

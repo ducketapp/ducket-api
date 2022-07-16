@@ -1,8 +1,8 @@
-package io.ducket.api.domain.model.tag
+package dev.ducket.api.domain.model.tag
 
-import io.ducket.api.domain.model.user.User
-import io.ducket.api.domain.model.user.UserEntity
-import io.ducket.api.domain.model.user.UsersTable
+import dev.ducket.api.domain.model.user.User
+import dev.ducket.api.domain.model.user.UserEntity
+import dev.ducket.api.domain.model.user.UsersTable
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID

@@ -1,7 +1,7 @@
-package io.ducket.api.app.scheduler
+package dev.ducket.api.app.scheduler
 
-import io.ducket.api.clients.rates.ReferenceRatesClient
-import io.ducket.api.domain.service.CurrencyService
+import dev.ducket.api.clients.rates.ReferenceRatesClient
+import dev.ducket.api.domain.service.CurrencyService
 import org.quartz.Job
 import org.quartz.Scheduler
 import org.quartz.spi.JobFactory

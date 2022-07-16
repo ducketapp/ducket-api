@@ -1,4 +1,4 @@
-package io.ducket.api.domain.controller.imports.dto
+package dev.ducket.api.domain.controller.imports.dto
 
 import org.valiktor.functions.hasSize
 import org.valiktor.functions.isNotBlank

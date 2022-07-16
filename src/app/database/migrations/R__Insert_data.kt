@@ -1,7 +1,7 @@
-package io.ducket.api.app.database.migrations
+package dev.ducket.api.app.database.migrations
 
-import io.ducket.api.domain.model.category.CategoriesTable
-import io.ducket.api.domain.model.currency.CurrenciesTable
+import dev.ducket.api.domain.model.category.CategoriesTable
+import dev.ducket.api.domain.model.currency.CurrenciesTable
 import org.flywaydb.core.api.migration.BaseJavaMigration
 import org.flywaydb.core.api.migration.Context
 import org.jetbrains.exposed.sql.batchInsert

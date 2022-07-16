@@ -1,7 +1,7 @@
-package io.ducket.api.domain.repository
+package dev.ducket.api.domain.repository
 
-import io.ducket.api.app.database.Transactional
-import io.ducket.api.domain.model.budget.BudgetAccountsTable
+import dev.ducket.api.app.database.Transactional
+import dev.ducket.api.domain.model.budget.BudgetAccountsTable
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 

@@ -1,4 +1,4 @@
-package io.ducket.api.domain.model.category
+package dev.ducket.api.domain.model.category
 
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass

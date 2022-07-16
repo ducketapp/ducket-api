@@ -1,6 +1,6 @@
-package io.ducket.api.test_data
+package dev.ducket.api.test_data
 
-import io.ducket.api.domain.model.tag.Tag
+import dev.ducket.api.domain.model.tag.Tag
 import java.time.Instant
 
 class TagObjectMother {

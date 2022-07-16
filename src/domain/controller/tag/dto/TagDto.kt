@@ -1,13 +1,8 @@
-package io.ducket.api.domain.controller.tag.dto
+package dev.ducket.api.domain.controller.tag.dto
 
-import io.ducket.api.domain.model.tag.Tag
+import dev.ducket.api.domain.model.tag.Tag
 
 data class TagDto(
     val id: Long,
     val name: String,
-) {
-    constructor(tag: Tag) : this(
-        id = tag.id,
-        name = tag.title,
-    )
-}
+)

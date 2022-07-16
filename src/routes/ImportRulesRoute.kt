@@ -1,8 +1,8 @@
-package io.ducket.api.routes
+package dev.ducket.api.routes
 
-import io.ducket.api.domain.controller.rule.ImportRuleController
-import io.ktor.auth.*
-import io.ktor.routing.*
+import dev.ducket.api.domain.controller.rule.ImportRuleController
+import io.ktor.server.auth.*
+import io.ktor.server.routing.*
 
 fun Route.importRules(importRuleController: ImportRuleController) {
     authenticate {

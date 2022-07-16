@@ -1,47 +1,70 @@
-buildscript {
-    ext {
-        kotlin_version = "1.6.10"
-        logback_version = "1.2.1"
-        log4j_version = "2.14.1"
-        ktor_version = "1.6.8"
-        hikaricp_version = "3.4.5"
-        exposed_version = "0.38.1"
-        unirest_version = "1.4.9"
-        flyway_version = "8.2.2"
-        valiktor_version = "0.12.0"
-        quartz_version = "2.3.2"
-        dataframe_version = "0.8.0"
-        jbcrypt_version = "0.4"
-        h2_version = "2.1.210"
-        hikari_version = "3.4.5"
-        mysql_connector_version = "8.0.11"
-        mockk_version = "1.12.2"
-    }
+//buildscript {
+//    ext {
+//        logback_version = "1.2.1"
+//        log4j_version = "2.14.1"
+//        hikaricp_version = "3.4.5"
+//        exposed_version = "0.38.1"
+//        unirest_version = "1.4.9"
+//        flyway_version = "8.2.2"
+//        valiktor_version = "0.12.0"
+//        quartz_version = "2.3.2"
+//        dataframe_version = "0.8.0"
+//        jbcrypt_version = "0.4"
+//        h2_version = "2.1.210"
+//        hikari_version = "3.4.5"
+//        mysql_connector_version = "8.0.11"
+//        mockk_version = "1.12.2"
+//        testcontainers_version = "1.17.3"
+//    }
+//
+//    repositories {
+//        mavenCentral()
+//        maven {
+//            url "https://plugins.gradle.org/m2/"
+//        }
+//    }
+//
+//    dependencies {
+//        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+//        classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.1"
+//        classpath "gradle.plugin.org.flywaydb:gradle-plugin-publishing:8.3.0"
+//    }
+//}
 
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-    
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.1"
-        classpath "gradle.plugin.org.flywaydb:gradle-plugin-publishing:8.3.0"
-    }
+plugins {
+    id 'application'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.10'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'org.flywaydb.flyway' version '8.3.0'
+    id 'jacoco'
 }
 
-apply plugin: 'kotlin'
-apply plugin: 'application'
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'org.flywaydb.flyway'
-apply plugin: 'jacoco'
+sourceCompatibility = 11
+targetCompatibility = 11
 
-group 'io.ducket.api'
+//compileKotlin {
+//    kotlinOptions.jvmTarget = "11"
+//}
+//
+//compileTestKotlin {
+//    kotlinOptions.jvmTarget = "11"
+//}
+
+//apply plugin: 'kotlin'
+//apply plugin: 'application'
+//apply plugin: 'com.github.johnrengelman.shadow'
+//apply plugin: 'org.flywaydb.flyway'
+//apply plugin: 'jacoco'
+
+group 'dev.ducket.api'
 version '0.0.1'
-mainClassName = "io.ktor.server.netty.EngineMain"
+application {
+    mainClassName = "io.ktor.server.netty.EngineMain"
+
+    def isDevelopment = project.ext.has("development")
+    applicationDefaultJvmArgs = ["-Dio.ktor.development=$isDevelopment"]
+}
+
 
 shadowJar {
     manifest {
@@ -49,11 +72,15 @@ shadowJar {
     }
 }
 
-compileKotlin {
-    kotlinOptions {
-        jvmTarget=1.8
-    }
+jacoco {
+    toolVersion = "0.8.2"
 }
+//
+//compileKotlin {
+//    kotlinOptions {
+//        jvmTarget=11
+//    }
+//}
 
 sourceSets {
     main.kotlin.srcDirs = main.java.srcDirs = ['src']
@@ -63,8 +90,11 @@ sourceSets {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
+    maven { url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap") }
+    maven {
+        url "https://plugins.gradle.org/m2/"
+    }
 }
 
 tasks.withType(Test).configureEach {
@@ -83,10 +113,6 @@ test {
     finalizedBy jacocoTestReport
 }
 
-jacoco {
-    toolVersion = "0.8.2"
-}
-
 jacocoTestReport {
     dependsOn test
     reports {
@@ -97,51 +123,25 @@ jacocoTestReport {
 
 
 dependencies {
-    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-
-    // Metrics
-    implementation "io.ktor:ktor-metrics-micrometer:$ktor_version"
-    implementation "io.micrometer:micrometer-registry-prometheus:1.7.1"
-
-    // Job Scheduler
-    implementation "org.quartz-scheduler:quartz:$quartz_version"
-
-    // DI
-    implementation "io.insert-koin:koin-ktor:3.1.4"
-    implementation "io.insert-koin:koin-logger-slf4j:3.1.4"
-
-    // CSV
-    implementation "org.apache.commons:commons-csv:1.5"
-    implementation "org.jetbrains.kotlinx:dataframe:$dataframe_version"
-
-    // ML
-    implementation "nz.ac.waikato.cms.weka:weka-stable:3.8.0"
-    implementation "org.nield:kotlin-statistics:1.2.1"
-
-    // Levenshtein Distance algorithm
-    implementation "org.apache.commons:commons-text:1.5"
-
-    // Aho-Corasick algorithm
-    implementation "org.ahocorasick:ahocorasick:0.4.0"
-
-    // Validation
-    implementation "org.valiktor:valiktor-core:$valiktor_version"
-
-    // Hashing
-    implementation "org.mindrot:jbcrypt:$jbcrypt_version"
+    // api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     // Ktor's core components
-    implementation "io.ktor:ktor-server-core:$ktor_version"
-    implementation "io.ktor:ktor-server:$ktor_version"
-    implementation "io.ktor:ktor-server-host-common:$ktor_version"
-    implementation "io.ktor:ktor-server-netty:$ktor_version"
+    implementation "io.ktor:ktor-server-jvm:$ktor_version"
+    implementation "io.ktor:ktor-server-core-jvm:$ktor_version"
+    implementation "io.ktor:ktor-server-netty-jvm:$ktor_version"
+    implementation "io.ktor:ktor-server-auth-jwt:$ktor_version"
+    implementation "io.ktor:ktor-server-content-negotiation:$ktor_version"
 
-    // Date time extension
-    implementation "org.threeten:threeten-extra:1.7.0"
-
-    // Auth
-    implementation "io.ktor:ktor-auth:$ktor_version"
-    implementation "io.ktor:ktor-auth-jwt:$ktor_version"
+    // Client
+    implementation "io.ktor:ktor-client-core:$ktor_version"
+    implementation "io.ktor:ktor-client-apache:$ktor_version"
+    implementation "io.ktor:ktor-client-jackson:$ktor_version"
+    implementation "io.ktor:ktor-client-logging:$ktor_version"
+    implementation "io.ktor:ktor-client-serialization:$ktor_version"
+    implementation "io.ktor:ktor-client-content-negotiation:$ktor_version"
+    implementation "io.ktor:ktor-serialization-jackson:$ktor_version"
+    implementation "io.ktor:ktor-serialization-kotlinx-xml:$ktor_version"
+    implementation "io.ktor:ktor-serialization-kotlinx-json:$ktor_version"
 
     // Database
     implementation "mysql:mysql-connector-java:$mysql_connector_version"
@@ -154,35 +154,45 @@ dependencies {
     implementation "org.flywaydb:flyway-core:$flyway_version"
     implementation "org.flywaydb:flyway-mysql:$flyway_version" // otherwise FlywayException: Unsupported Database: MySQL 8.0
 
-    // Client
-    implementation "io.ktor:ktor-client-core:$ktor_version"
-    implementation "io.ktor:ktor-client-cio:$ktor_version"
-    implementation "io.ktor:ktor-client-apache:$ktor_version"
-    implementation "io.ktor:ktor-client-serialization:$ktor_version"
-    implementation "io.ktor:ktor-client-jackson:$ktor_version"
-    implementation "io.ktor:ktor-client-logging:$ktor_version"
-
     // An implementation of SLF4J
     implementation "ch.qos.logback:logback-classic:$logback_version"
-    implementation "org.slf4j:jul-to-slf4j:1.7.0"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.6.0"
 
     // Serialization/deserialization
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.11.1"
-    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.11.1"
-    implementation "org.apache.camel:camel-xpath:3.9.0"
-    implementation "io.ktor:ktor-jackson:$ktor_version"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jackson_version"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson_version"
 
-    // provides a convenient mechanism for converting Kotlin objects into a serialized form like JSON, and vice versa
-    implementation "io.ktor:ktor-serialization:$ktor_version"
+    // Metrics
+    implementation "io.ktor:ktor-server-metrics-micrometer:$ktor_version"
+    implementation "io.micrometer:micrometer-registry-prometheus:$prometheus_version"
+
+    // Job Scheduler
+    implementation "org.quartz-scheduler:quartz:$quartz_version"
+
+    // DI
+    implementation "io.insert-koin:koin-ktor:$koin_version"
+    implementation "io.insert-koin:koin-logger-slf4j:$koin_version"
+
+    // ML
+    implementation "nz.ac.waikato.cms.weka:weka-stable:3.8.0"
+    implementation "org.nield:kotlin-statistics:1.2.1"
+
+    // Other
+    implementation "org.valiktor:valiktor-core:$valiktor_version"
+    implementation "org.mindrot:jbcrypt:$jbcrypt_version"
+    implementation "org.threeten:threeten-extra:$threeten_version"
+    implementation "org.jetbrains.kotlinx:dataframe:$dataframe_version"
+    implementation "org.apache.commons:commons-text:1.5" // Levenshtein Distance algorithm
+    implementation "org.ahocorasick:ahocorasick:0.4.0" // Aho-Corasick algorithm
 
     // allows us to test parts of our Ktor application without having to use the whole HTTP stack in the process
-    testImplementation "io.ktor:ktor-server-tests:$ktor_version"
+    testImplementation "io.ktor:ktor-server-tests-jvm:$ktor_version"
     testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
-    testImplementation "io.mockk:mockk:1.12.2"
-    testImplementation 'io.kotest:kotest-runner-junit5:5.0.3'
-    testImplementation 'io.kotest:kotest-assertions-core-jvm:5.0.3'
-    testImplementation "org.junit.jupiter:junit-jupiter:5.8.0"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:5.8.0"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.8.0"
+    testImplementation "org.testcontainers:mysql:$testcontainers_version"
+    testImplementation "org.testcontainers:junit-jupiter:$testcontainers_version"
+    testImplementation "io.mockk:mockk:$mockk_version"
+    testImplementation "io.kotest:kotest-runner-junit5:$kotest_version"
+    testImplementation "io.kotest:kotest-assertions-core-jvm:$kotest_version"
+    testImplementation "org.junit.jupiter:junit-jupiter:$junit_version"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:$junit_version"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit_version"
 }

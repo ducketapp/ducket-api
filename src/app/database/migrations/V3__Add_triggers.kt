@@ -1,4 +1,4 @@
-package io.ducket.api.app.database.migrations
+package dev.ducket.api.app.database.migrations
 
 import org.flywaydb.core.api.migration.BaseJavaMigration
 import org.flywaydb.core.api.migration.Context
@@ -54,20 +54,6 @@ class V3__Add_triggers: BaseJavaMigration() {
                 END;;
             """.trimIndent()
 
-            val groupBeforeDeleteTrigger = """
-                CREATE DEFINER = CURRENT_USER TRIGGER `group_before_delete` BEFORE DELETE ON `group` FOR EACH ROW
-                BEGIN
-                	DELETE FROM `group_membership` WHERE `group_membership`.`group_id` = OLD.`id`;
-                END;;
-            """.trimIndent()
-
-            val groupMembershipBeforeDeleteTrigger = """
-                CREATE DEFINER = CURRENT_USER TRIGGER `group_membership_before_delete` BEFORE DELETE ON `group_membership` FOR EACH ROW
-                BEGIN
-                	DELETE FROM `group_member_account_permission` WHERE `group_member_account_permission`.`membership_id` = OLD.`id`;
-                END;;
-            """.trimIndent()
-
             val budgetBeforeDeleteTrigger = """
                 CREATE DEFINER = CURRENT_USER TRIGGER `budget_before_delete` BEFORE DELETE ON `budget` FOR EACH ROW
                 BEGIN
@@ -80,13 +66,6 @@ class V3__Add_triggers: BaseJavaMigration() {
                 BEGIN
                 	DELETE FROM `periodic_budget_account` WHERE `periodic_budget_account`.`budget_id` = OLD.`id`;
                     DELETE FROM `periodic_budget_limit` WHERE `periodic_budget_limit`.`budget_id` = OLD.`id`;
-                END;;
-            """.trimIndent()
-
-            val accountBeforeDeleteTrigger = """
-                CREATE DEFINER = CURRENT_USER TRIGGER `account_before_delete` BEFORE DELETE ON `account` FOR EACH ROW
-                BEGIN
-                	DELETE FROM `group_member_account_permission` WHERE `group_member_account_permission`.`account_id` = OLD.`id`;
                 END;;
             """.trimIndent()
 
@@ -105,11 +84,8 @@ class V3__Add_triggers: BaseJavaMigration() {
 
             // Before delete
             connection.prepareStatement(operationBeforeDeleteTrigger, false).executeUpdate()
-            connection.prepareStatement(groupBeforeDeleteTrigger, false).executeUpdate()
-            connection.prepareStatement(groupMembershipBeforeDeleteTrigger, false).executeUpdate()
             connection.prepareStatement(budgetBeforeDeleteTrigger, false).executeUpdate()
             connection.prepareStatement(periodicBudgetBeforeDeleteTrigger, false).executeUpdate()
-            connection.prepareStatement(accountBeforeDeleteTrigger, false).executeUpdate()
             connection.prepareStatement(importBeforeDeleteTrigger, false).executeUpdate()
 
             // After delete

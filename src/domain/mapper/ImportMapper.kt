@@ -1,9 +1,9 @@
-package io.ducket.api.domain.mapper
+package dev.ducket.api.domain.mapper
 
-import io.ducket.api.domain.model.imports.Import
-import io.ducket.api.domain.model.imports.ImportUpdate
-import io.ducket.api.domain.controller.imports.dto.ImportDto
-import io.ducket.api.domain.controller.imports.dto.ImportUpdateDto
+import dev.ducket.api.domain.model.imports.Import
+import dev.ducket.api.domain.model.imports.ImportUpdate
+import dev.ducket.api.domain.controller.imports.dto.ImportDto
+import dev.ducket.api.domain.controller.imports.dto.ImportUpdateDto
 
 object ImportMapper {
 

@@ -1,6 +1,6 @@
-package io.ducket.api.domain.controller.rule.dto
+package dev.ducket.api.domain.controller.rule.dto
 
-import io.ducket.api.app.ImportRuleApplyType
+import dev.ducket.api.app.ImportRuleApplyType
 import org.valiktor.functions.*
 
 data class ImportRuleCreateUpdateDto(

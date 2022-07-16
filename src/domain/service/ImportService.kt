@@ -1,21 +1,21 @@
-package io.ducket.api.domain.service
+package dev.ducket.api.domain.service
 
-import io.ducket.api.domain.mapper.OperationMapper
-import io.ducket.api.domain.model.category.Category
-import io.ducket.api.domain.model.imports.ImportCreate
-import io.ducket.api.domain.model.imports.ImportRule
-import io.ducket.api.domain.model.operation.OperationCreate
-import io.ducket.api.app.ImportRuleApplyType
-import io.ducket.api.app.OperationType
-import io.ducket.api.app.database.Transactional
-import io.ducket.api.domain.controller.imports.dto.OperationImportDto
-import io.ducket.api.domain.controller.imports.dto.ImportDto
-import io.ducket.api.domain.controller.imports.dto.ImportUpdateDto
-import io.ducket.api.domain.mapper.ImportMapper
-import io.ducket.api.domain.repository.*
-import io.ducket.api.plugins.DuplicateDataException
-import io.ducket.api.plugins.InvalidDataException
-import io.ducket.api.plugins.NoDataFoundException
+import dev.ducket.api.domain.mapper.OperationMapper
+import dev.ducket.api.domain.model.category.Category
+import dev.ducket.api.domain.model.imports.ImportCreate
+import dev.ducket.api.domain.model.imports.ImportRule
+import dev.ducket.api.domain.model.operation.OperationCreate
+import dev.ducket.api.app.ImportRuleApplyType
+import dev.ducket.api.app.OperationType
+import dev.ducket.api.app.database.Transactional
+import dev.ducket.api.domain.controller.imports.dto.OperationImportDto
+import dev.ducket.api.domain.controller.imports.dto.ImportDto
+import dev.ducket.api.domain.controller.imports.dto.ImportUpdateDto
+import dev.ducket.api.domain.mapper.ImportMapper
+import dev.ducket.api.domain.repository.*
+import dev.ducket.api.plugins.DuplicateDataException
+import dev.ducket.api.plugins.InvalidDataException
+import dev.ducket.api.plugins.NoDataFoundException
 import org.ahocorasick.trie.Trie
 
 

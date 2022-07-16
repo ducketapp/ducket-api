@@ -1,19 +1,19 @@
-package io.ducket.api.domain.controller.user
+package dev.ducket.api.domain.controller.user
 
-import io.ducket.api.auth.JwtManager
-import io.ducket.api.auth.UserPrincipal
-import io.ducket.api.auth.UserRole
-import io.ducket.api.domain.controller.user.dto.UserAuthenticateDto
-import io.ducket.api.domain.controller.user.dto.UserCreateDto
-import io.ducket.api.domain.controller.user.dto.UserUpdateDto
-import io.ducket.api.domain.service.*
-import io.ducket.api.principalOrThrow
-import io.ktor.application.*
-import io.ktor.auth.*
+import dev.ducket.api.auth.authentication.JwtManager
+import dev.ducket.api.auth.authentication.UserPrincipal
+import dev.ducket.api.auth.authentication.UserRole
+import dev.ducket.api.domain.controller.user.dto.UserAuthenticateDto
+import dev.ducket.api.domain.controller.user.dto.UserCreateDto
+import dev.ducket.api.domain.controller.user.dto.UserUpdateDto
+import dev.ducket.api.domain.service.*
+import dev.ducket.api.principalOrThrow
 import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.util.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.util.*
 import org.koin.java.KoinJavaComponent.inject
 
 class UserController(private val userService: UserService) {

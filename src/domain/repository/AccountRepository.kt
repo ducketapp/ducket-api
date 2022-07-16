@@ -1,15 +1,14 @@
-package io.ducket.api.domain.repository
+package dev.ducket.api.domain.repository
 
-import io.ducket.api.domain.model.account.*
-import io.ducket.api.domain.model.account.AccountsTable
-import io.ducket.api.domain.model.currency.CurrenciesTable
-import io.ducket.api.domain.model.currency.CurrencyEntity
-import io.ducket.api.domain.model.user.UserEntity
-import io.ducket.api.app.database.Transactional
+import dev.ducket.api.domain.model.account.*
+import dev.ducket.api.domain.model.account.AccountsTable
+import dev.ducket.api.domain.model.currency.CurrenciesTable
+import dev.ducket.api.domain.model.currency.CurrencyEntity
+import dev.ducket.api.domain.model.user.UserEntity
+import dev.ducket.api.app.database.Transactional
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.transactions.transaction
 
 class AccountRepository: Transactional {
 
@@ -42,8 +41,7 @@ class AccountRepository: Transactional {
         }.firstOrNull()?.toModel()
     }
 
-    // TODO suspend
-    fun findAll(userId: Long): List<Account> = transaction {
+    suspend fun findAll(userId: Long): List<Account> = blockingTransaction {
         AccountEntity.find {
             AccountsTable.userId.eq(userId)
         }.orderBy(AccountsTable.createdAt to SortOrder.DESC).toList().map { it.toModel() }

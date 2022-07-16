@@ -1,10 +1,10 @@
-package io.ducket.api.domain.mapper
+package dev.ducket.api.domain.mapper
 
-import io.ducket.api.domain.controller.tag.dto.TagCreateUpdateDto
-import io.ducket.api.domain.controller.tag.dto.TagDto
-import io.ducket.api.domain.model.tag.Tag
-import io.ducket.api.domain.model.tag.TagCreate
-import io.ducket.api.domain.model.tag.TagUpdate
+import dev.ducket.api.domain.controller.tag.dto.TagCreateUpdateDto
+import dev.ducket.api.domain.controller.tag.dto.TagDto
+import dev.ducket.api.domain.model.tag.Tag
+import dev.ducket.api.domain.model.tag.TagCreate
+import dev.ducket.api.domain.model.tag.TagUpdate
 
 object TagMapper {
 

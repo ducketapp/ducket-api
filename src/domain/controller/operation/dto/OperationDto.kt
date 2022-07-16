@@ -1,13 +1,11 @@
-package io.ducket.api.domain.controller.operation.dto
+package dev.ducket.api.domain.controller.operation.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import io.ducket.api.domain.controller.category.dto.CategoryDto
-import io.ducket.api.domain.controller.imports.dto.ImportDto
-import io.ducket.api.app.OperationType
-import io.ducket.api.domain.controller.account.dto.AccountDto
-import io.ducket.api.domain.controller.tag.dto.TagDto
-import io.ducket.api.utils.InstantSerializer
+import dev.ducket.api.domain.controller.category.dto.CategoryDto
+import dev.ducket.api.domain.controller.imports.dto.ImportDto
+import dev.ducket.api.app.OperationType
+import dev.ducket.api.domain.controller.account.dto.AccountDto
+import dev.ducket.api.domain.controller.tag.dto.TagDto
 import java.time.Instant
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -25,5 +23,5 @@ data class OperationDto(
     val notes: String?,
     val location: OperationLocationDto?,
     val tags: List<TagDto>,
-    @JsonSerialize(using = InstantSerializer::class) val date: Instant,
+    val date: Instant,
 )

@@ -1,20 +1,18 @@
-package io.ducket.api.domain.repository
+package dev.ducket.api.domain.repository
 
-import io.ducket.api.domain.model.account.AccountsTable
-import io.ducket.api.domain.model.currency.CurrenciesTable
-import io.ducket.api.domain.model.currency.CurrencyEntity
-import io.ducket.api.domain.model.imports.ImportRulesTable
-import io.ducket.api.domain.model.imports.ImportsTable
-import io.ducket.api.domain.model.operation.OperationsTable
-import io.ducket.api.domain.model.user.*
-import io.ducket.api.domain.model.user.UsersTable
-import io.ducket.api.domain.model.periodic_budget.PeriodicBudgetsTable
-import io.ducket.api.domain.model.group.GroupsTable
-import io.ducket.api.app.database.Transactional
-import io.ducket.api.domain.model.budget.BudgetsTable
+import dev.ducket.api.domain.model.account.AccountsTable
+import dev.ducket.api.domain.model.currency.CurrenciesTable
+import dev.ducket.api.domain.model.currency.CurrencyEntity
+import dev.ducket.api.domain.model.imports.ImportRulesTable
+import dev.ducket.api.domain.model.imports.ImportsTable
+import dev.ducket.api.domain.model.operation.OperationsTable
+import dev.ducket.api.domain.model.user.*
+import dev.ducket.api.domain.model.user.UsersTable
+import dev.ducket.api.domain.model.periodic_budget.PeriodicBudgetsTable
+import dev.ducket.api.app.database.Transactional
+import dev.ducket.api.domain.model.budget.BudgetsTable
 
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.transactions.transaction
 
 class UserRepository: Transactional {
 
@@ -40,8 +38,7 @@ class UserRepository: Transactional {
         UserEntity.find { UsersTable.email.eq(email) }.firstOrNull()?.toModel()
     }
 
-    // TODO suspend
-    fun findOne(userId: Long): User? = transaction {
+    suspend fun findOne(userId: Long): User? = blockingTransaction {
         UserEntity.findById(userId)?.toModel()
     }
 
@@ -51,7 +48,6 @@ class UserRepository: Transactional {
 
     suspend fun deleteData(userId: Long): Unit = blockingTransaction {
         OperationsTable.deleteWhere { OperationsTable.userId.eq(userId) }
-        GroupsTable.deleteWhere { GroupsTable.ownerId.eq(userId) }
         BudgetsTable.deleteWhere { BudgetsTable.userId.eq(userId) }
         PeriodicBudgetsTable.deleteWhere { PeriodicBudgetsTable.userId.eq(userId) }
         ImportsTable.deleteWhere { ImportsTable.userId.eq(userId) }

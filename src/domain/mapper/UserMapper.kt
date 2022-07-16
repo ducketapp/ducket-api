@@ -1,15 +1,14 @@
-package io.ducket.api.domain.mapper
+package dev.ducket.api.domain.mapper
 
-import io.ducket.api.domain.model.currency.Currency
-import io.ducket.api.domain.model.user.User
-import io.ducket.api.domain.model.user.UserCreate
-import io.ducket.api.domain.model.user.UserEntity
-import io.ducket.api.domain.model.user.UserUpdate
-import io.ducket.api.domain.controller.currency.dto.CurrencyDto
-import io.ducket.api.domain.controller.user.dto.UserCreateDto
-import io.ducket.api.domain.controller.user.dto.UserDto
-import io.ducket.api.domain.controller.user.dto.UserUpdateDto
-import io.ducket.api.utils.toLocalDate
+import dev.ducket.api.domain.model.currency.Currency
+import dev.ducket.api.domain.model.user.User
+import dev.ducket.api.domain.model.user.UserCreate
+import dev.ducket.api.domain.model.user.UserUpdate
+import dev.ducket.api.domain.controller.currency.dto.CurrencyDto
+import dev.ducket.api.domain.controller.user.dto.UserCreateDto
+import dev.ducket.api.domain.controller.user.dto.UserDto
+import dev.ducket.api.domain.controller.user.dto.UserUpdateDto
+import dev.ducket.api.utils.toLocalDate
 
 object UserMapper {
 

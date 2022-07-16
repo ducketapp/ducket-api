@@ -1,9 +1,9 @@
-package io.ducket.api.domain.service
+package dev.ducket.api.domain.service
 
-import io.ducket.api.domain.mapper.CategoryMapper
-import io.ducket.api.domain.controller.category.dto.CategoryDto
-import io.ducket.api.domain.repository.CategoryRepository
-import io.ducket.api.plugins.NoDataFoundException
+import dev.ducket.api.domain.mapper.CategoryMapper
+import dev.ducket.api.domain.controller.category.dto.CategoryDto
+import dev.ducket.api.domain.repository.CategoryRepository
+import dev.ducket.api.plugins.NoDataFoundException
 
 class CategoryService(private val categoryRepository: CategoryRepository) {
 
