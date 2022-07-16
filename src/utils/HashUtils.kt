@@ -1,6 +1,5 @@
 package dev.ducket.api.utils
 
-
 import dev.ducket.api.app.BCRYPT_HASH_ROUNDS
 import org.mindrot.jbcrypt.BCrypt
 

@@ -1,36 +1,3 @@
-//buildscript {
-//    ext {
-//        logback_version = "1.2.1"
-//        log4j_version = "2.14.1"
-//        hikaricp_version = "3.4.5"
-//        exposed_version = "0.38.1"
-//        unirest_version = "1.4.9"
-//        flyway_version = "8.2.2"
-//        valiktor_version = "0.12.0"
-//        quartz_version = "2.3.2"
-//        dataframe_version = "0.8.0"
-//        jbcrypt_version = "0.4"
-//        h2_version = "2.1.210"
-//        hikari_version = "3.4.5"
-//        mysql_connector_version = "8.0.11"
-//        mockk_version = "1.12.2"
-//        testcontainers_version = "1.17.3"
-//    }
-//
-//    repositories {
-//        mavenCentral()
-//        maven {
-//            url "https://plugins.gradle.org/m2/"
-//        }
-//    }
-//
-//    dependencies {
-//        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-//        classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.1"
-//        classpath "gradle.plugin.org.flywaydb:gradle-plugin-publishing:8.3.0"
-//    }
-//}
-
 plugins {
     id 'application'
     id 'org.jetbrains.kotlin.jvm' version '1.7.10'
@@ -41,20 +8,6 @@ plugins {
 
 sourceCompatibility = 11
 targetCompatibility = 11
-
-//compileKotlin {
-//    kotlinOptions.jvmTarget = "11"
-//}
-//
-//compileTestKotlin {
-//    kotlinOptions.jvmTarget = "11"
-//}
-
-//apply plugin: 'kotlin'
-//apply plugin: 'application'
-//apply plugin: 'com.github.johnrengelman.shadow'
-//apply plugin: 'org.flywaydb.flyway'
-//apply plugin: 'jacoco'
 
 group 'dev.ducket.api'
 version '0.0.1'
@@ -75,12 +28,6 @@ shadowJar {
 jacoco {
     toolVersion = "0.8.2"
 }
-//
-//compileKotlin {
-//    kotlinOptions {
-//        jvmTarget=11
-//    }
-//}
 
 sourceSets {
     main.kotlin.srcDirs = main.java.srcDirs = ['src']
@@ -123,14 +70,13 @@ jacocoTestReport {
 
 
 dependencies {
-    // api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-
-    // Ktor's core components
+    // Server
     implementation "io.ktor:ktor-server-jvm:$ktor_version"
     implementation "io.ktor:ktor-server-core-jvm:$ktor_version"
     implementation "io.ktor:ktor-server-netty-jvm:$ktor_version"
     implementation "io.ktor:ktor-server-auth-jwt:$ktor_version"
     implementation "io.ktor:ktor-server-content-negotiation:$ktor_version"
+    implementation "io.ktor:ktor-server-freemarker:$ktor_version"
 
     // Client
     implementation "io.ktor:ktor-client-core:$ktor_version"
