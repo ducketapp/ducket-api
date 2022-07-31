@@ -81,7 +81,7 @@ internal class AccountServiceTest : BaseUnitTest() {
         val accountCreateDto = AccountObjectMother.accountCreateDto()
         val expected = AccountObjectMother.accountDto()
 
-        coEvery { accountRepositoryMock.findOneByTitle(userId, accountCreateDto.title) } returns null
+        coEvery { accountRepositoryMock.findOneByTitle(userId, accountCreateDto.name) } returns null
         coEvery { accountRepositoryMock.create(capture(userIdSlot), capture(accountCreateSlot)) } returns account
 
         // when
@@ -98,7 +98,7 @@ internal class AccountServiceTest : BaseUnitTest() {
         // given
         val account = AccountObjectMother.account()
         val accountCreateDto = AccountObjectMother.accountCreateDto()
-        coEvery { accountRepositoryMock.findOneByTitle(userId, accountCreateDto.title) } returns account
+        coEvery { accountRepositoryMock.findOneByTitle(userId, accountCreateDto.name) } returns account
 
         // when
         val executable = { runBlocking { cut.createAccount(userId, accountCreateDto) } }
@@ -120,7 +120,7 @@ internal class AccountServiceTest : BaseUnitTest() {
         val account = AccountObjectMother.account()
         val accountUpdateDto = AccountObjectMother.accountUpdateDto()
 
-        coEvery { accountRepositoryMock.findOneByTitle(userId, accountUpdateDto.title) } returns null
+        coEvery { accountRepositoryMock.findOneByTitle(userId, accountUpdateDto.name) } returns null
         coEvery { accountRepositoryMock.update(capture(userIdSlot), capture(accountIdSlot), capture(accountUpdateSlot)) } returns account
 
         // when
@@ -137,9 +137,9 @@ internal class AccountServiceTest : BaseUnitTest() {
     fun should_ThrowException_When_UpdateAccountWithExistingAccountTitle() {
         // given
         val accountUpdateDto = AccountObjectMother.accountUpdateDto()
-        val account = AccountObjectMother.account().copy(id = 2L, title = accountUpdateDto.title)
+        val account = AccountObjectMother.account().copy(id = 2L, name = accountUpdateDto.name)
 
-        coEvery { accountRepositoryMock.findOneByTitle(userId, accountUpdateDto.title) } returns account
+        coEvery { accountRepositoryMock.findOneByTitle(userId, accountUpdateDto.name) } returns account
 
         // when
         val executable = { runBlocking { cut.updateAccount(userId, 1L, accountUpdateDto) } }
@@ -161,7 +161,7 @@ internal class AccountServiceTest : BaseUnitTest() {
         val account = AccountObjectMother.account()
         val accountUpdateDto = AccountObjectMother.accountUpdateDto()
 
-        coEvery { accountRepositoryMock.findOneByTitle(userId, accountUpdateDto.title) } returns null
+        coEvery { accountRepositoryMock.findOneByTitle(userId, accountUpdateDto.name) } returns null
         coEvery { accountRepositoryMock.update(capture(userIdSlot), capture(accountIdSlot), capture(accountUpdateSlot)) } returns null
 
         // when

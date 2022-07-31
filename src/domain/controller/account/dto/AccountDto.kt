@@ -10,7 +10,7 @@ import java.math.BigDecimal
 data class AccountDto(
     val id: Long,
     val extId: String?,
-    val title: String,
+    val name: String,
     val startBalance: BigDecimal,
     val totalBalance: BigDecimal,
     val type: AccountType,
@@ -20,7 +20,7 @@ data class AccountDto(
     constructor(account: Account) : this(
         id = account.id,
         extId = account.extId,
-        title = account.title,
+        name = account.name,
         startBalance = account.startBalance,
         totalBalance = account.totalBalance,
         type = account.type,

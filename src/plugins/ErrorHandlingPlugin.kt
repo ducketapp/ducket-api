@@ -5,8 +5,10 @@ import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import dev.ducket.api.getLogger
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
+import io.ktor.util.*
 import org.valiktor.ConstraintViolationException
 import org.valiktor.i18n.mapToMessage
 import java.sql.BatchUpdateException
@@ -30,6 +32,7 @@ fun StatusPagesConfig.applicationStatuses() {
     }
 }
 
+@OptIn(InternalAPI::class)
 fun StatusPagesConfig.applicationExceptions() {
     exception<Throwable> { call, cause ->
         getLogger().error(cause.stackTraceToString())
@@ -64,6 +67,20 @@ fun StatusPagesConfig.applicationExceptions() {
     exception<UnrecognizedPropertyException> {  call, cause ->
         HttpStatusCode.BadRequest.also {
             call.respond(status = it, message = ErrorResponse(it, "Unrecognized property: '${cause.propertyName}'"))
+        }
+    }
+
+    exception<BadRequestException> { call, cause ->
+        val rootCause = cause.rootCause
+
+        val message = if (rootCause is MissingKotlinParameterException) {
+            "Required field '${rootCause.parameter.name}' is missing"
+        } else {
+            "Incorrect client request"
+        }
+
+        HttpStatusCode.BadRequest.also {
+            call.respond(status = it, message = ErrorResponse(it, message))
         }
     }
 

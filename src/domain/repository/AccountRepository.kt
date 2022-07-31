@@ -15,7 +15,7 @@ class AccountRepository: Transactional {
     suspend fun create(userId: Long, data: AccountCreate): Account = blockingTransaction {
         AccountEntity.new {
             this.extId = data.extId
-            this.title = data.title
+            this.name = data.name
             this.startBalance = data.startBalance
             this.notes = data.notes
             this.user = UserEntity[userId]
@@ -28,7 +28,7 @@ class AccountRepository: Transactional {
         AccountEntity.find {
             AccountsTable.id.eq(accountId).and(AccountsTable.userId.eq(userId))
         }.firstOrNull()?.apply {
-            this.title = data.title
+            this.name = data.name
             this.notes = data.notes
             this.type = data.type
             this.startBalance = data.startBalance
@@ -55,7 +55,7 @@ class AccountRepository: Transactional {
 
     suspend fun findOneByTitle(userId: Long, name: String): Account? = blockingTransaction {
         AccountEntity.find {
-            AccountsTable.title.eq(name).and(AccountsTable.userId.eq(userId))
+            AccountsTable.name.eq(name).and(AccountsTable.userId.eq(userId))
         }.firstOrNull()?.toModel()
     }
 

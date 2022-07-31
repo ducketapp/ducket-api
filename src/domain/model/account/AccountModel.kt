@@ -25,14 +25,14 @@ internal object AccountsTable : LongIdTable("account") {
     val userId = reference("user_id", UsersTable)
     val currencyId = reference("currency_id", CurrenciesTable)
     val type = enumerationByName("type", 32, AccountType::class)
-    val title = varchar("title", 64)
+    val name = varchar("name", 64)
     val startBalance = decimal("start_balance", 10, DEFAULT_SCALE).clientDefault { BigDecimal.ZERO }
     val notes = varchar("notes", 128).nullable()
     val createdAt = timestamp("created_at").clientDefault { Instant.now() }
     val modifiedAt = timestamp("modified_at").clientDefault { Instant.now() }
 
     init {
-        uniqueIndex("account_unique_index", userId, title, extId)
+        uniqueIndex("account_unique_index", userId, name, extId)
     }
 }
 
@@ -40,7 +40,7 @@ class AccountEntity(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<AccountEntity>(AccountsTable)
 
     var extId by AccountsTable.extId
-    var title by AccountsTable.title
+    var name by AccountsTable.name
     var startBalance by AccountsTable.startBalance
     var notes by AccountsTable.notes
     var user by UserEntity referencedOn AccountsTable.userId
@@ -60,7 +60,7 @@ class AccountEntity(id: EntityID<Long>) : LongEntity(id) {
     fun toModel() = Account(
         id.value,
         extId,
-        title,
+        name,
         startBalance,
         totalBalance,
         notes,
@@ -75,7 +75,7 @@ class AccountEntity(id: EntityID<Long>) : LongEntity(id) {
 data class Account(
     val id: Long,
     val extId: String?,
-    val title: String,
+    val name: String,
     val startBalance: BigDecimal,
     val totalBalance: BigDecimal,
     val notes: String?,
@@ -88,7 +88,7 @@ data class Account(
 
 data class AccountCreate(
     val extId: String?,
-    val title: String,
+    val name: String,
     val startBalance: BigDecimal,
     val notes: String?,
     val userId: Long,
@@ -97,7 +97,7 @@ data class AccountCreate(
 )
 
 data class AccountUpdate(
-    val title: String,
+    val name: String,
     val startBalance: BigDecimal,
     val notes: String?,
     val type: AccountType,

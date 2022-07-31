@@ -15,7 +15,7 @@ class AccountObjectMother {
         fun account() = Account(
             id = 1L,
             extId = null,
-            title = "Cash USD",
+            name = "Cash USD",
             notes = "Account in United States dollar",
             startBalance = BigDecimal.ZERO,
             totalBalance = BigDecimal.ZERO,
@@ -29,7 +29,7 @@ class AccountObjectMother {
         fun accountCreate() = AccountCreate(
             extId = null,
             userId = UserObjectMother.user().id,
-            title = "Cash USD",
+            name = "Cash USD",
             notes = "Account in United States dollar",
             currency = "USD",
             startBalance = BigDecimal.ZERO,
@@ -37,14 +37,14 @@ class AccountObjectMother {
         )
 
         fun accountUpdate() = AccountUpdate(
-            title = "Savings USD",
+            name = "Savings USD",
             notes = "Savings in United States dollar",
             startBalance = BigDecimal(12_345_678.90),
             type = AccountType.SAVINGS
         )
 
         fun accountCreateDto() = AccountCreateDto(
-            title = "Cash USD",
+            name = "Cash USD",
             notes = "Account in United States dollar",
             currency = "USD",
             startBalance = BigDecimal.ZERO,
@@ -52,7 +52,7 @@ class AccountObjectMother {
         )
 
         fun accountUpdateDto() = AccountUpdateDto(
-            title = "Savings USD",
+            name = "Savings USD",
             notes = "Savings in United States dollar",
             startBalance = BigDecimal(12_345_678.90),
             type = AccountType.SAVINGS
@@ -61,7 +61,7 @@ class AccountObjectMother {
         fun accountDto() = AccountDto(
             id = 1L,
             extId = null,
-            title = "Cash USD",
+            name = "Cash USD",
             startBalance = BigDecimal.ZERO,
             totalBalance = BigDecimal.ZERO,
             type = AccountType.CASH,

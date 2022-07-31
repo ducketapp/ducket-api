@@ -8,7 +8,7 @@ import org.valiktor.functions.*
 import java.math.BigDecimal
 
 data class AccountCreateDto(
-    val title: String,
+    val name: String,
     val startBalance: BigDecimal,
     val currency: String,
     val type: AccountType,
@@ -16,7 +16,7 @@ data class AccountCreateDto(
 ) {
     fun validate(): AccountCreateDto {
         org.valiktor.validate(this) {
-            validate(AccountCreateDto::title).isNotNull().hasSize(1, 64)
+            validate(AccountCreateDto::name).isNotNull().hasSize(1, 64)
             validate(AccountCreateDto::startBalance).scaleBetween(0, DEFAULT_SCALE)
             validate(AccountCreateDto::currency).isNotBlank().hasLength(3)
             validate(AccountCreateDto::notes).hasSize(1, 128)

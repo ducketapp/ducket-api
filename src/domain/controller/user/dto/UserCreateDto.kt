@@ -1,10 +1,8 @@
 package dev.ducket.api.domain.controller.user.dto
 
-import dev.ducket.api.app.DEFAULT_SCALE
+import dev.ducket.api.domain.controller.account.dto.DefaultAccountCreateDto
 import dev.ducket.api.utils.hasLength
-import dev.ducket.api.utils.scaleBetween
 import org.valiktor.functions.*
-import java.math.BigDecimal
 
 data class UserCreateDto(
     val name: String,
@@ -12,7 +10,7 @@ data class UserCreateDto(
     val email: String,
     val currency: String,
     val password: String,
-    val startBalance: BigDecimal,
+    val defaultAccount: DefaultAccountCreateDto?,
 ) {
     fun validate(): UserCreateDto {
         org.valiktor.validate(this) {
@@ -21,7 +19,7 @@ data class UserCreateDto(
             validate(UserCreateDto::email).isNotBlank().isEmail()
             validate(UserCreateDto::password).isNotBlank().hasSize(4, 16)
             validate(UserCreateDto::currency).isNotBlank().hasLength(3)
-            validate(UserCreateDto::startBalance).scaleBetween(0, DEFAULT_SCALE)
+            validate(UserCreateDto::defaultAccount).validate { it.validate() }
         }
         return this
     }

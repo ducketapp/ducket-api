@@ -24,13 +24,13 @@ class AccountService(
     }
 
     suspend fun createAccount(userId: Long, dto: AccountCreateDto): AccountDto {
-        accountRepository.findOneByTitle(userId, dto.title)?.let { throw DuplicateDataException() }
+        accountRepository.findOneByTitle(userId, dto.name)?.let { throw DuplicateDataException() }
 
         return accountRepository.create(userId, dto.toModel(userId)).toDto()
     }
 
     suspend fun updateAccount(userId: Long, accountId: Long, dto: AccountUpdateDto): AccountDto {
-        accountRepository.findOneByTitle(userId, dto.title)?.takeIf { it.id != accountId }?.also { throw DuplicateDataException() }
+        accountRepository.findOneByTitle(userId, dto.name)?.takeIf { it.id != accountId }?.also { throw DuplicateDataException() }
 
         return accountRepository.update(userId, accountId, dto.toModel())?.toDto() ?: throw NoDataFoundException()
     }

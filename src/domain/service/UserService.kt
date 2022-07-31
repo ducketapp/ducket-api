@@ -39,16 +39,19 @@ class UserService(
 
         return blockingTransaction {
             userRepository.createOne(UserMapper.mapDtoToModel(dto, HashUtils::hash)).let { user ->
-                accountService.createAccount(
-                    userId = user.id,
-                    dto = AccountCreateDto(
-                        title = "Cash ${user.currency.isoCode}",
-                        notes = "Account in ${user.currency.name}",
-                        startBalance = dto.startBalance,
-                        currency = user.currency.isoCode,
-                        type = AccountType.CASH,
+                if (dto.defaultAccount != null) {
+                    accountService.createAccount(
+                        userId = user.id,
+                        dto = AccountCreateDto(
+                            name = dto.defaultAccount.name,
+                            startBalance = dto.defaultAccount.startBalance,
+                            currency = user.currency.isoCode,
+                            type = AccountType.CASH,
+                            notes = "Account in ${user.currency.name}",
+                        )
                     )
-                )
+                }
+
                 UserMapper.mapModelToDto(user)
             }
         }
