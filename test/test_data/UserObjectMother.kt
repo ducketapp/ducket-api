@@ -43,8 +43,8 @@ class UserObjectMother {
             phone = "+48123456789",
             email = "johnwick@test.com",
             password = "1234",
-            startBalance = BigDecimal.ZERO,
             currency = CurrencyObjectMother.currency().isoCode,
+            defaultAccount = null
         )
 
         fun userAuthDto(): UserAuthenticateDto = UserAuthenticateDto(
