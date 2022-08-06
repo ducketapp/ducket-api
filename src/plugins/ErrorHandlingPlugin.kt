@@ -76,6 +76,7 @@ fun StatusPagesConfig.applicationExceptions() {
         val message = if (rootCause is MissingKotlinParameterException) {
             "Required field '${rootCause.parameter.name}' is missing"
         } else {
+            getLogger().error(cause.stackTraceToString())
             "Incorrect client request"
         }
 

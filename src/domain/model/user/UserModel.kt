@@ -10,7 +10,6 @@ import org.jetbrains.exposed.sql.javatime.timestamp
 import java.time.Instant
 
 internal object UsersTable : LongIdTable("user") {
-    val phone = varchar("phone", 32).nullable().uniqueIndex()
     val email = varchar("email", 64).uniqueIndex()
     val name = varchar("name", 64)
     val passwordHash = varchar("password_hash", 128)
@@ -24,7 +23,6 @@ class UserEntity(id: EntityID<Long>) : LongEntity(id) {
 
     var currency by CurrencyEntity referencedOn UsersTable.currencyId
 
-    var phone by UsersTable.phone
     var name by UsersTable.name
     var email by UsersTable.email
     var passwordHash by UsersTable.passwordHash
@@ -33,7 +31,6 @@ class UserEntity(id: EntityID<Long>) : LongEntity(id) {
 
     fun toModel() = User(
         id.value,
-        phone,
         name,
         email,
         currency.toModel(),
@@ -45,7 +42,6 @@ class UserEntity(id: EntityID<Long>) : LongEntity(id) {
 
 data class User(
     val id: Long,
-    val phone: String?,
     val name: String,
     val email: String,
     val currency: Currency,
@@ -55,7 +51,6 @@ data class User(
 )
 
 data class UserCreate(
-    val phone: String?,
     val name: String,
     val email: String,
     val currency: String,
@@ -63,7 +58,6 @@ data class UserCreate(
 )
 
 data class UserUpdate(
-    val phone: String?,
     val name: String,
     val passwordHash: String,
 )

@@ -77,7 +77,7 @@ internal class UserServiceTest : BaseUnitTest() {
         val userPasswordHashSlot = slot<String>()
         val authUserDto = UserObjectMother.userAuthDto()
         val user = UserObjectMother.user()
-        val expected = UserDto(user)
+        val expected = UserMapper.mapModelToDto(user)
         mockkObject(HashUtils)
 
         coEvery { userRepositoryMock.findOneByEmail(authUserDto.email) } returns user

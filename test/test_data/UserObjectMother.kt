@@ -16,7 +16,6 @@ class UserObjectMother {
         fun user(): User = User(
             id = 1L,
             name = "John Wick",
-            phone = "+48123456789",
             email = "johnwick@test.com",
             passwordHash = "hash",
             currency = CurrencyObjectMother.currency(),
@@ -26,7 +25,6 @@ class UserObjectMother {
 
         fun userCreate(): UserCreate = UserCreate(
             name = "John Wick",
-            phone = "+48123456789",
             email = "johnwick@test.com",
             passwordHash = "hash",
             currency = CurrencyObjectMother.currency().isoCode
@@ -34,17 +32,14 @@ class UserObjectMother {
 
         fun userUpdate(): UserUpdate = UserUpdate(
             name = "John Quick",
-            phone = "+48987654321",
             passwordHash = "hash",
         )
 
         fun userCreateDto(): UserCreateDto = UserCreateDto(
             name = "John Wick",
-            phone = "+48123456789",
             email = "johnwick@test.com",
             password = "1234",
             currency = CurrencyObjectMother.currency().isoCode,
-            defaultAccount = null
         )
 
         fun userAuthDto(): UserAuthenticateDto = UserAuthenticateDto(
@@ -54,17 +49,16 @@ class UserObjectMother {
 
         fun userUpdateDto(): UserUpdateDto = UserUpdateDto(
             name = "John Quick",
-            phone = "+48987654321",
             password = "4321",
         )
 
         fun userDto(): UserDto = UserDto(
             id = 1L,
             name = "John Wick",
-            phone = "+48123456789",
             email = "johnwick@test.com",
             currency = CurrencyObjectMother.currencyDto(),
-            sinceDate = Instant.ofEpochSecond(1642708900).toLocalDate(),
+            createdAt = Instant.ofEpochSecond(1642708900).toEpochMilli(),
+            modifiedAt = Instant.ofEpochSecond(1642708900).toEpochMilli(),
         )
     }
 }

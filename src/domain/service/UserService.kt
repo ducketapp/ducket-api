@@ -19,7 +19,8 @@ class UserService(
 ): Transactional {
 
     suspend fun getUser(userId: Long): UserDto {
-        return userRepository.findOne(userId)?.let { UserMapper.mapModelToDto(it) } ?: throw NoDataFoundException()
+        return userRepository.findOne(userId)?.let { UserMapper.mapModelToDto(it) }
+            ?: throw NoDataFoundException("No such user was found")
     }
 
     suspend fun authenticateUser(dto: UserAuthenticateDto): UserDto {
@@ -27,9 +28,9 @@ class UserService(
             if (HashUtils.check(dto.password, user.passwordHash)) {
                 UserMapper.mapModelToDto(user)
             } else {
-                throw AuthenticationException("Either password or email is incorrect")
+                throw AuthenticationException("Incorrect password")
             }
-        } ?: throw AuthenticationException()
+        } ?: throw NoDataFoundException()
     }
 
     suspend fun createUser(dto: UserCreateDto): UserDto {
@@ -37,23 +38,8 @@ class UserService(
             throw DuplicateDataException("Such email has already been taken")
         }
 
-        return blockingTransaction {
-            userRepository.createOne(UserMapper.mapDtoToModel(dto, HashUtils::hash)).let { user ->
-                if (dto.defaultAccount != null) {
-                    accountService.createAccount(
-                        userId = user.id,
-                        dto = AccountCreateDto(
-                            name = dto.defaultAccount.name,
-                            startBalance = dto.defaultAccount.startBalance,
-                            currency = user.currency.isoCode,
-                            type = AccountType.CASH,
-                            notes = "Account in ${user.currency.name}",
-                        )
-                    )
-                }
-
-                UserMapper.mapModelToDto(user)
-            }
+        return userRepository.createOne(UserMapper.mapDtoToModel(dto, HashUtils::hash)).let { user ->
+            UserMapper.mapModelToDto(user)
         }
     }
 

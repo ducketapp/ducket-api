@@ -19,7 +19,6 @@ class UserRepository: Transactional {
     suspend fun createOne(data: UserCreate): User = blockingTransaction {
         UserEntity.new {
             this.name = data.name
-            this.phone = data.phone
             this.email = data.email
             this.currency = CurrencyEntity.find { CurrenciesTable.isoCode.eq(data.currency) }.first()
             this.passwordHash = data.passwordHash
@@ -29,7 +28,6 @@ class UserRepository: Transactional {
     suspend fun updateOne(userId: Long, data: UserUpdate): User? = blockingTransaction {
         UserEntity.findById(userId)?.apply {
             this.name = data.name
-            this.phone = data.phone
             this.passwordHash = data.passwordHash
         }?.toModel()
     }

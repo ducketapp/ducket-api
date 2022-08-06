@@ -8,6 +8,8 @@ import dev.ducket.api.domain.controller.account.dto.AccountCreateDto
 import dev.ducket.api.domain.controller.account.dto.AccountDto
 import dev.ducket.api.domain.controller.account.dto.AccountUpdateDto
 import dev.ducket.api.domain.controller.currency.dto.CurrencyDto
+import dev.ducket.api.domain.controller.user.dto.UserDto
+import dev.ducket.api.domain.model.user.User
 
 object AccountMapper {
 

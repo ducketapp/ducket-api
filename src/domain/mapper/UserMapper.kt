@@ -26,8 +26,9 @@ object UserMapper {
 
     fun mapModelToDto(model: User): UserDto {
         return DataClassMapper<User, UserDto>()
+            .provide(UserDto::modifiedAt) { it.modifiedAt.toEpochMilli() }
+            .provide(UserDto::createdAt) { it.createdAt.toEpochMilli() }
             .register(UserDto::currency, DataClassMapper<Currency, CurrencyDto>())
-            .provide(UserDto::sinceDate) { it.createdAt.toLocalDate() }
             .invoke(model)
     }
 }
