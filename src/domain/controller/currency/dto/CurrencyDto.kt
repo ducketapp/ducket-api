@@ -1,6 +1,6 @@
-package dev.ducket.api.domain.controller.currency.dto
+package dev.ducketapp.service.domain.controller.currency.dto
 
-import dev.ducket.api.domain.model.currency.Currency
+import dev.ducketapp.service.domain.model.currency.Currency
 
 data class CurrencyDto(
     val id: Long,

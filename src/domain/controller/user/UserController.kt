@@ -1,13 +1,13 @@
-package dev.ducket.api.domain.controller.user
+package dev.ducketapp.service.domain.controller.user
 
-import dev.ducket.api.auth.authentication.JwtManager
-import dev.ducket.api.auth.authentication.UserPrincipal
-import dev.ducket.api.auth.authentication.UserRole
-import dev.ducket.api.domain.controller.user.dto.UserAuthenticateDto
-import dev.ducket.api.domain.controller.user.dto.UserCreateDto
-import dev.ducket.api.domain.controller.user.dto.UserUpdateDto
-import dev.ducket.api.domain.service.*
-import dev.ducket.api.principalOrThrow
+import dev.ducketapp.service.auth.authentication.JwtManager
+import dev.ducketapp.service.auth.authentication.UserPrincipal
+import dev.ducketapp.service.auth.authentication.UserRole
+import dev.ducketapp.service.domain.controller.user.dto.UserAuthenticateDto
+import dev.ducketapp.service.domain.controller.user.dto.UserCreateDto
+import dev.ducketapp.service.domain.controller.user.dto.UserUpdateDto
+import dev.ducketapp.service.domain.service.*
+import dev.ducketapp.service.principalOrThrow
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

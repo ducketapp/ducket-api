@@ -1,4 +1,4 @@
-package dev.ducket.api.clients.rates.dto
+package dev.ducketapp.service.clients.rates.dto
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper

@@ -1,12 +1,12 @@
-package dev.ducket.api.auth.authentication
+package dev.ducketapp.service.auth.authentication
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import dev.ducket.api.config.AppConfig
-import dev.ducket.api.domain.repository.UserRepository
-import dev.ducket.api.plugins.AuthenticationException
+import dev.ducketapp.service.config.AppConfig
+import dev.ducketapp.service.domain.repository.UserRepository
+import dev.ducketapp.service.plugins.AuthenticationException
 import io.ktor.server.auth.jwt.*
 import kotlinx.coroutines.runBlocking
 

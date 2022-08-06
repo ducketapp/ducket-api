@@ -1,6 +1,6 @@
-package dev.ducket.api.domain.controller.user.dto
+package dev.ducketapp.service.domain.controller.user.dto
 
-import dev.ducket.api.utils.hasLength
+import dev.ducketapp.service.utils.hasLength
 import org.valiktor.functions.*
 
 data class UserCreateDto(

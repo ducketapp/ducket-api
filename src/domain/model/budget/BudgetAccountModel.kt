@@ -1,6 +1,6 @@
-package dev.ducket.api.domain.model.budget
+package dev.ducketapp.service.domain.model.budget
 
-import dev.ducket.api.domain.model.account.AccountsTable
+import dev.ducketapp.service.domain.model.account.AccountsTable
 import org.jetbrains.exposed.sql.Table
 
 internal object BudgetAccountsTable : Table("budget_account") {

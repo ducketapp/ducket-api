@@ -1,15 +1,15 @@
-package dev.ducket.api.domain.service
+package dev.ducketapp.service.domain.service
 
-import dev.ducket.api.app.PeriodicBudgetType
-import dev.ducket.api.domain.mapper.PeriodicBudgetLimitMapper
-import dev.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetLimitCreateDto
-import dev.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetLimitDto
-import dev.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetLimitUpdateDto
-import dev.ducket.api.domain.repository.PeriodicBudgetLimitRepository
-import dev.ducket.api.domain.repository.PeriodicBudgetRepository
-import dev.ducket.api.plugins.DuplicateDataException
-import dev.ducket.api.plugins.InvalidDataException
-import dev.ducket.api.plugins.NoDataFoundException
+import dev.ducketapp.service.app.PeriodicBudgetType
+import dev.ducketapp.service.domain.mapper.PeriodicBudgetLimitMapper
+import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitCreateDto
+import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitDto
+import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitUpdateDto
+import dev.ducketapp.service.domain.repository.PeriodicBudgetLimitRepository
+import dev.ducketapp.service.domain.repository.PeriodicBudgetRepository
+import dev.ducketapp.service.plugins.DuplicateDataException
+import dev.ducketapp.service.plugins.InvalidDataException
+import dev.ducketapp.service.plugins.NoDataFoundException
 import org.threeten.extra.*
 import java.time.*
 import java.time.temporal.IsoFields

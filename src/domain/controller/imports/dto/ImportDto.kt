@@ -1,4 +1,4 @@
-package dev.ducket.api.domain.controller.imports.dto
+package dev.ducketapp.service.domain.controller.imports.dto
 
 import java.time.Instant
 

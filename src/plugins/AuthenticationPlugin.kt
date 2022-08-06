@@ -1,6 +1,6 @@
-package dev.ducket.api.plugins
+package dev.ducketapp.service.plugins
 
-import dev.ducket.api.auth.authentication.JwtManager
+import dev.ducketapp.service.auth.authentication.JwtManager
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*

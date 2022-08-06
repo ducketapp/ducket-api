@@ -1,11 +1,11 @@
-package dev.ducket.api.domain.repository
+package dev.ducketapp.service.domain.repository
 
-import dev.ducket.api.domain.model.account.*
-import dev.ducket.api.domain.model.account.AccountsTable
-import dev.ducket.api.domain.model.currency.CurrenciesTable
-import dev.ducket.api.domain.model.currency.CurrencyEntity
-import dev.ducket.api.domain.model.user.UserEntity
-import dev.ducket.api.app.database.Transactional
+import dev.ducketapp.service.domain.model.account.*
+import dev.ducketapp.service.domain.model.account.AccountsTable
+import dev.ducketapp.service.domain.model.currency.CurrenciesTable
+import dev.ducketapp.service.domain.model.currency.CurrencyEntity
+import dev.ducketapp.service.domain.model.user.UserEntity
+import dev.ducketapp.service.app.database.Transactional
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere

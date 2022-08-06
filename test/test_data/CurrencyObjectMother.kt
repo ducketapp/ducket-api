@@ -1,7 +1,7 @@
-package dev.ducket.api.test_data
+package dev.ducketapp.service.test_data
 
-import dev.ducket.api.domain.model.currency.Currency
-import dev.ducket.api.domain.controller.currency.dto.CurrencyDto
+import dev.ducketapp.service.domain.model.currency.Currency
+import dev.ducketapp.service.domain.controller.currency.dto.CurrencyDto
 
 class CurrencyObjectMother {
     companion object {

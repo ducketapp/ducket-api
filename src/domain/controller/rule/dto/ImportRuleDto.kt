@@ -1,7 +1,7 @@
-package dev.ducket.api.domain.controller.rule.dto
+package dev.ducketapp.service.domain.controller.rule.dto
 
-import dev.ducket.api.app.ImportRuleApplyType
-import dev.ducket.api.domain.controller.category.dto.CategoryDto
+import dev.ducketapp.service.app.ImportRuleApplyType
+import dev.ducketapp.service.domain.controller.category.dto.CategoryDto
 
 data class ImportRuleDto(
     val id: Long,

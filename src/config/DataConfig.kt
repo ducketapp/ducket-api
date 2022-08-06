@@ -1,4 +1,4 @@
-package dev.ducket.api.config
+package dev.ducketapp.service.config
 
 data class DataConfig(
     val pullRates: Boolean,

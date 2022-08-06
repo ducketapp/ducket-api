@@ -1,4 +1,4 @@
-package dev.ducket.api.plugins
+package dev.ducketapp.service.plugins
 
 import freemarker.cache.ClassTemplateLoader
 import freemarker.core.HTMLOutputFormat

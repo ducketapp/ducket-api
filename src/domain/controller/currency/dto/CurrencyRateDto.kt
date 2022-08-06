@@ -1,4 +1,4 @@
-package dev.ducket.api.domain.controller.currency.dto
+package dev.ducketapp.service.domain.controller.currency.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import java.math.BigDecimal

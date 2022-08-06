@@ -1,4 +1,4 @@
-package dev.ducket.api.routes
+package dev.ducketapp.service.routes
 
 import io.ktor.http.*
 import io.ktor.server.response.*

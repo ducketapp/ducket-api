@@ -1,8 +1,8 @@
-package dev.ducket.api.plugins
+package dev.ducketapp.service.plugins
 
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
-import dev.ducket.api.getLogger
+import dev.ducketapp.service.getLogger
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.*

@@ -1,6 +1,6 @@
-package dev.ducket.api.routes
+package dev.ducketapp.service.routes
 
-import dev.ducket.api.domain.controller.rule.ImportRuleController
+import dev.ducketapp.service.domain.controller.rule.ImportRuleController
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 

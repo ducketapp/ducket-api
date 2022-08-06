@@ -1,18 +1,18 @@
-package dev.ducket.api.domain.service
+package dev.ducketapp.service.domain.service
 
-import dev.ducket.api.app.database.Transactional
-import dev.ducket.api.domain.controller.BulkDeleteDto
-import dev.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetCreateDto
-import dev.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetDto
-import dev.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetUpdateDto
-import dev.ducket.api.domain.mapper.PeriodicBudgetMapper
-import dev.ducket.api.domain.model.periodic_budget.PeriodicBudgetLimitCreate
-import dev.ducket.api.domain.model.periodic_budget.PeriodicBudgetLimitUpdate
-import dev.ducket.api.domain.repository.*
-import dev.ducket.api.plugins.DuplicateDataException
-import dev.ducket.api.plugins.InvalidDataException
-import dev.ducket.api.plugins.NoDataFoundException
-import dev.ducket.api.utils.*
+import dev.ducketapp.service.app.database.Transactional
+import dev.ducketapp.service.domain.controller.BulkDeleteDto
+import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetCreateDto
+import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetDto
+import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetUpdateDto
+import dev.ducketapp.service.domain.mapper.PeriodicBudgetMapper
+import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudgetLimitCreate
+import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudgetLimitUpdate
+import dev.ducketapp.service.domain.repository.*
+import dev.ducketapp.service.plugins.DuplicateDataException
+import dev.ducketapp.service.plugins.InvalidDataException
+import dev.ducketapp.service.plugins.NoDataFoundException
+import dev.ducketapp.service.utils.*
 
 
 class PeriodicBudgetService(

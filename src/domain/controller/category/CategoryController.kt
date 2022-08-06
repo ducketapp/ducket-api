@@ -1,6 +1,6 @@
-package dev.ducket.api.domain.controller.category
+package dev.ducketapp.service.domain.controller.category
 
-import dev.ducket.api.domain.service.CategoryService
+import dev.ducketapp.service.domain.service.CategoryService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*

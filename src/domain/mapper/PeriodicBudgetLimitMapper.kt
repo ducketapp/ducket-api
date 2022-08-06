@@ -1,11 +1,11 @@
-package dev.ducket.api.domain.mapper
+package dev.ducketapp.service.domain.mapper
 
-import dev.ducket.api.domain.model.periodic_budget.PeriodicBudgetLimit
-import dev.ducket.api.domain.model.periodic_budget.PeriodicBudgetLimitCreate
-import dev.ducket.api.domain.model.periodic_budget.PeriodicBudgetLimitUpdate
-import dev.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetLimitCreateDto
-import dev.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetLimitDto
-import dev.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetLimitUpdateDto
+import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudgetLimit
+import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudgetLimitCreate
+import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudgetLimitUpdate
+import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitCreateDto
+import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitDto
+import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitUpdateDto
 
 object PeriodicBudgetLimitMapper {
 

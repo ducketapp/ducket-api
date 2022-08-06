@@ -1,10 +1,10 @@
-package dev.ducket.api.domain.repository
+package dev.ducketapp.service.domain.repository
 
-import dev.ducket.api.app.database.Transactional
-import dev.ducket.api.domain.model.currency.CurrencyRate
-import dev.ducket.api.domain.model.currency.CurrencyRateCreate
-import dev.ducket.api.domain.model.currency.CurrencyRateEntity
-import dev.ducket.api.domain.model.currency.CurrencyRatesTable
+import dev.ducketapp.service.app.database.Transactional
+import dev.ducketapp.service.domain.model.currency.CurrencyRate
+import dev.ducketapp.service.domain.model.currency.CurrencyRateCreate
+import dev.ducketapp.service.domain.model.currency.CurrencyRateEntity
+import dev.ducketapp.service.domain.model.currency.CurrencyRatesTable
 import org.jetbrains.exposed.sql.*
 import java.time.LocalDate
 

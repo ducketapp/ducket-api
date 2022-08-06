@@ -1,4 +1,4 @@
-package dev.ducket.api
+package dev.ducketapp.service
 
 import com.typesafe.config.ConfigFactory
 import io.ktor.server.application.*

@@ -1,4 +1,4 @@
-package dev.ducket.api.domain.mapper
+package dev.ducketapp.service.domain.mapper
 
 import java.lang.IllegalArgumentException
 import kotlin.reflect.KClass

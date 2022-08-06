@@ -1,12 +1,12 @@
-package dev.ducket.api.domain.repository
+package dev.ducketapp.service.domain.repository
 
-import dev.ducket.api.domain.model.category.CategoryEntity
-import dev.ducket.api.domain.model.currency.CurrenciesTable
-import dev.ducket.api.domain.model.currency.CurrencyEntity
-import dev.ducket.api.domain.model.periodic_budget.*
-import dev.ducket.api.domain.model.periodic_budget.PeriodicBudgetsTable
-import dev.ducket.api.domain.model.user.UserEntity
-import dev.ducket.api.app.database.Transactional
+import dev.ducketapp.service.domain.model.category.CategoryEntity
+import dev.ducketapp.service.domain.model.currency.CurrenciesTable
+import dev.ducketapp.service.domain.model.currency.CurrencyEntity
+import dev.ducketapp.service.domain.model.periodic_budget.*
+import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudgetsTable
+import dev.ducketapp.service.domain.model.user.UserEntity
+import dev.ducketapp.service.app.database.Transactional
 import org.jetbrains.exposed.sql.*
 
 class PeriodicBudgetRepository: Transactional {

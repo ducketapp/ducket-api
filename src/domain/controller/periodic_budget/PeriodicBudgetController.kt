@@ -1,13 +1,13 @@
-package  dev.ducket.api.domain.controller.periodic_budget
+package  dev.ducketapp.service.domain.controller.periodic_budget
 
-import dev.ducket.api.domain.controller.BulkDeleteDto
-import dev.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetCreateDto
-import dev.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetLimitCreateDto
-import dev.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetLimitUpdateDto
-import dev.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetUpdateDto
-import dev.ducket.api.domain.service.PeriodicBudgetLimitService
-import dev.ducket.api.domain.service.PeriodicBudgetService
-import dev.ducket.api.principalOrThrow
+import dev.ducketapp.service.domain.controller.BulkDeleteDto
+import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetCreateDto
+import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitCreateDto
+import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitUpdateDto
+import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetUpdateDto
+import dev.ducketapp.service.domain.service.PeriodicBudgetLimitService
+import dev.ducketapp.service.domain.service.PeriodicBudgetService
+import dev.ducketapp.service.principalOrThrow
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

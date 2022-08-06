@@ -1,4 +1,4 @@
-package dev.ducket.api.app.database
+package dev.ducketapp.service.app.database
 
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.Transaction

@@ -1,4 +1,4 @@
-package dev.ducket.api.auth.authentication
+package dev.ducketapp.service.auth.authentication
 
 @Suppress("unused")
 enum class UserRole {

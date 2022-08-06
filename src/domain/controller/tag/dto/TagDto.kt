@@ -1,6 +1,6 @@
-package dev.ducket.api.domain.controller.tag.dto
+package dev.ducketapp.service.domain.controller.tag.dto
 
-import dev.ducket.api.domain.model.tag.Tag
+import dev.ducketapp.service.domain.model.tag.Tag
 
 data class TagDto(
     val id: Long,

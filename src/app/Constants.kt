@@ -1,4 +1,4 @@
-package dev.ducket.api.app
+package dev.ducketapp.service.app
 
 import java.math.BigDecimal
 

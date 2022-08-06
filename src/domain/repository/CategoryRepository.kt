@@ -1,8 +1,8 @@
-package dev.ducket.api.domain.repository
+package dev.ducketapp.service.domain.repository
 
-import dev.ducket.api.domain.model.category.Category
-import dev.ducket.api.domain.model.category.CategoryEntity
-import dev.ducket.api.app.database.Transactional
+import dev.ducketapp.service.domain.model.category.Category
+import dev.ducketapp.service.domain.model.category.CategoryEntity
+import dev.ducketapp.service.app.database.Transactional
 
 class CategoryRepository: Transactional {
 

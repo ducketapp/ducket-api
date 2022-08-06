@@ -1,15 +1,15 @@
-package dev.ducket.api.domain.service
+package dev.ducketapp.service.domain.service
 
-import dev.ducket.api.app.database.Transactional
-import dev.ducket.api.domain.controller.BulkDeleteDto
-import dev.ducket.api.domain.controller.account.dto.AccountCreateDto
-import dev.ducket.api.domain.controller.account.dto.AccountDto
-import dev.ducket.api.domain.controller.account.dto.AccountUpdateDto
-import dev.ducket.api.domain.mapper.AccountMapper.toDto
-import dev.ducket.api.domain.mapper.AccountMapper.toModel
-import dev.ducket.api.domain.repository.*
-import dev.ducket.api.plugins.DuplicateDataException
-import dev.ducket.api.plugins.NoDataFoundException
+import dev.ducketapp.service.app.database.Transactional
+import dev.ducketapp.service.domain.controller.BulkDeleteDto
+import dev.ducketapp.service.domain.controller.account.dto.AccountCreateDto
+import dev.ducketapp.service.domain.controller.account.dto.AccountDto
+import dev.ducketapp.service.domain.controller.account.dto.AccountUpdateDto
+import dev.ducketapp.service.domain.mapper.AccountMapper.toDto
+import dev.ducketapp.service.domain.mapper.AccountMapper.toModel
+import dev.ducketapp.service.domain.repository.*
+import dev.ducketapp.service.plugins.DuplicateDataException
+import dev.ducketapp.service.plugins.NoDataFoundException
 
 class AccountService(
     private val accountRepository: AccountRepository,

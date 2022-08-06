@@ -1,8 +1,8 @@
-package dev.ducket.api.domain.controller.operation
+package dev.ducketapp.service.domain.controller.operation
 
-import dev.ducket.api.domain.controller.operation.dto.OperationCreateUpdateDto
-import dev.ducket.api.domain.service.OperationService
-import dev.ducket.api.principalOrThrow
+import dev.ducketapp.service.domain.controller.operation.dto.OperationCreateUpdateDto
+import dev.ducketapp.service.domain.service.OperationService
+import dev.ducketapp.service.principalOrThrow
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

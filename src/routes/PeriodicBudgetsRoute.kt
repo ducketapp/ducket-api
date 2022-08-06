@@ -1,8 +1,8 @@
-package dev.ducket.api.routes
+package dev.ducketapp.service.routes
 
-import dev.ducket.api.auth.authentication.UserRole
-import dev.ducket.api.auth.authorization.authorize
-import dev.ducket.api.domain.controller.periodic_budget.PeriodicBudgetController
+import dev.ducketapp.service.auth.authentication.UserRole
+import dev.ducketapp.service.auth.authorization.authorize
+import dev.ducketapp.service.domain.controller.periodic_budget.PeriodicBudgetController
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 

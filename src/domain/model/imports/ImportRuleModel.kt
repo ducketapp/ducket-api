@@ -1,12 +1,12 @@
-package dev.ducket.api.domain.model.imports
+package dev.ducketapp.service.domain.model.imports
 
-import dev.ducket.api.domain.model.user.User
-import dev.ducket.api.domain.model.user.UserEntity
-import dev.ducket.api.domain.model.user.UsersTable
-import dev.ducket.api.app.ImportRuleApplyType
-import dev.ducket.api.domain.model.category.CategoriesTable
-import dev.ducket.api.domain.model.category.Category
-import dev.ducket.api.domain.model.category.CategoryEntity
+import dev.ducketapp.service.domain.model.user.User
+import dev.ducketapp.service.domain.model.user.UserEntity
+import dev.ducketapp.service.domain.model.user.UsersTable
+import dev.ducketapp.service.app.ImportRuleApplyType
+import dev.ducketapp.service.domain.model.category.CategoriesTable
+import dev.ducketapp.service.domain.model.category.Category
+import dev.ducketapp.service.domain.model.category.CategoryEntity
 import org.jetbrains.exposed.dao.*
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable

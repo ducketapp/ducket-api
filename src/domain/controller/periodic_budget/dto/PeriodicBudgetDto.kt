@@ -1,10 +1,10 @@
-package dev.ducket.api.domain.controller.periodic_budget.dto
+package dev.ducketapp.service.domain.controller.periodic_budget.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import dev.ducket.api.app.PeriodicBudgetType
-import dev.ducket.api.domain.controller.account.dto.AccountDto
-import dev.ducket.api.domain.controller.category.dto.CategoryDto
-import dev.ducket.api.domain.controller.currency.dto.CurrencyDto
+import dev.ducketapp.service.app.PeriodicBudgetType
+import dev.ducketapp.service.domain.controller.account.dto.AccountDto
+import dev.ducketapp.service.domain.controller.category.dto.CategoryDto
+import dev.ducketapp.service.domain.controller.currency.dto.CurrencyDto
 import java.time.LocalDate
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

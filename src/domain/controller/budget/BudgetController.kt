@@ -1,10 +1,10 @@
-package dev.ducket.api.domain.controller.budget
+package dev.ducketapp.service.domain.controller.budget
 
-import dev.ducket.api.domain.controller.BulkDeleteDto
-import dev.ducket.api.domain.controller.budget.dto.BudgetCreateDto
-import dev.ducket.api.domain.controller.budget.dto.BudgetUpdateDto
-import dev.ducket.api.domain.service.BudgetService
-import dev.ducket.api.principalOrThrow
+import dev.ducketapp.service.domain.controller.BulkDeleteDto
+import dev.ducketapp.service.domain.controller.budget.dto.BudgetCreateDto
+import dev.ducketapp.service.domain.controller.budget.dto.BudgetUpdateDto
+import dev.ducketapp.service.domain.service.BudgetService
+import dev.ducketapp.service.principalOrThrow
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

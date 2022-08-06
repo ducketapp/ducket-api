@@ -1,15 +1,15 @@
-package dev.ducket.api.domain.service
+package dev.ducketapp.service.domain.service
 
-import dev.ducket.api.domain.mapper.OperationMapper
-import dev.ducket.api.app.OperationType
-import dev.ducket.api.app.database.Transactional
-import dev.ducket.api.domain.controller.operation.dto.OperationCreateUpdateDto
-import dev.ducket.api.domain.controller.operation.dto.OperationDto
-import dev.ducket.api.domain.repository.AccountRepository
-import dev.ducket.api.domain.repository.CategoryRepository
-import dev.ducket.api.domain.repository.OperationRepository
-import dev.ducket.api.plugins.InvalidDataException
-import dev.ducket.api.plugins.NoDataFoundException
+import dev.ducketapp.service.domain.mapper.OperationMapper
+import dev.ducketapp.service.app.OperationType
+import dev.ducketapp.service.app.database.Transactional
+import dev.ducketapp.service.domain.controller.operation.dto.OperationCreateUpdateDto
+import dev.ducketapp.service.domain.controller.operation.dto.OperationDto
+import dev.ducketapp.service.domain.repository.AccountRepository
+import dev.ducketapp.service.domain.repository.CategoryRepository
+import dev.ducketapp.service.domain.repository.OperationRepository
+import dev.ducketapp.service.plugins.InvalidDataException
+import dev.ducketapp.service.plugins.NoDataFoundException
 
 class OperationService(
     private val operationRepository: OperationRepository,

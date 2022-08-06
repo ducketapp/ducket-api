@@ -1,6 +1,6 @@
-package dev.ducket.api.utils
+package dev.ducketapp.service.utils
 
-import dev.ducket.api.app.BCRYPT_HASH_ROUNDS
+import dev.ducketapp.service.app.BCRYPT_HASH_ROUNDS
 import org.mindrot.jbcrypt.BCrypt
 
 object HashUtils {

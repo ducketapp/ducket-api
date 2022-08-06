@@ -1,4 +1,4 @@
-package dev.ducket.api.app.database
+package dev.ducketapp.service.app.database
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource

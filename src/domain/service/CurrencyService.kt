@@ -1,17 +1,17 @@
-package dev.ducket.api.domain.service
+package dev.ducketapp.service.domain.service
 
-import dev.ducket.api.app.DEFAULT_ROUNDING
-import dev.ducket.api.app.DEFAULT_RATE_SCALE
-import dev.ducket.api.app.database.Transactional
-import dev.ducket.api.domain.mapper.CurrencyMapper
-import dev.ducket.api.clients.rates.dto.ReferenceDto
-import dev.ducket.api.domain.controller.currency.dto.CurrencyDto
-import dev.ducket.api.domain.controller.currency.dto.CurrencyRateDto
-import dev.ducket.api.domain.model.currency.CurrencyRateCreate
-import dev.ducket.api.domain.repository.CurrencyRateRepository
-import dev.ducket.api.domain.repository.CurrencyRepository
-import dev.ducket.api.getLogger
-import dev.ducket.api.plugins.NoDataFoundException
+import dev.ducketapp.service.app.DEFAULT_ROUNDING
+import dev.ducketapp.service.app.DEFAULT_RATE_SCALE
+import dev.ducketapp.service.app.database.Transactional
+import dev.ducketapp.service.domain.mapper.CurrencyMapper
+import dev.ducketapp.service.clients.rates.dto.ReferenceDto
+import dev.ducketapp.service.domain.controller.currency.dto.CurrencyDto
+import dev.ducketapp.service.domain.controller.currency.dto.CurrencyRateDto
+import dev.ducketapp.service.domain.model.currency.CurrencyRateCreate
+import dev.ducketapp.service.domain.repository.CurrencyRateRepository
+import dev.ducketapp.service.domain.repository.CurrencyRepository
+import dev.ducketapp.service.getLogger
+import dev.ducketapp.service.plugins.NoDataFoundException
 import java.math.BigDecimal.*
 import java.time.LocalDate
 

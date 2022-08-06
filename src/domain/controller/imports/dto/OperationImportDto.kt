@@ -1,7 +1,7 @@
-package dev.ducket.api.domain.controller.imports.dto
+package dev.ducketapp.service.domain.controller.imports.dto
 
-import dev.ducket.api.app.DEFAULT_SCALE
-import dev.ducket.api.utils.scaleBetween
+import dev.ducketapp.service.app.DEFAULT_SCALE
+import dev.ducketapp.service.utils.scaleBetween
 import org.valiktor.functions.*
 import java.math.BigDecimal
 import java.time.LocalDate

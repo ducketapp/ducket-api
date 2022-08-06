@@ -9,7 +9,7 @@ plugins {
 sourceCompatibility = 11
 targetCompatibility = 11
 
-group 'dev.ducket.api'
+group 'dev.ducketapp.service'
 version '0.0.1'
 application {
     mainClassName = "io.ktor.server.netty.EngineMain"

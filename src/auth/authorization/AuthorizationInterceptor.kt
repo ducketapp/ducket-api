@@ -1,7 +1,7 @@
-package dev.ducket.api.auth.authorization
+package dev.ducketapp.service.auth.authorization
 
-import dev.ducket.api.auth.authentication.UserRole
-import dev.ducket.api.plugins.AuthorizationException
+import dev.ducketapp.service.auth.authentication.UserRole
+import dev.ducketapp.service.plugins.AuthorizationException
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*

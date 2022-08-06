@@ -1,9 +1,9 @@
-package dev.ducket.api.domain.repository
+package dev.ducketapp.service.domain.repository
 
-import dev.ducket.api.domain.model.imports.*
-import dev.ducket.api.domain.model.imports.ImportsTable
-import dev.ducket.api.domain.model.user.UserEntity
-import dev.ducket.api.app.database.Transactional
+import dev.ducketapp.service.domain.model.imports.*
+import dev.ducketapp.service.domain.model.imports.ImportsTable
+import dev.ducketapp.service.domain.model.user.UserEntity
+import dev.ducketapp.service.app.database.Transactional
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 

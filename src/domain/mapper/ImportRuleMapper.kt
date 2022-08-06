@@ -1,12 +1,12 @@
-package dev.ducket.api.domain.mapper
+package dev.ducketapp.service.domain.mapper
 
-import dev.ducket.api.domain.model.category.Category
-import dev.ducket.api.domain.model.imports.ImportRule
-import dev.ducket.api.domain.model.imports.ImportRuleCreate
-import dev.ducket.api.domain.model.imports.ImportRuleUpdate
-import dev.ducket.api.domain.controller.category.dto.CategoryDto
-import dev.ducket.api.domain.controller.rule.dto.ImportRuleCreateUpdateDto
-import dev.ducket.api.domain.controller.rule.dto.ImportRuleDto
+import dev.ducketapp.service.domain.model.category.Category
+import dev.ducketapp.service.domain.model.imports.ImportRule
+import dev.ducketapp.service.domain.model.imports.ImportRuleCreate
+import dev.ducketapp.service.domain.model.imports.ImportRuleUpdate
+import dev.ducketapp.service.domain.controller.category.dto.CategoryDto
+import dev.ducketapp.service.domain.controller.rule.dto.ImportRuleCreateUpdateDto
+import dev.ducketapp.service.domain.controller.rule.dto.ImportRuleDto
 
 object ImportRuleMapper {
 

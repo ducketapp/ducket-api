@@ -1,10 +1,10 @@
-package dev.ducket.api.domain.controller.imports
+package dev.ducketapp.service.domain.controller.imports
 
-import dev.ducket.api.domain.controller.imports.dto.ImportUpdateDto
-import dev.ducket.api.domain.controller.imports.dto.OperationImportDto
-import dev.ducket.api.domain.service.ImportService
-import dev.ducket.api.plugins.InvalidDataException
-import dev.ducket.api.principalOrThrow
+import dev.ducketapp.service.domain.controller.imports.dto.ImportUpdateDto
+import dev.ducketapp.service.domain.controller.imports.dto.OperationImportDto
+import dev.ducketapp.service.domain.service.ImportService
+import dev.ducketapp.service.plugins.InvalidDataException
+import dev.ducketapp.service.principalOrThrow
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*

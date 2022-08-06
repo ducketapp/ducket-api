@@ -1,6 +1,6 @@
-package dev.ducket.api.domain.model.operation
+package dev.ducketapp.service.domain.model.operation
 
-import dev.ducket.api.domain.model.tag.TagsTable
+import dev.ducketapp.service.domain.model.tag.TagsTable
 import org.jetbrains.exposed.sql.Table
 
 internal object OperationTagsTable : Table("operation_tag") {

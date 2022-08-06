@@ -1,12 +1,12 @@
-package dev.ducket.api.test_data
+package dev.ducketapp.service.test_data
 
-import dev.ducket.api.domain.model.account.Account
-import dev.ducket.api.app.AccountType
-import dev.ducket.api.domain.controller.account.dto.AccountCreateDto
-import dev.ducket.api.domain.controller.account.dto.AccountDto
-import dev.ducket.api.domain.controller.account.dto.AccountUpdateDto
-import dev.ducket.api.domain.model.account.AccountCreate
-import dev.ducket.api.domain.model.account.AccountUpdate
+import dev.ducketapp.service.domain.model.account.Account
+import dev.ducketapp.service.app.AccountType
+import dev.ducketapp.service.domain.controller.account.dto.AccountCreateDto
+import dev.ducketapp.service.domain.controller.account.dto.AccountDto
+import dev.ducketapp.service.domain.controller.account.dto.AccountUpdateDto
+import dev.ducketapp.service.domain.model.account.AccountCreate
+import dev.ducketapp.service.domain.model.account.AccountUpdate
 import java.math.BigDecimal
 import java.time.Instant
 

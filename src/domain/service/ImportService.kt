@@ -1,21 +1,21 @@
-package dev.ducket.api.domain.service
+package dev.ducketapp.service.domain.service
 
-import dev.ducket.api.domain.mapper.OperationMapper
-import dev.ducket.api.domain.model.category.Category
-import dev.ducket.api.domain.model.imports.ImportCreate
-import dev.ducket.api.domain.model.imports.ImportRule
-import dev.ducket.api.domain.model.operation.OperationCreate
-import dev.ducket.api.app.ImportRuleApplyType
-import dev.ducket.api.app.OperationType
-import dev.ducket.api.app.database.Transactional
-import dev.ducket.api.domain.controller.imports.dto.OperationImportDto
-import dev.ducket.api.domain.controller.imports.dto.ImportDto
-import dev.ducket.api.domain.controller.imports.dto.ImportUpdateDto
-import dev.ducket.api.domain.mapper.ImportMapper
-import dev.ducket.api.domain.repository.*
-import dev.ducket.api.plugins.DuplicateDataException
-import dev.ducket.api.plugins.InvalidDataException
-import dev.ducket.api.plugins.NoDataFoundException
+import dev.ducketapp.service.domain.mapper.OperationMapper
+import dev.ducketapp.service.domain.model.category.Category
+import dev.ducketapp.service.domain.model.imports.ImportCreate
+import dev.ducketapp.service.domain.model.imports.ImportRule
+import dev.ducketapp.service.domain.model.operation.OperationCreate
+import dev.ducketapp.service.app.ImportRuleApplyType
+import dev.ducketapp.service.app.OperationType
+import dev.ducketapp.service.app.database.Transactional
+import dev.ducketapp.service.domain.controller.imports.dto.OperationImportDto
+import dev.ducketapp.service.domain.controller.imports.dto.ImportDto
+import dev.ducketapp.service.domain.controller.imports.dto.ImportUpdateDto
+import dev.ducketapp.service.domain.mapper.ImportMapper
+import dev.ducketapp.service.domain.repository.*
+import dev.ducketapp.service.plugins.DuplicateDataException
+import dev.ducketapp.service.plugins.InvalidDataException
+import dev.ducketapp.service.plugins.NoDataFoundException
 import org.ahocorasick.trie.Trie
 
 

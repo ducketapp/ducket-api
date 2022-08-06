@@ -1,7 +1,7 @@
-package dev.ducket.api.app.database
+package dev.ducketapp.service.app.database
 
-import dev.ducket.api.config.AppConfig
-import dev.ducket.api.getLogger
+import dev.ducketapp.service.config.AppConfig
+import dev.ducketapp.service.getLogger
 import org.flywaydb.core.Flyway
 
 open class MainDatabase(appConfig: AppConfig): MySqlDatabase(appConfig) {

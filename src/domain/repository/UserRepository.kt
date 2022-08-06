@@ -1,16 +1,16 @@
-package dev.ducket.api.domain.repository
+package dev.ducketapp.service.domain.repository
 
-import dev.ducket.api.domain.model.account.AccountsTable
-import dev.ducket.api.domain.model.currency.CurrenciesTable
-import dev.ducket.api.domain.model.currency.CurrencyEntity
-import dev.ducket.api.domain.model.imports.ImportRulesTable
-import dev.ducket.api.domain.model.imports.ImportsTable
-import dev.ducket.api.domain.model.operation.OperationsTable
-import dev.ducket.api.domain.model.user.*
-import dev.ducket.api.domain.model.user.UsersTable
-import dev.ducket.api.domain.model.periodic_budget.PeriodicBudgetsTable
-import dev.ducket.api.app.database.Transactional
-import dev.ducket.api.domain.model.budget.BudgetsTable
+import dev.ducketapp.service.domain.model.account.AccountsTable
+import dev.ducketapp.service.domain.model.currency.CurrenciesTable
+import dev.ducketapp.service.domain.model.currency.CurrencyEntity
+import dev.ducketapp.service.domain.model.imports.ImportRulesTable
+import dev.ducketapp.service.domain.model.imports.ImportsTable
+import dev.ducketapp.service.domain.model.operation.OperationsTable
+import dev.ducketapp.service.domain.model.user.*
+import dev.ducketapp.service.domain.model.user.UsersTable
+import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudgetsTable
+import dev.ducketapp.service.app.database.Transactional
+import dev.ducketapp.service.domain.model.budget.BudgetsTable
 
 import org.jetbrains.exposed.sql.*
 

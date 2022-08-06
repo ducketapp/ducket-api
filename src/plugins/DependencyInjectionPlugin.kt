@@ -1,6 +1,6 @@
-package dev.ducket.api.plugins
+package dev.ducketapp.service.plugins
 
-import dev.ducket.api.app.di.AppModule
+import dev.ducketapp.service.app.di.AppModule
 import io.ktor.server.application.*
 import org.koin.ktor.plugin.Koin
 

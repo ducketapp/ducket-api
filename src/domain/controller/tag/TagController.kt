@@ -1,9 +1,9 @@
-package dev.ducket.api.domain.controller.tag
+package dev.ducketapp.service.domain.controller.tag
 
-import dev.ducket.api.domain.controller.BulkDeleteDto
-import dev.ducket.api.domain.controller.tag.dto.TagCreateUpdateDto
-import dev.ducket.api.domain.service.TagService
-import dev.ducket.api.principalOrThrow
+import dev.ducketapp.service.domain.controller.BulkDeleteDto
+import dev.ducketapp.service.domain.controller.tag.dto.TagCreateUpdateDto
+import dev.ducketapp.service.domain.service.TagService
+import dev.ducketapp.service.principalOrThrow
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

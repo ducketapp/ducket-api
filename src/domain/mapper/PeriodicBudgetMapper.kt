@@ -1,18 +1,18 @@
-package dev.ducket.api.domain.mapper
+package dev.ducketapp.service.domain.mapper
 
-import dev.ducket.api.domain.model.account.Account
-import dev.ducket.api.domain.model.category.Category
-import dev.ducket.api.domain.model.currency.Currency
-import dev.ducket.api.domain.controller.category.dto.CategoryDto
-import dev.ducket.api.domain.controller.currency.dto.CurrencyDto
-import dev.ducket.api.domain.model.periodic_budget.PeriodicBudget
-import dev.ducket.api.domain.model.periodic_budget.PeriodicBudgetCreate
-import dev.ducket.api.domain.model.periodic_budget.PeriodicBudgetUpdate
-import dev.ducket.api.domain.controller.account.dto.AccountDto
-import dev.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetCreateDto
-import dev.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetDto
-import dev.ducket.api.domain.controller.periodic_budget.dto.PeriodicBudgetUpdateDto
-import dev.ducket.api.domain.mapper.DataClassMapper.Companion.collectionMapper
+import dev.ducketapp.service.domain.model.account.Account
+import dev.ducketapp.service.domain.model.category.Category
+import dev.ducketapp.service.domain.model.currency.Currency
+import dev.ducketapp.service.domain.controller.category.dto.CategoryDto
+import dev.ducketapp.service.domain.controller.currency.dto.CurrencyDto
+import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudget
+import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudgetCreate
+import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudgetUpdate
+import dev.ducketapp.service.domain.controller.account.dto.AccountDto
+import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetCreateDto
+import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetDto
+import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetUpdateDto
+import dev.ducketapp.service.domain.mapper.DataClassMapper.Companion.collectionMapper
 
 object PeriodicBudgetMapper {
 

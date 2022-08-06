@@ -1,9 +1,9 @@
-package dev.ducket.api.domain.repository
+package dev.ducketapp.service.domain.repository
 
-import dev.ducket.api.domain.model.currency.CurrenciesTable
-import dev.ducket.api.domain.model.currency.Currency
-import dev.ducket.api.domain.model.currency.CurrencyEntity
-import dev.ducket.api.app.database.Transactional
+import dev.ducketapp.service.domain.model.currency.CurrenciesTable
+import dev.ducketapp.service.domain.model.currency.Currency
+import dev.ducketapp.service.domain.model.currency.CurrencyEntity
+import dev.ducketapp.service.app.database.Transactional
 
 class CurrencyRepository: Transactional {
 

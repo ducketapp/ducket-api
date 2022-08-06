@@ -1,15 +1,15 @@
-package dev.ducket.api.domain.service
+package dev.ducketapp.service.domain.service
 
-import dev.ducket.api.app.database.Transactional
-import dev.ducket.api.domain.mapper.BudgetMapper
-import dev.ducket.api.domain.controller.BulkDeleteDto
-import dev.ducket.api.domain.controller.budget.dto.BudgetCreateDto
-import dev.ducket.api.domain.controller.budget.dto.BudgetDto
-import dev.ducket.api.domain.controller.budget.dto.BudgetUpdateDto
-import dev.ducket.api.domain.repository.BudgetAccountRepository
-import dev.ducket.api.domain.repository.BudgetRepository
-import dev.ducket.api.plugins.DuplicateDataException
-import dev.ducket.api.plugins.NoDataFoundException
+import dev.ducketapp.service.app.database.Transactional
+import dev.ducketapp.service.domain.mapper.BudgetMapper
+import dev.ducketapp.service.domain.controller.BulkDeleteDto
+import dev.ducketapp.service.domain.controller.budget.dto.BudgetCreateDto
+import dev.ducketapp.service.domain.controller.budget.dto.BudgetDto
+import dev.ducketapp.service.domain.controller.budget.dto.BudgetUpdateDto
+import dev.ducketapp.service.domain.repository.BudgetAccountRepository
+import dev.ducketapp.service.domain.repository.BudgetRepository
+import dev.ducketapp.service.plugins.DuplicateDataException
+import dev.ducketapp.service.plugins.NoDataFoundException
 
 class BudgetService(
     private val budgetRepository: BudgetRepository,

@@ -1,9 +1,9 @@
-package dev.ducket.api.domain.mapper
+package dev.ducketapp.service.domain.mapper
 
-import dev.ducket.api.domain.model.currency.Currency
-import dev.ducket.api.domain.controller.currency.dto.CurrencyDto
-import dev.ducket.api.domain.controller.currency.dto.CurrencyRateDto
-import dev.ducket.api.domain.model.currency.CurrencyRate
+import dev.ducketapp.service.domain.model.currency.Currency
+import dev.ducketapp.service.domain.controller.currency.dto.CurrencyDto
+import dev.ducketapp.service.domain.controller.currency.dto.CurrencyRateDto
+import dev.ducketapp.service.domain.model.currency.CurrencyRate
 
 object CurrencyMapper {
 

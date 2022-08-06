@@ -1,8 +1,8 @@
-package dev.ducket.api.app.scheduler
+package dev.ducketapp.service.app.scheduler
 
-import dev.ducket.api.clients.rates.ReferenceRatesClient
-import dev.ducket.api.domain.service.CurrencyService
-import dev.ducket.api.getLogger
+import dev.ducketapp.service.clients.rates.ReferenceRatesClient
+import dev.ducketapp.service.domain.service.CurrencyService
+import dev.ducketapp.service.getLogger
 import kotlinx.coroutines.runBlocking
 import org.quartz.Job
 import org.quartz.JobExecutionContext

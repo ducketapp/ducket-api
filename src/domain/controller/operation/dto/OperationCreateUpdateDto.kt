@@ -1,8 +1,8 @@
-package dev.ducket.api.domain.controller.operation.dto
+package dev.ducketapp.service.domain.controller.operation.dto
 
-import dev.ducket.api.app.DEFAULT_SCALE
-import dev.ducket.api.app.OperationType
-import dev.ducket.api.utils.scaleBetween
+import dev.ducketapp.service.app.DEFAULT_SCALE
+import dev.ducketapp.service.app.OperationType
+import dev.ducketapp.service.utils.scaleBetween
 import org.valiktor.functions.*
 import java.time.Instant
 

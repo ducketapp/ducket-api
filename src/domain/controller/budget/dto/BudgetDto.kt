@@ -1,9 +1,9 @@
-package dev.ducket.api.domain.controller.budget.dto
+package dev.ducketapp.service.domain.controller.budget.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import dev.ducket.api.domain.controller.account.dto.AccountDto
-import dev.ducket.api.domain.controller.category.dto.CategoryDto
-import dev.ducket.api.domain.controller.currency.dto.CurrencyDto
+import dev.ducketapp.service.domain.controller.account.dto.AccountDto
+import dev.ducketapp.service.domain.controller.category.dto.CategoryDto
+import dev.ducketapp.service.domain.controller.currency.dto.CurrencyDto
 import java.time.LocalDate
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

@@ -1,16 +1,16 @@
-package dev.ducket.api.domain.service
+package dev.ducketapp.service.domain.service
 
-import dev.ducket.api.app.AccountType
-import dev.ducket.api.app.database.Transactional
-import dev.ducket.api.domain.mapper.UserMapper
-import dev.ducket.api.utils.HashUtils
-import dev.ducket.api.domain.controller.account.dto.AccountCreateDto
-import dev.ducket.api.domain.controller.user.dto.UserAuthenticateDto
-import dev.ducket.api.domain.controller.user.dto.UserCreateDto
-import dev.ducket.api.domain.controller.user.dto.UserDto
-import dev.ducket.api.domain.controller.user.dto.UserUpdateDto
-import dev.ducket.api.domain.repository.*
-import dev.ducket.api.plugins.*
+import dev.ducketapp.service.app.AccountType
+import dev.ducketapp.service.app.database.Transactional
+import dev.ducketapp.service.domain.mapper.UserMapper
+import dev.ducketapp.service.utils.HashUtils
+import dev.ducketapp.service.domain.controller.account.dto.AccountCreateDto
+import dev.ducketapp.service.domain.controller.user.dto.UserAuthenticateDto
+import dev.ducketapp.service.domain.controller.user.dto.UserCreateDto
+import dev.ducketapp.service.domain.controller.user.dto.UserDto
+import dev.ducketapp.service.domain.controller.user.dto.UserUpdateDto
+import dev.ducketapp.service.domain.repository.*
+import dev.ducketapp.service.plugins.*
 
 
 class UserService(

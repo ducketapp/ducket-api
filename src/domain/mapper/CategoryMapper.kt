@@ -1,7 +1,7 @@
-package dev.ducket.api.domain.mapper
+package dev.ducketapp.service.domain.mapper
 
-import dev.ducket.api.domain.model.category.Category
-import dev.ducket.api.domain.controller.category.dto.CategoryDto
+import dev.ducketapp.service.domain.model.category.Category
+import dev.ducketapp.service.domain.controller.category.dto.CategoryDto
 
 object CategoryMapper {
 

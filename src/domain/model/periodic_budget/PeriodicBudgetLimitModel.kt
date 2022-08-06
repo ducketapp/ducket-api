@@ -1,6 +1,6 @@
-package dev.ducket.api.domain.model.periodic_budget
+package dev.ducketapp.service.domain.model.periodic_budget
 
-import dev.ducket.api.app.DEFAULT_SCALE
+import dev.ducketapp.service.app.DEFAULT_SCALE
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID

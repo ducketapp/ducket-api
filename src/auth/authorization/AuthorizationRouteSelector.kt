@@ -1,4 +1,4 @@
-package dev.ducket.api.auth.authorization
+package dev.ducketapp.service.auth.authorization
 
 import io.ktor.server.routing.*
 

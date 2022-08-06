@@ -1,13 +1,13 @@
-package dev.ducket.api
+package dev.ducketapp.service
 
-import dev.ducket.api.app.database.AppDatabase
-import dev.ducket.api.app.scheduler.AppCurrencyRatesPullJob
-import dev.ducket.api.app.scheduler.AppJobFactory
-import dev.ducket.api.auth.authentication.UserPrincipal
-import dev.ducket.api.clients.rates.ReferenceRatesClient
-import dev.ducket.api.config.*
-import dev.ducket.api.domain.service.CurrencyService
-import dev.ducket.api.plugins.*
+import dev.ducketapp.service.app.database.AppDatabase
+import dev.ducketapp.service.app.scheduler.AppCurrencyRatesPullJob
+import dev.ducketapp.service.app.scheduler.AppJobFactory
+import dev.ducketapp.service.auth.authentication.UserPrincipal
+import dev.ducketapp.service.clients.rates.ReferenceRatesClient
+import dev.ducketapp.service.config.*
+import dev.ducketapp.service.domain.service.CurrencyService
+import dev.ducketapp.service.plugins.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.engine.*

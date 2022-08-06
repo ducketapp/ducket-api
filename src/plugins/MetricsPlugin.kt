@@ -1,4 +1,4 @@
-package dev.ducket.api.plugins
+package dev.ducketapp.service.plugins
 
 import io.ktor.server.application.*
 import io.ktor.server.metrics.micrometer.*

@@ -1,4 +1,4 @@
-package dev.ducket.api.domain.controller
+package dev.ducketapp.service.domain.controller
 
 import org.valiktor.functions.*
 
