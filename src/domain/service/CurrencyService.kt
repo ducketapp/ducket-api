@@ -21,7 +21,7 @@ class CurrencyService(
 ): Transactional {
 
     suspend fun getCurrencyRate(baseCurrency: String, quoteCurrency: String, date: LocalDate): CurrencyRateDto {
-        return if (date.isEqual(LocalDate.now()) || date.isBefore(LocalDate.now())) {
+        return if (date.isEqual(LocalDate.now()) || date.isAfter(LocalDate.now())) {
             currencyRateRepository.findLatest(baseCurrency, quoteCurrency)
         } else {
             currencyRateRepository.findOneByDate(baseCurrency, quoteCurrency, date)
