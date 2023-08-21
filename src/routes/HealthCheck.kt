@@ -1,4 +1,4 @@
-package dev.ducketapp.service.routes
+package org.expenny.service.routes
 
 import io.ktor.http.*
 import io.ktor.server.response.*

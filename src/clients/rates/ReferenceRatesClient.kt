@@ -1,6 +1,6 @@
-package dev.ducketapp.service.clients.rates
+package org.expenny.service.clients.rates
 
-import dev.ducketapp.service.clients.rates.dto.DataStructureDto
+import org.expenny.service.clients.rates.dto.DataStructureDto
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*

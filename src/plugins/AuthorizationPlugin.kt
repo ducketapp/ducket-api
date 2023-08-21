@@ -1,7 +1,7 @@
-package dev.ducketapp.service.plugins
+package org.expenny.service.plugins
 
-import dev.ducketapp.service.auth.authorization.Authorization
-import dev.ducketapp.service.auth.authentication.UserPrincipal
+import org.expenny.service.auth.authorization.Authorization
+import org.expenny.service.auth.authentication.UserPrincipal
 import io.ktor.server.application.*
 
 fun Application.installAuthorizationPlugin() {

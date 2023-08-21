@@ -1,6 +1,6 @@
-package dev.ducketapp.service.domain.controller.category
+package org.expenny.service.domain.controller.category
 
-import dev.ducketapp.service.domain.service.CategoryService
+import org.expenny.service.domain.service.CategoryService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*

@@ -1,14 +1,14 @@
-package dev.ducketapp.service.domain.mapper
+package org.expenny.service.domain.mapper
 
-import dev.ducketapp.service.domain.model.currency.Currency
-import dev.ducketapp.service.domain.model.user.User
-import dev.ducketapp.service.domain.model.user.UserCreate
-import dev.ducketapp.service.domain.model.user.UserUpdate
-import dev.ducketapp.service.domain.controller.currency.dto.CurrencyDto
-import dev.ducketapp.service.domain.controller.user.dto.UserCreateDto
-import dev.ducketapp.service.domain.controller.user.dto.UserDto
-import dev.ducketapp.service.domain.controller.user.dto.UserUpdateDto
-import dev.ducketapp.service.utils.toLocalDate
+import org.expenny.service.domain.model.currency.Currency
+import org.expenny.service.domain.model.user.User
+import org.expenny.service.domain.model.user.UserCreate
+import org.expenny.service.domain.model.user.UserUpdate
+import org.expenny.service.domain.controller.currency.dto.CurrencyDto
+import org.expenny.service.domain.controller.user.dto.UserCreateDto
+import org.expenny.service.domain.controller.user.dto.UserDto
+import org.expenny.service.domain.controller.user.dto.UserUpdateDto
+import org.expenny.service.utils.toLocalDate
 
 object UserMapper {
 

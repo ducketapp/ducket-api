@@ -1,11 +1,11 @@
-package dev.ducketapp.service.domain.controller.operation.dto
+package org.expenny.service.domain.controller.operation.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import dev.ducketapp.service.domain.controller.category.dto.CategoryDto
-import dev.ducketapp.service.domain.controller.imports.dto.ImportDto
-import dev.ducketapp.service.app.OperationType
-import dev.ducketapp.service.domain.controller.account.dto.AccountDto
-import dev.ducketapp.service.domain.controller.tag.dto.TagDto
+import org.expenny.service.domain.controller.category.dto.CategoryDto
+import org.expenny.service.domain.controller.imports.dto.ImportDto
+import org.expenny.service.app.OperationType
+import org.expenny.service.domain.controller.account.dto.AccountDto
+import org.expenny.service.domain.controller.tag.dto.TagDto
 import java.time.Instant
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

@@ -1,4 +1,4 @@
-package dev.ducketapp.service.domain.controller.operation.dto
+package org.expenny.service.domain.controller.operation.dto
 
 import java.math.BigDecimal
 

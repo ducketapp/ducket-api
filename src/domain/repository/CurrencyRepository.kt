@@ -1,9 +1,9 @@
-package dev.ducketapp.service.domain.repository
+package org.expenny.service.domain.repository
 
-import dev.ducketapp.service.domain.model.currency.CurrenciesTable
-import dev.ducketapp.service.domain.model.currency.Currency
-import dev.ducketapp.service.domain.model.currency.CurrencyEntity
-import dev.ducketapp.service.app.database.Transactional
+import org.expenny.service.domain.model.currency.CurrenciesTable
+import org.expenny.service.domain.model.currency.Currency
+import org.expenny.service.domain.model.currency.CurrencyEntity
+import org.expenny.service.app.database.Transactional
 
 class CurrencyRepository: Transactional {
 

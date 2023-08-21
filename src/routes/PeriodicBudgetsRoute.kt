@@ -1,8 +1,8 @@
-package dev.ducketapp.service.routes
+package org.expenny.service.routes
 
-import dev.ducketapp.service.auth.authentication.UserRole
-import dev.ducketapp.service.auth.authorization.authorize
-import dev.ducketapp.service.domain.controller.periodic_budget.PeriodicBudgetController
+import org.expenny.service.auth.authentication.UserRole
+import org.expenny.service.auth.authorization.authorize
+import org.expenny.service.domain.controller.periodic_budget.PeriodicBudgetController
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 

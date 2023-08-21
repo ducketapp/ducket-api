@@ -1,18 +1,18 @@
-package dev.ducketapp.service.domain.service
+package org.expenny.service.domain.service
 
-import dev.ducketapp.service.app.database.Transactional
-import dev.ducketapp.service.domain.controller.BulkDeleteDto
-import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetCreateDto
-import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetDto
-import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetUpdateDto
-import dev.ducketapp.service.domain.mapper.PeriodicBudgetMapper
-import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudgetLimitCreate
-import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudgetLimitUpdate
-import dev.ducketapp.service.domain.repository.*
-import dev.ducketapp.service.plugins.DuplicateDataException
-import dev.ducketapp.service.plugins.InvalidDataException
-import dev.ducketapp.service.plugins.NoDataFoundException
-import dev.ducketapp.service.utils.*
+import org.expenny.service.app.database.Transactional
+import org.expenny.service.domain.controller.BulkDeleteDto
+import org.expenny.service.domain.controller.periodic_budget.dto.PeriodicBudgetCreateDto
+import org.expenny.service.domain.controller.periodic_budget.dto.PeriodicBudgetDto
+import org.expenny.service.domain.controller.periodic_budget.dto.PeriodicBudgetUpdateDto
+import org.expenny.service.domain.mapper.PeriodicBudgetMapper
+import org.expenny.service.domain.model.periodic_budget.PeriodicBudgetLimitCreate
+import org.expenny.service.domain.model.periodic_budget.PeriodicBudgetLimitUpdate
+import org.expenny.service.domain.repository.*
+import org.expenny.service.plugins.DuplicateDataException
+import org.expenny.service.plugins.InvalidDataException
+import org.expenny.service.plugins.NoDataFoundException
+import org.expenny.service.utils.*
 
 
 class PeriodicBudgetService(

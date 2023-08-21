@@ -1,18 +1,18 @@
-package dev.ducketapp.service.domain.mapper
+package org.expenny.service.domain.mapper
 
-import dev.ducketapp.service.domain.model.account.Account
-import dev.ducketapp.service.domain.model.category.Category
-import dev.ducketapp.service.domain.model.currency.Currency
-import dev.ducketapp.service.domain.controller.category.dto.CategoryDto
-import dev.ducketapp.service.domain.controller.currency.dto.CurrencyDto
-import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudget
-import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudgetCreate
-import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudgetUpdate
-import dev.ducketapp.service.domain.controller.account.dto.AccountDto
-import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetCreateDto
-import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetDto
-import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetUpdateDto
-import dev.ducketapp.service.domain.mapper.DataClassMapper.Companion.collectionMapper
+import org.expenny.service.domain.model.account.Account
+import org.expenny.service.domain.model.category.Category
+import org.expenny.service.domain.model.currency.Currency
+import org.expenny.service.domain.controller.category.dto.CategoryDto
+import org.expenny.service.domain.controller.currency.dto.CurrencyDto
+import org.expenny.service.domain.model.periodic_budget.PeriodicBudget
+import org.expenny.service.domain.model.periodic_budget.PeriodicBudgetCreate
+import org.expenny.service.domain.model.periodic_budget.PeriodicBudgetUpdate
+import org.expenny.service.domain.controller.account.dto.AccountDto
+import org.expenny.service.domain.controller.periodic_budget.dto.PeriodicBudgetCreateDto
+import org.expenny.service.domain.controller.periodic_budget.dto.PeriodicBudgetDto
+import org.expenny.service.domain.controller.periodic_budget.dto.PeriodicBudgetUpdateDto
+import org.expenny.service.domain.mapper.DataClassMapper.Companion.collectionMapper
 
 object PeriodicBudgetMapper {
 

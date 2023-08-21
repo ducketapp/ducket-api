@@ -1,13 +1,13 @@
-package  dev.ducketapp.service.domain.controller.periodic_budget
+package  org.expenny.service.domain.controller.periodic_budget
 
-import dev.ducketapp.service.domain.controller.BulkDeleteDto
-import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetCreateDto
-import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitCreateDto
-import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitUpdateDto
-import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetUpdateDto
-import dev.ducketapp.service.domain.service.PeriodicBudgetLimitService
-import dev.ducketapp.service.domain.service.PeriodicBudgetService
-import dev.ducketapp.service.principalOrThrow
+import org.expenny.service.domain.controller.BulkDeleteDto
+import org.expenny.service.domain.controller.periodic_budget.dto.PeriodicBudgetCreateDto
+import org.expenny.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitCreateDto
+import org.expenny.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitUpdateDto
+import org.expenny.service.domain.controller.periodic_budget.dto.PeriodicBudgetUpdateDto
+import org.expenny.service.domain.service.PeriodicBudgetLimitService
+import org.expenny.service.domain.service.PeriodicBudgetService
+import org.expenny.service.principalOrThrow
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

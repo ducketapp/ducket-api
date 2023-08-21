@@ -1,16 +1,16 @@
-package dev.ducketapp.service.domain.service
+package org.expenny.service.domain.service
 
-import dev.ducketapp.service.app.AccountType
-import dev.ducketapp.service.app.database.Transactional
-import dev.ducketapp.service.domain.mapper.UserMapper
-import dev.ducketapp.service.utils.HashUtils
-import dev.ducketapp.service.domain.controller.account.dto.AccountCreateDto
-import dev.ducketapp.service.domain.controller.user.dto.UserAuthenticateDto
-import dev.ducketapp.service.domain.controller.user.dto.UserCreateDto
-import dev.ducketapp.service.domain.controller.user.dto.UserDto
-import dev.ducketapp.service.domain.controller.user.dto.UserUpdateDto
-import dev.ducketapp.service.domain.repository.*
-import dev.ducketapp.service.plugins.*
+import org.expenny.service.app.AccountType
+import org.expenny.service.app.database.Transactional
+import org.expenny.service.domain.mapper.UserMapper
+import org.expenny.service.utils.HashUtils
+import org.expenny.service.domain.controller.account.dto.AccountCreateDto
+import org.expenny.service.domain.controller.user.dto.UserAuthenticateDto
+import org.expenny.service.domain.controller.user.dto.UserCreateDto
+import org.expenny.service.domain.controller.user.dto.UserDto
+import org.expenny.service.domain.controller.user.dto.UserUpdateDto
+import org.expenny.service.domain.repository.*
+import org.expenny.service.plugins.*
 
 
 class UserService(

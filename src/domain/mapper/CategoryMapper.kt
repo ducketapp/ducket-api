@@ -1,7 +1,7 @@
-package dev.ducketapp.service.domain.mapper
+package org.expenny.service.domain.mapper
 
-import dev.ducketapp.service.domain.model.category.Category
-import dev.ducketapp.service.domain.controller.category.dto.CategoryDto
+import org.expenny.service.domain.model.category.Category
+import org.expenny.service.domain.controller.category.dto.CategoryDto
 
 object CategoryMapper {
 

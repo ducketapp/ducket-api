@@ -1,10 +1,10 @@
-package dev.ducketapp.service.domain.controller.budget
+package org.expenny.service.domain.controller.budget
 
-import dev.ducketapp.service.domain.controller.BulkDeleteDto
-import dev.ducketapp.service.domain.controller.budget.dto.BudgetCreateDto
-import dev.ducketapp.service.domain.controller.budget.dto.BudgetUpdateDto
-import dev.ducketapp.service.domain.service.BudgetService
-import dev.ducketapp.service.principalOrThrow
+import org.expenny.service.domain.controller.BulkDeleteDto
+import org.expenny.service.domain.controller.budget.dto.BudgetCreateDto
+import org.expenny.service.domain.controller.budget.dto.BudgetUpdateDto
+import org.expenny.service.domain.service.BudgetService
+import org.expenny.service.principalOrThrow
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

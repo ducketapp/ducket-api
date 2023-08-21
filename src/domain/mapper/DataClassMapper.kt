@@ -1,4 +1,4 @@
-package dev.ducketapp.service.domain.mapper
+package org.expenny.service.domain.mapper
 
 import java.lang.IllegalArgumentException
 import kotlin.reflect.KClass

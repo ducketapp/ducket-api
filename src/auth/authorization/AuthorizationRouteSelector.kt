@@ -1,4 +1,4 @@
-package dev.ducketapp.service.auth.authorization
+package org.expenny.service.auth.authorization
 
 import io.ktor.server.routing.*
 

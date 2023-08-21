@@ -1,6 +1,6 @@
-package dev.ducketapp.service.domain.controller.tag.dto
+package org.expenny.service.domain.controller.tag.dto
 
-import dev.ducketapp.service.domain.model.tag.Tag
+import org.expenny.service.domain.model.tag.Tag
 
 data class TagDto(
     val id: Long,

@@ -1,7 +1,7 @@
-package dev.ducketapp.service.domain.controller.periodic_budget.dto
+package org.expenny.service.domain.controller.periodic_budget.dto
 
-import dev.ducketapp.service.app.DEFAULT_SCALE
-import dev.ducketapp.service.utils.scaleBetween
+import org.expenny.service.app.DEFAULT_SCALE
+import org.expenny.service.utils.scaleBetween
 import org.valiktor.functions.isNotZero
 import org.valiktor.functions.isPositive
 import java.math.BigDecimal

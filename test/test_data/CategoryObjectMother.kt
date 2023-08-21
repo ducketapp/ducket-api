@@ -1,6 +1,6 @@
-package dev.ducketapp.service.test_data
+package org.expenny.service.test_data
 
-import dev.ducketapp.service.domain.model.category.Category
+import org.expenny.service.domain.model.category.Category
 
 class CategoryObjectMother {
     companion object {

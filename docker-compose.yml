@@ -1,10 +1,10 @@
 version: '3'
 
 services:
-  ducket-database:
+  expenny-database:
     image: mysql/mysql-server:8.0.23
     restart: unless-stopped
-    container_name: ducket-database
+    container_name: expenny-database
     environment:
       - TZ=${DB_TZ}
       - MYSQL_ROOT_USER=${DB_ROOT_USER}
@@ -22,16 +22,16 @@ services:
       retries: 3
     command: ['mysqld', '--character-set-server=utf8mb4', '--log_bin_trust_function_creators=1']
 
-  ducket-backend:
+  expenny-backend:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ducket-backend
+    container_name: expenny-backend
     depends_on:
-      - ducket-database
+      - expenny-database
     restart: unless-stopped
     environment:
-      - DB_HOST=ducket-database
+      - DB_HOST=expenny-database
       - DB_PORT=${DB_PORT}
       - DB_USER=${DB_ROOT_USER}
       - DB_PASSWORD=${DB_ROOT_PASSWORD}
@@ -44,14 +44,14 @@ services:
       - ${APP_PORT}:${APP_PORT}
     volumes:
       - backend_build:/app/build
-      - /var/log/ducket:/app/logs
+      - /var/log/expenny:/app/logs
       - /tmp/ecb:/tmp/ecb
 
   prometheus:
     image: prom/prometheus:v2.32.0
     container_name: prometheus
     depends_on:
-      - ducket-backend
+      - expenny-backend
     restart: unless-stopped
     ports:
       - 9090:9090
@@ -64,7 +64,7 @@ services:
     image: grafana/loki:2.4.1
     container_name: loki
     depends_on:
-      - ducket-backend
+      - expenny-backend
     ports:
       - 3100:3100
     volumes:
@@ -76,10 +76,10 @@ services:
     image: grafana/promtail:2.4.1
     container_name: promtail
     depends_on:
-      - ducket-backend
+      - expenny-backend
     volumes:
       - /var/log:/var/log
-      - /var/log/ducket:/var/log/ducket
+      - /var/log/expenny:/var/log/expenny
       - /var/lib/docker/containers:/var/lib/docker/containers
       - ./resources/monitoring/promtail.yaml:/etc/promtail/config.yaml
     command: ['-config.file=/etc/promtail/config.yaml']
@@ -88,7 +88,7 @@ services:
     image: grafana/grafana-oss:8.1.8
     container_name: grafana
     depends_on:
-      - ducket-backend
+      - expenny-backend
       - prometheus
     ports:
       - 3000:3000

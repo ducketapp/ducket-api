@@ -1,12 +1,12 @@
-package dev.ducketapp.service.domain.repository
+package org.expenny.service.domain.repository
 
-import dev.ducketapp.service.domain.model.category.CategoryEntity
-import dev.ducketapp.service.domain.model.currency.CurrenciesTable
-import dev.ducketapp.service.domain.model.currency.CurrencyEntity
-import dev.ducketapp.service.domain.model.user.UserEntity
-import dev.ducketapp.service.app.database.Transactional
-import dev.ducketapp.service.domain.model.budget.*
-import dev.ducketapp.service.domain.model.budget.BudgetsTable
+import org.expenny.service.domain.model.category.CategoryEntity
+import org.expenny.service.domain.model.currency.CurrenciesTable
+import org.expenny.service.domain.model.currency.CurrencyEntity
+import org.expenny.service.domain.model.user.UserEntity
+import org.expenny.service.app.database.Transactional
+import org.expenny.service.domain.model.budget.*
+import org.expenny.service.domain.model.budget.BudgetsTable
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 

@@ -1,8 +1,8 @@
-package dev.ducketapp.service.domain.repository
+package org.expenny.service.domain.repository
 
-import dev.ducketapp.service.domain.model.category.Category
-import dev.ducketapp.service.domain.model.category.CategoryEntity
-import dev.ducketapp.service.app.database.Transactional
+import org.expenny.service.domain.model.category.Category
+import org.expenny.service.domain.model.category.CategoryEntity
+import org.expenny.service.app.database.Transactional
 
 class CategoryRepository: Transactional {
 

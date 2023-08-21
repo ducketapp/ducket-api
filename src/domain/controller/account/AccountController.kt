@@ -1,11 +1,11 @@
-package dev.ducketapp.service.domain.controller.account
+package org.expenny.service.domain.controller.account
 
-import dev.ducketapp.service.domain.controller.BulkDeleteDto
-import dev.ducketapp.service.domain.controller.account.dto.AccountCreateDto
-import dev.ducketapp.service.domain.controller.account.dto.AccountUpdateDto
-import dev.ducketapp.service.domain.service.AccountService
-import dev.ducketapp.service.domain.service.ImportService
-import dev.ducketapp.service.principalOrThrow
+import org.expenny.service.domain.controller.BulkDeleteDto
+import org.expenny.service.domain.controller.account.dto.AccountCreateDto
+import org.expenny.service.domain.controller.account.dto.AccountUpdateDto
+import org.expenny.service.domain.service.AccountService
+import org.expenny.service.domain.service.ImportService
+import org.expenny.service.principalOrThrow
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

@@ -1,10 +1,10 @@
-package dev.ducketapp.service.domain.mapper
+package org.expenny.service.domain.mapper
 
-import dev.ducketapp.service.domain.controller.tag.dto.TagCreateUpdateDto
-import dev.ducketapp.service.domain.controller.tag.dto.TagDto
-import dev.ducketapp.service.domain.model.tag.Tag
-import dev.ducketapp.service.domain.model.tag.TagCreate
-import dev.ducketapp.service.domain.model.tag.TagUpdate
+import org.expenny.service.domain.controller.tag.dto.TagCreateUpdateDto
+import org.expenny.service.domain.controller.tag.dto.TagDto
+import org.expenny.service.domain.model.tag.Tag
+import org.expenny.service.domain.model.tag.TagCreate
+import org.expenny.service.domain.model.tag.TagUpdate
 
 object TagMapper {
 

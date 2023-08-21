@@ -1,10 +1,10 @@
-package dev.ducketapp.service.domain.controller.imports
+package org.expenny.service.domain.controller.imports
 
-import dev.ducketapp.service.domain.controller.imports.dto.ImportUpdateDto
-import dev.ducketapp.service.domain.controller.imports.dto.OperationImportDto
-import dev.ducketapp.service.domain.service.ImportService
-import dev.ducketapp.service.plugins.InvalidDataException
-import dev.ducketapp.service.principalOrThrow
+import org.expenny.service.domain.controller.imports.dto.ImportUpdateDto
+import org.expenny.service.domain.controller.imports.dto.OperationImportDto
+import org.expenny.service.domain.service.ImportService
+import org.expenny.service.plugins.InvalidDataException
+import org.expenny.service.principalOrThrow
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*

@@ -1,4 +1,4 @@
-package dev.ducketapp.service.domain.controller
+package org.expenny.service.domain.controller
 
 import org.valiktor.functions.*
 

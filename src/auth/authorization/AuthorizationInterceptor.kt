@@ -1,7 +1,7 @@
-package dev.ducketapp.service.auth.authorization
+package org.expenny.service.auth.authorization
 
-import dev.ducketapp.service.auth.authentication.UserRole
-import dev.ducketapp.service.plugins.AuthorizationException
+import org.expenny.service.auth.authentication.UserRole
+import org.expenny.service.plugins.AuthorizationException
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*

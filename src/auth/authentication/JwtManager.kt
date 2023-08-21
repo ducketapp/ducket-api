@@ -1,12 +1,12 @@
-package dev.ducketapp.service.auth.authentication
+package org.expenny.service.auth.authentication
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import dev.ducketapp.service.config.AppConfig
-import dev.ducketapp.service.domain.repository.UserRepository
-import dev.ducketapp.service.plugins.AuthenticationException
+import org.expenny.service.config.AppConfig
+import org.expenny.service.domain.repository.UserRepository
+import org.expenny.service.plugins.AuthenticationException
 import io.ktor.server.auth.jwt.*
 import kotlinx.coroutines.runBlocking
 

@@ -1,6 +1,6 @@
-package dev.ducketapp.service.domain.controller.currency
+package org.expenny.service.domain.controller.currency
 
-import dev.ducketapp.service.domain.service.CurrencyService
+import org.expenny.service.domain.service.CurrencyService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*

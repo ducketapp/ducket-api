@@ -1,7 +1,7 @@
-package dev.ducketapp.service.app.database
+package org.expenny.service.app.database
 
-import dev.ducketapp.service.config.AppConfig
-import dev.ducketapp.service.getLogger
+import org.expenny.service.config.AppConfig
+import org.expenny.service.getLogger
 import org.flywaydb.core.Flyway
 
 open class MainDatabase(appConfig: AppConfig): MySqlDatabase(appConfig) {
@@ -11,7 +11,7 @@ open class MainDatabase(appConfig: AppConfig): MySqlDatabase(appConfig) {
 
         val flyway = Flyway.configure()
             .dataSource(dataSource)
-            .locations("classpath:dev/ducket/api/app/database/migrations")
+            .locations("classpath:org/expenny/service/app/database/migrations")
             .load()
 
         try {

@@ -1,12 +1,12 @@
-package dev.ducketapp.service.test_data
+package org.expenny.service.test_data
 
-import dev.ducketapp.service.domain.model.account.Account
-import dev.ducketapp.service.app.AccountType
-import dev.ducketapp.service.domain.controller.account.dto.AccountCreateDto
-import dev.ducketapp.service.domain.controller.account.dto.AccountDto
-import dev.ducketapp.service.domain.controller.account.dto.AccountUpdateDto
-import dev.ducketapp.service.domain.model.account.AccountCreate
-import dev.ducketapp.service.domain.model.account.AccountUpdate
+import org.expenny.service.domain.model.account.Account
+import org.expenny.service.app.AccountType
+import org.expenny.service.domain.controller.account.dto.AccountCreateDto
+import org.expenny.service.domain.controller.account.dto.AccountDto
+import org.expenny.service.domain.controller.account.dto.AccountUpdateDto
+import org.expenny.service.domain.model.account.AccountCreate
+import org.expenny.service.domain.model.account.AccountUpdate
 import java.math.BigDecimal
 import java.time.Instant
 

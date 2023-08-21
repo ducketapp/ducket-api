@@ -1,4 +1,4 @@
-package dev.ducketapp.service.auth.authentication
+package org.expenny.service.auth.authentication
 
 import io.ktor.server.auth.*
 

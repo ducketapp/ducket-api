@@ -1,4 +1,4 @@
-package dev.ducketapp.service.plugins
+package org.expenny.service.plugins
 
 import com.fasterxml.jackson.core.util.DefaultIndenter
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter

@@ -1,8 +1,8 @@
-package dev.ducketapp.service.domain.model.user
+package org.expenny.service.domain.model.user
 
-import dev.ducketapp.service.domain.model.currency.CurrenciesTable
-import dev.ducketapp.service.domain.model.currency.Currency
-import dev.ducketapp.service.domain.model.currency.CurrencyEntity
+import org.expenny.service.domain.model.currency.CurrenciesTable
+import org.expenny.service.domain.model.currency.Currency
+import org.expenny.service.domain.model.currency.CurrencyEntity
 import org.jetbrains.exposed.dao.*
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable

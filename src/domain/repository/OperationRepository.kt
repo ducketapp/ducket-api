@@ -1,12 +1,12 @@
-package dev.ducketapp.service.domain.repository
+package org.expenny.service.domain.repository
 
-import dev.ducketapp.service.domain.model.account.AccountEntity
-import dev.ducketapp.service.domain.model.category.CategoryEntity
-import dev.ducketapp.service.domain.model.imports.ImportEntity
-import dev.ducketapp.service.domain.model.operation.*
-import dev.ducketapp.service.domain.model.operation.OperationsTable
-import dev.ducketapp.service.domain.model.user.UserEntity
-import dev.ducketapp.service.app.database.Transactional
+import org.expenny.service.domain.model.account.AccountEntity
+import org.expenny.service.domain.model.category.CategoryEntity
+import org.expenny.service.domain.model.imports.ImportEntity
+import org.expenny.service.domain.model.operation.*
+import org.expenny.service.domain.model.operation.OperationsTable
+import org.expenny.service.domain.model.user.UserEntity
+import org.expenny.service.app.database.Transactional
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.batchInsert

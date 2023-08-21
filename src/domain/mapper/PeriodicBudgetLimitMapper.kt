@@ -1,11 +1,11 @@
-package dev.ducketapp.service.domain.mapper
+package org.expenny.service.domain.mapper
 
-import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudgetLimit
-import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudgetLimitCreate
-import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudgetLimitUpdate
-import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitCreateDto
-import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitDto
-import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitUpdateDto
+import org.expenny.service.domain.model.periodic_budget.PeriodicBudgetLimit
+import org.expenny.service.domain.model.periodic_budget.PeriodicBudgetLimitCreate
+import org.expenny.service.domain.model.periodic_budget.PeriodicBudgetLimitUpdate
+import org.expenny.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitCreateDto
+import org.expenny.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitDto
+import org.expenny.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitUpdateDto
 
 object PeriodicBudgetLimitMapper {
 

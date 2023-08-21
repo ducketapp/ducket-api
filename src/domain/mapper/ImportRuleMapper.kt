@@ -1,12 +1,12 @@
-package dev.ducketapp.service.domain.mapper
+package org.expenny.service.domain.mapper
 
-import dev.ducketapp.service.domain.model.category.Category
-import dev.ducketapp.service.domain.model.imports.ImportRule
-import dev.ducketapp.service.domain.model.imports.ImportRuleCreate
-import dev.ducketapp.service.domain.model.imports.ImportRuleUpdate
-import dev.ducketapp.service.domain.controller.category.dto.CategoryDto
-import dev.ducketapp.service.domain.controller.rule.dto.ImportRuleCreateUpdateDto
-import dev.ducketapp.service.domain.controller.rule.dto.ImportRuleDto
+import org.expenny.service.domain.model.category.Category
+import org.expenny.service.domain.model.imports.ImportRule
+import org.expenny.service.domain.model.imports.ImportRuleCreate
+import org.expenny.service.domain.model.imports.ImportRuleUpdate
+import org.expenny.service.domain.controller.category.dto.CategoryDto
+import org.expenny.service.domain.controller.rule.dto.ImportRuleCreateUpdateDto
+import org.expenny.service.domain.controller.rule.dto.ImportRuleDto
 
 object ImportRuleMapper {
 

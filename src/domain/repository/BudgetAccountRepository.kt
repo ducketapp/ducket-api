@@ -1,7 +1,7 @@
-package dev.ducketapp.service.domain.repository
+package org.expenny.service.domain.repository
 
-import dev.ducketapp.service.app.database.Transactional
-import dev.ducketapp.service.domain.model.budget.BudgetAccountsTable
+import org.expenny.service.app.database.Transactional
+import org.expenny.service.domain.model.budget.BudgetAccountsTable
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 

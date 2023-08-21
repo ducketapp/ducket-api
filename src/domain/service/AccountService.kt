@@ -1,15 +1,15 @@
-package dev.ducketapp.service.domain.service
+package org.expenny.service.domain.service
 
-import dev.ducketapp.service.app.database.Transactional
-import dev.ducketapp.service.domain.controller.BulkDeleteDto
-import dev.ducketapp.service.domain.controller.account.dto.AccountCreateDto
-import dev.ducketapp.service.domain.controller.account.dto.AccountDto
-import dev.ducketapp.service.domain.controller.account.dto.AccountUpdateDto
-import dev.ducketapp.service.domain.mapper.AccountMapper.toDto
-import dev.ducketapp.service.domain.mapper.AccountMapper.toModel
-import dev.ducketapp.service.domain.repository.*
-import dev.ducketapp.service.plugins.DuplicateDataException
-import dev.ducketapp.service.plugins.NoDataFoundException
+import org.expenny.service.app.database.Transactional
+import org.expenny.service.domain.controller.BulkDeleteDto
+import org.expenny.service.domain.controller.account.dto.AccountCreateDto
+import org.expenny.service.domain.controller.account.dto.AccountDto
+import org.expenny.service.domain.controller.account.dto.AccountUpdateDto
+import org.expenny.service.domain.mapper.AccountMapper.toDto
+import org.expenny.service.domain.mapper.AccountMapper.toModel
+import org.expenny.service.domain.repository.*
+import org.expenny.service.plugins.DuplicateDataException
+import org.expenny.service.plugins.NoDataFoundException
 
 class AccountService(
     private val accountRepository: AccountRepository,

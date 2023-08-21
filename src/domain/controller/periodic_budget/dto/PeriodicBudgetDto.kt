@@ -1,10 +1,10 @@
-package dev.ducketapp.service.domain.controller.periodic_budget.dto
+package org.expenny.service.domain.controller.periodic_budget.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import dev.ducketapp.service.app.PeriodicBudgetType
-import dev.ducketapp.service.domain.controller.account.dto.AccountDto
-import dev.ducketapp.service.domain.controller.category.dto.CategoryDto
-import dev.ducketapp.service.domain.controller.currency.dto.CurrencyDto
+import org.expenny.service.app.PeriodicBudgetType
+import org.expenny.service.domain.controller.account.dto.AccountDto
+import org.expenny.service.domain.controller.category.dto.CategoryDto
+import org.expenny.service.domain.controller.currency.dto.CurrencyDto
 import java.time.LocalDate
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

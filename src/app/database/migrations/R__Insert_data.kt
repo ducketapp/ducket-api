@@ -1,7 +1,7 @@
-package dev.ducketapp.service.app.database.migrations
+package org.expenny.service.app.database.migrations
 
-import dev.ducketapp.service.domain.model.category.CategoriesTable
-import dev.ducketapp.service.domain.model.currency.CurrenciesTable
+import org.expenny.service.domain.model.category.CategoriesTable
+import org.expenny.service.domain.model.currency.CurrenciesTable
 import org.flywaydb.core.api.migration.BaseJavaMigration
 import org.flywaydb.core.api.migration.Context
 import org.jetbrains.exposed.sql.batchInsert

@@ -1,15 +1,15 @@
-package dev.ducketapp.service.domain.service
+package org.expenny.service.domain.service
 
-import dev.ducketapp.service.app.PeriodicBudgetType
-import dev.ducketapp.service.domain.mapper.PeriodicBudgetLimitMapper
-import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitCreateDto
-import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitDto
-import dev.ducketapp.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitUpdateDto
-import dev.ducketapp.service.domain.repository.PeriodicBudgetLimitRepository
-import dev.ducketapp.service.domain.repository.PeriodicBudgetRepository
-import dev.ducketapp.service.plugins.DuplicateDataException
-import dev.ducketapp.service.plugins.InvalidDataException
-import dev.ducketapp.service.plugins.NoDataFoundException
+import org.expenny.service.app.PeriodicBudgetType
+import org.expenny.service.domain.mapper.PeriodicBudgetLimitMapper
+import org.expenny.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitCreateDto
+import org.expenny.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitDto
+import org.expenny.service.domain.controller.periodic_budget.dto.PeriodicBudgetLimitUpdateDto
+import org.expenny.service.domain.repository.PeriodicBudgetLimitRepository
+import org.expenny.service.domain.repository.PeriodicBudgetRepository
+import org.expenny.service.plugins.DuplicateDataException
+import org.expenny.service.plugins.InvalidDataException
+import org.expenny.service.plugins.NoDataFoundException
 import org.threeten.extra.*
 import java.time.*
 import java.time.temporal.IsoFields

@@ -1,6 +1,6 @@
-package dev.ducketapp.service.routes
+package org.expenny.service.routes
 
-import dev.ducketapp.service.domain.controller.category.CategoryController
+import org.expenny.service.domain.controller.category.CategoryController
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 

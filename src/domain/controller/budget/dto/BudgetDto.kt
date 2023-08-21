@@ -1,9 +1,9 @@
-package dev.ducketapp.service.domain.controller.budget.dto
+package org.expenny.service.domain.controller.budget.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import dev.ducketapp.service.domain.controller.account.dto.AccountDto
-import dev.ducketapp.service.domain.controller.category.dto.CategoryDto
-import dev.ducketapp.service.domain.controller.currency.dto.CurrencyDto
+import org.expenny.service.domain.controller.account.dto.AccountDto
+import org.expenny.service.domain.controller.category.dto.CategoryDto
+import org.expenny.service.domain.controller.currency.dto.CurrencyDto
 import java.math.BigDecimal
 import java.time.LocalDate
 

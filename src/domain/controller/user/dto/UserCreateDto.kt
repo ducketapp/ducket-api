@@ -1,6 +1,6 @@
-package dev.ducketapp.service.domain.controller.user.dto
+package org.expenny.service.domain.controller.user.dto
 
-import dev.ducketapp.service.utils.hasLength
+import org.expenny.service.utils.hasLength
 import org.valiktor.functions.*
 
 data class UserCreateDto(

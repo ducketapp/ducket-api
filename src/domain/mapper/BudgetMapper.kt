@@ -1,18 +1,18 @@
-package dev.ducketapp.service.domain.mapper
+package org.expenny.service.domain.mapper
 
-import dev.ducketapp.service.domain.model.account.Account
-import dev.ducketapp.service.domain.model.category.Category
-import dev.ducketapp.service.domain.model.currency.Currency
-import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudgetCreate
-import dev.ducketapp.service.domain.controller.account.dto.AccountDto
-import dev.ducketapp.service.domain.controller.budget.dto.BudgetCreateDto
-import dev.ducketapp.service.domain.controller.budget.dto.BudgetDto
-import dev.ducketapp.service.domain.controller.budget.dto.BudgetUpdateDto
-import dev.ducketapp.service.domain.controller.category.dto.CategoryDto
-import dev.ducketapp.service.domain.controller.currency.dto.CurrencyDto
-import dev.ducketapp.service.domain.model.budget.Budget
-import dev.ducketapp.service.domain.model.budget.BudgetCreate
-import dev.ducketapp.service.domain.model.budget.BudgetUpdate
+import org.expenny.service.domain.model.account.Account
+import org.expenny.service.domain.model.category.Category
+import org.expenny.service.domain.model.currency.Currency
+import org.expenny.service.domain.model.periodic_budget.PeriodicBudgetCreate
+import org.expenny.service.domain.controller.account.dto.AccountDto
+import org.expenny.service.domain.controller.budget.dto.BudgetCreateDto
+import org.expenny.service.domain.controller.budget.dto.BudgetDto
+import org.expenny.service.domain.controller.budget.dto.BudgetUpdateDto
+import org.expenny.service.domain.controller.category.dto.CategoryDto
+import org.expenny.service.domain.controller.currency.dto.CurrencyDto
+import org.expenny.service.domain.model.budget.Budget
+import org.expenny.service.domain.model.budget.BudgetCreate
+import org.expenny.service.domain.model.budget.BudgetUpdate
 
 object BudgetMapper {
 

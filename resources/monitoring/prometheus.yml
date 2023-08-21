@@ -3,4 +3,4 @@ scrape_configs:
     metrics_path: /metrics
     scrape_interval: 5s
     static_configs:
-      - targets: ['ducket-backend:8100']
+      - targets: ['expenny-backend:8100']

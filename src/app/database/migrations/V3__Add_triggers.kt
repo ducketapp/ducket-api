@@ -1,4 +1,4 @@
-package dev.ducketapp.service.app.database.migrations
+package org.expenny.service.app.database.migrations
 
 import org.flywaydb.core.api.migration.BaseJavaMigration
 import org.flywaydb.core.api.migration.Context

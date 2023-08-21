@@ -1,12 +1,12 @@
-package dev.ducketapp.service.domain.service
+package org.expenny.service.domain.service
 
-import dev.ducketapp.service.domain.mapper.TagMapper
-import dev.ducketapp.service.domain.controller.BulkDeleteDto
-import dev.ducketapp.service.domain.controller.tag.dto.TagCreateUpdateDto
-import dev.ducketapp.service.domain.controller.tag.dto.TagDto
-import dev.ducketapp.service.domain.repository.TagRepository
-import dev.ducketapp.service.plugins.DuplicateDataException
-import dev.ducketapp.service.plugins.NoDataFoundException
+import org.expenny.service.domain.mapper.TagMapper
+import org.expenny.service.domain.controller.BulkDeleteDto
+import org.expenny.service.domain.controller.tag.dto.TagCreateUpdateDto
+import org.expenny.service.domain.controller.tag.dto.TagDto
+import org.expenny.service.domain.repository.TagRepository
+import org.expenny.service.plugins.DuplicateDataException
+import org.expenny.service.plugins.NoDataFoundException
 
 class TagService(private val tagRepository: TagRepository) {
 

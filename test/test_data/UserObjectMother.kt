@@ -1,13 +1,13 @@
-package dev.ducketapp.service.test_data
+package org.expenny.service.test_data
 
-import dev.ducketapp.service.domain.model.user.User
-import dev.ducketapp.service.domain.model.user.UserCreate
-import dev.ducketapp.service.domain.model.user.UserUpdate
-import dev.ducketapp.service.domain.controller.user.dto.UserAuthenticateDto
-import dev.ducketapp.service.domain.controller.user.dto.UserCreateDto
-import dev.ducketapp.service.domain.controller.user.dto.UserDto
-import dev.ducketapp.service.domain.controller.user.dto.UserUpdateDto
-import dev.ducketapp.service.utils.toLocalDate
+import org.expenny.service.domain.model.user.User
+import org.expenny.service.domain.model.user.UserCreate
+import org.expenny.service.domain.model.user.UserUpdate
+import org.expenny.service.domain.controller.user.dto.UserAuthenticateDto
+import org.expenny.service.domain.controller.user.dto.UserCreateDto
+import org.expenny.service.domain.controller.user.dto.UserDto
+import org.expenny.service.domain.controller.user.dto.UserUpdateDto
+import org.expenny.service.utils.toLocalDate
 import java.math.BigDecimal
 import java.time.Instant
 

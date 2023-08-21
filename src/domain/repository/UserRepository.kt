@@ -1,16 +1,16 @@
-package dev.ducketapp.service.domain.repository
+package org.expenny.service.domain.repository
 
-import dev.ducketapp.service.domain.model.account.AccountsTable
-import dev.ducketapp.service.domain.model.currency.CurrenciesTable
-import dev.ducketapp.service.domain.model.currency.CurrencyEntity
-import dev.ducketapp.service.domain.model.imports.ImportRulesTable
-import dev.ducketapp.service.domain.model.imports.ImportsTable
-import dev.ducketapp.service.domain.model.operation.OperationsTable
-import dev.ducketapp.service.domain.model.user.*
-import dev.ducketapp.service.domain.model.user.UsersTable
-import dev.ducketapp.service.domain.model.periodic_budget.PeriodicBudgetsTable
-import dev.ducketapp.service.app.database.Transactional
-import dev.ducketapp.service.domain.model.budget.BudgetsTable
+import org.expenny.service.domain.model.account.AccountsTable
+import org.expenny.service.domain.model.currency.CurrenciesTable
+import org.expenny.service.domain.model.currency.CurrencyEntity
+import org.expenny.service.domain.model.imports.ImportRulesTable
+import org.expenny.service.domain.model.imports.ImportsTable
+import org.expenny.service.domain.model.operation.OperationsTable
+import org.expenny.service.domain.model.user.*
+import org.expenny.service.domain.model.user.UsersTable
+import org.expenny.service.domain.model.periodic_budget.PeriodicBudgetsTable
+import org.expenny.service.app.database.Transactional
+import org.expenny.service.domain.model.budget.BudgetsTable
 
 import org.jetbrains.exposed.sql.*
 

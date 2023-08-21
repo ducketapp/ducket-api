@@ -1,4 +1,4 @@
-package dev.ducketapp.service.app.database
+package org.expenny.service.app.database
 
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.Transaction

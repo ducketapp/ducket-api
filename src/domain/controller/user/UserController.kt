@@ -1,13 +1,13 @@
-package dev.ducketapp.service.domain.controller.user
+package org.expenny.service.domain.controller.user
 
-import dev.ducketapp.service.auth.authentication.JwtManager
-import dev.ducketapp.service.auth.authentication.UserPrincipal
-import dev.ducketapp.service.auth.authentication.UserRole
-import dev.ducketapp.service.domain.controller.user.dto.UserAuthenticateDto
-import dev.ducketapp.service.domain.controller.user.dto.UserCreateDto
-import dev.ducketapp.service.domain.controller.user.dto.UserUpdateDto
-import dev.ducketapp.service.domain.service.*
-import dev.ducketapp.service.principalOrThrow
+import org.expenny.service.auth.authentication.JwtManager
+import org.expenny.service.auth.authentication.UserPrincipal
+import org.expenny.service.auth.authentication.UserRole
+import org.expenny.service.domain.controller.user.dto.UserAuthenticateDto
+import org.expenny.service.domain.controller.user.dto.UserCreateDto
+import org.expenny.service.domain.controller.user.dto.UserUpdateDto
+import org.expenny.service.domain.service.*
+import org.expenny.service.principalOrThrow
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

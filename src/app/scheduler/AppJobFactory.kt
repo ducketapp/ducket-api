@@ -1,7 +1,7 @@
-package dev.ducketapp.service.app.scheduler
+package org.expenny.service.app.scheduler
 
-import dev.ducketapp.service.clients.rates.ReferenceRatesClient
-import dev.ducketapp.service.domain.service.CurrencyService
+import org.expenny.service.clients.rates.ReferenceRatesClient
+import org.expenny.service.domain.service.CurrencyService
 import org.quartz.Job
 import org.quartz.Scheduler
 import org.quartz.spi.JobFactory

@@ -1,7 +1,7 @@
-package dev.ducketapp.service.test_data
+package org.expenny.service.test_data
 
-import dev.ducketapp.service.domain.model.operation.Operation
-import dev.ducketapp.service.app.OperationType
+import org.expenny.service.domain.model.operation.Operation
+import org.expenny.service.app.OperationType
 import java.math.BigDecimal
 import java.time.Instant
 

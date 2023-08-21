@@ -1,4 +1,4 @@
-package dev.ducketapp.service.plugins
+package org.expenny.service.plugins
 
 import io.ktor.server.application.*
 import io.ktor.server.plugins.defaultheaders.*

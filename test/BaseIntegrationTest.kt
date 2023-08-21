@@ -1,4 +1,4 @@
-package dev.ducketapp.service
+package org.expenny.service
 
 import com.typesafe.config.ConfigFactory
 import io.ktor.server.application.*

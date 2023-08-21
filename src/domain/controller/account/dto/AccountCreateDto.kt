@@ -1,9 +1,9 @@
-package dev.ducketapp.service.domain.controller.account.dto
+package org.expenny.service.domain.controller.account.dto
 
-import dev.ducketapp.service.app.AccountType
-import dev.ducketapp.service.app.DEFAULT_SCALE
-import dev.ducketapp.service.utils.hasLength
-import dev.ducketapp.service.utils.scaleBetween
+import org.expenny.service.app.AccountType
+import org.expenny.service.app.DEFAULT_SCALE
+import org.expenny.service.utils.hasLength
+import org.expenny.service.utils.scaleBetween
 import org.valiktor.functions.*
 import java.math.BigDecimal
 

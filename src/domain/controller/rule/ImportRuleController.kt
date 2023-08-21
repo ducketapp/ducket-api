@@ -1,9 +1,9 @@
-package dev.ducketapp.service.domain.controller.rule
+package org.expenny.service.domain.controller.rule
 
-import dev.ducketapp.service.domain.controller.BulkDeleteDto
-import dev.ducketapp.service.domain.controller.rule.dto.ImportRuleCreateUpdateDto
-import dev.ducketapp.service.domain.service.ImportRuleService
-import dev.ducketapp.service.principalOrThrow
+import org.expenny.service.domain.controller.BulkDeleteDto
+import org.expenny.service.domain.controller.rule.dto.ImportRuleCreateUpdateDto
+import org.expenny.service.domain.service.ImportRuleService
+import org.expenny.service.principalOrThrow
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

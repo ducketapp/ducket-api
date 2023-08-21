@@ -1,6 +1,6 @@
-package dev.ducketapp.service.utils
+package org.expenny.service.utils
 
-import dev.ducketapp.service.app.PeriodicBudgetType
+import org.expenny.service.app.PeriodicBudgetType
 import org.threeten.extra.LocalDateRange
 import org.threeten.extra.YearQuarter
 import java.math.BigDecimal

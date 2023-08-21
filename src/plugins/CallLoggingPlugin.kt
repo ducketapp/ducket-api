@@ -1,6 +1,6 @@
-package dev.ducketapp.service.plugins
+package org.expenny.service.plugins
 
-import dev.ducketapp.service.auth.authentication.UserPrincipal
+import org.expenny.service.auth.authentication.UserPrincipal
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.plugins.callloging.*

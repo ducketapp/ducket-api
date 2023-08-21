@@ -1,10 +1,10 @@
-package dev.ducketapp.service.domain.controller.account.dto
+package org.expenny.service.domain.controller.account.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import dev.ducketapp.service.domain.model.account.Account
-import dev.ducketapp.service.app.AccountType
-import dev.ducketapp.service.domain.controller.currency.dto.CurrencyDto
-import dev.ducketapp.service.domain.controller.user.dto.UserDto
+import org.expenny.service.domain.model.account.Account
+import org.expenny.service.app.AccountType
+import org.expenny.service.domain.controller.currency.dto.CurrencyDto
+import org.expenny.service.domain.controller.user.dto.UserDto
 import java.math.BigDecimal
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

@@ -1,8 +1,8 @@
-package dev.ducketapp.service.domain.controller.operation
+package org.expenny.service.domain.controller.operation
 
-import dev.ducketapp.service.domain.controller.operation.dto.OperationCreateUpdateDto
-import dev.ducketapp.service.domain.service.OperationService
-import dev.ducketapp.service.principalOrThrow
+import org.expenny.service.domain.controller.operation.dto.OperationCreateUpdateDto
+import org.expenny.service.domain.service.OperationService
+import org.expenny.service.principalOrThrow
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

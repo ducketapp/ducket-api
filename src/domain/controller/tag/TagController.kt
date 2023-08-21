@@ -1,9 +1,9 @@
-package dev.ducketapp.service.domain.controller.tag
+package org.expenny.service.domain.controller.tag
 
-import dev.ducketapp.service.domain.controller.BulkDeleteDto
-import dev.ducketapp.service.domain.controller.tag.dto.TagCreateUpdateDto
-import dev.ducketapp.service.domain.service.TagService
-import dev.ducketapp.service.principalOrThrow
+import org.expenny.service.domain.controller.BulkDeleteDto
+import org.expenny.service.domain.controller.tag.dto.TagCreateUpdateDto
+import org.expenny.service.domain.service.TagService
+import org.expenny.service.principalOrThrow
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

@@ -1,9 +1,9 @@
-package dev.ducketapp.service.domain.controller.user.dto
+package org.expenny.service.domain.controller.user.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import dev.ducketapp.service.domain.controller.currency.dto.CurrencyDto
-import dev.ducketapp.service.domain.model.user.User
-import dev.ducketapp.service.utils.toLocalDate
+import org.expenny.service.domain.controller.currency.dto.CurrencyDto
+import org.expenny.service.domain.model.user.User
+import org.expenny.service.utils.toLocalDate
 import java.time.Instant
 import java.time.LocalDate
 

@@ -1,4 +1,4 @@
-package dev.ducketapp.service.domain.controller.periodic_budget.dto
+package org.expenny.service.domain.controller.periodic_budget.dto
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import java.math.BigDecimal

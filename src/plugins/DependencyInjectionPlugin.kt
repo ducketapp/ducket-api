@@ -1,6 +1,6 @@
-package dev.ducketapp.service.plugins
+package org.expenny.service.plugins
 
-import dev.ducketapp.service.app.di.AppModule
+import org.expenny.service.app.di.AppModule
 import io.ktor.server.application.*
 import org.koin.ktor.plugin.Koin
 

@@ -1,12 +1,12 @@
-package dev.ducketapp.service.domain.service
+package org.expenny.service.domain.service
 
-import dev.ducketapp.service.domain.controller.BulkDeleteDto
-import dev.ducketapp.service.domain.controller.rule.dto.ImportRuleCreateUpdateDto
-import dev.ducketapp.service.domain.controller.rule.dto.ImportRuleDto
-import dev.ducketapp.service.domain.mapper.ImportRuleMapper
-import dev.ducketapp.service.domain.repository.ImportRuleRepository
-import dev.ducketapp.service.plugins.DuplicateDataException
-import dev.ducketapp.service.plugins.NoDataFoundException
+import org.expenny.service.domain.controller.BulkDeleteDto
+import org.expenny.service.domain.controller.rule.dto.ImportRuleCreateUpdateDto
+import org.expenny.service.domain.controller.rule.dto.ImportRuleDto
+import org.expenny.service.domain.mapper.ImportRuleMapper
+import org.expenny.service.domain.repository.ImportRuleRepository
+import org.expenny.service.plugins.DuplicateDataException
+import org.expenny.service.plugins.NoDataFoundException
 
 class ImportRuleService(
     private val importRuleRepository: ImportRuleRepository,

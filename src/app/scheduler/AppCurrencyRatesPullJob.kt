@@ -1,8 +1,8 @@
-package dev.ducketapp.service.app.scheduler
+package org.expenny.service.app.scheduler
 
-import dev.ducketapp.service.clients.rates.ReferenceRatesClient
-import dev.ducketapp.service.domain.service.CurrencyService
-import dev.ducketapp.service.getLogger
+import org.expenny.service.clients.rates.ReferenceRatesClient
+import org.expenny.service.domain.service.CurrencyService
+import org.expenny.service.getLogger
 import kotlinx.coroutines.runBlocking
 import org.quartz.Job
 import org.quartz.JobExecutionContext

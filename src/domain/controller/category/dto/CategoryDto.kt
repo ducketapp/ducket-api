@@ -1,4 +1,4 @@
-package dev.ducketapp.service.domain.controller.category.dto
+package org.expenny.service.domain.controller.category.dto
 
 data class CategoryDto(
     val id: Long,

@@ -1,15 +1,15 @@
-package dev.ducketapp.service.domain.service
+package org.expenny.service.domain.service
 
-import dev.ducketapp.service.app.database.Transactional
-import dev.ducketapp.service.domain.mapper.BudgetMapper
-import dev.ducketapp.service.domain.controller.BulkDeleteDto
-import dev.ducketapp.service.domain.controller.budget.dto.BudgetCreateDto
-import dev.ducketapp.service.domain.controller.budget.dto.BudgetDto
-import dev.ducketapp.service.domain.controller.budget.dto.BudgetUpdateDto
-import dev.ducketapp.service.domain.repository.BudgetAccountRepository
-import dev.ducketapp.service.domain.repository.BudgetRepository
-import dev.ducketapp.service.plugins.DuplicateDataException
-import dev.ducketapp.service.plugins.NoDataFoundException
+import org.expenny.service.app.database.Transactional
+import org.expenny.service.domain.mapper.BudgetMapper
+import org.expenny.service.domain.controller.BulkDeleteDto
+import org.expenny.service.domain.controller.budget.dto.BudgetCreateDto
+import org.expenny.service.domain.controller.budget.dto.BudgetDto
+import org.expenny.service.domain.controller.budget.dto.BudgetUpdateDto
+import org.expenny.service.domain.repository.BudgetAccountRepository
+import org.expenny.service.domain.repository.BudgetRepository
+import org.expenny.service.plugins.DuplicateDataException
+import org.expenny.service.plugins.NoDataFoundException
 
 class BudgetService(
     private val budgetRepository: BudgetRepository,

@@ -1,21 +1,21 @@
-package dev.ducketapp.service.domain.service
+package org.expenny.service.domain.service
 
-import dev.ducketapp.service.domain.mapper.OperationMapper
-import dev.ducketapp.service.domain.model.category.Category
-import dev.ducketapp.service.domain.model.imports.ImportCreate
-import dev.ducketapp.service.domain.model.imports.ImportRule
-import dev.ducketapp.service.domain.model.operation.OperationCreate
-import dev.ducketapp.service.app.ImportRuleApplyType
-import dev.ducketapp.service.app.OperationType
-import dev.ducketapp.service.app.database.Transactional
-import dev.ducketapp.service.domain.controller.imports.dto.OperationImportDto
-import dev.ducketapp.service.domain.controller.imports.dto.ImportDto
-import dev.ducketapp.service.domain.controller.imports.dto.ImportUpdateDto
-import dev.ducketapp.service.domain.mapper.ImportMapper
-import dev.ducketapp.service.domain.repository.*
-import dev.ducketapp.service.plugins.DuplicateDataException
-import dev.ducketapp.service.plugins.InvalidDataException
-import dev.ducketapp.service.plugins.NoDataFoundException
+import org.expenny.service.domain.mapper.OperationMapper
+import org.expenny.service.domain.model.category.Category
+import org.expenny.service.domain.model.imports.ImportCreate
+import org.expenny.service.domain.model.imports.ImportRule
+import org.expenny.service.domain.model.operation.OperationCreate
+import org.expenny.service.app.ImportRuleApplyType
+import org.expenny.service.app.OperationType
+import org.expenny.service.app.database.Transactional
+import org.expenny.service.domain.controller.imports.dto.OperationImportDto
+import org.expenny.service.domain.controller.imports.dto.ImportDto
+import org.expenny.service.domain.controller.imports.dto.ImportUpdateDto
+import org.expenny.service.domain.mapper.ImportMapper
+import org.expenny.service.domain.repository.*
+import org.expenny.service.plugins.DuplicateDataException
+import org.expenny.service.plugins.InvalidDataException
+import org.expenny.service.plugins.NoDataFoundException
 import org.ahocorasick.trie.Trie
 
 

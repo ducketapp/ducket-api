@@ -1,8 +1,8 @@
-package dev.ducketapp.service.domain.model.imports
+package org.expenny.service.domain.model.imports
 
-import dev.ducketapp.service.domain.model.user.User
-import dev.ducketapp.service.domain.model.user.UserEntity
-import dev.ducketapp.service.domain.model.user.UsersTable
+import org.expenny.service.domain.model.user.User
+import org.expenny.service.domain.model.user.UserEntity
+import org.expenny.service.domain.model.user.UsersTable
 import org.jetbrains.exposed.dao.*
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable

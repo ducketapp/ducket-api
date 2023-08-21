@@ -1,4 +1,4 @@
-package dev.ducketapp.service.utils
+package org.expenny.service.utils
 
 import org.valiktor.Constraint
 import org.valiktor.Validator

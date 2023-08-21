@@ -16,13 +16,13 @@ scrape_configs:
           job: varlogs
           __path__: /var/log/*log
 
-  - job_name: ducket
+  - job_name: expenny
     static_configs:
       - targets:
           - localhost
         labels:
           job: applogs
-          __path__: /var/log/ducket/*log
+          __path__: /var/log/expenny/*log
 
   - job_name: containers
     static_configs:

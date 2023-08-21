@@ -1,4 +1,4 @@
-package dev.ducketapp.service.domain.model.category
+package org.expenny.service.domain.model.category
 
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass

@@ -1,6 +1,6 @@
-package dev.ducketapp.service
+package org.expenny.service
 
-import dev.ducketapp.service.test_data.UserObjectMother
+import org.expenny.service.test_data.UserObjectMother
 import io.mockk.clearAllMocks
 import org.junit.jupiter.api.BeforeEach
 

@@ -1,4 +1,4 @@
-package dev.ducketapp.service.domain.model.currency
+package org.expenny.service.domain.model.currency
 
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass

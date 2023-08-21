@@ -1,9 +1,9 @@
-package dev.ducketapp.service.domain.mapper
+package org.expenny.service.domain.mapper
 
-import dev.ducketapp.service.domain.model.currency.Currency
-import dev.ducketapp.service.domain.controller.currency.dto.CurrencyDto
-import dev.ducketapp.service.domain.controller.currency.dto.CurrencyRateDto
-import dev.ducketapp.service.domain.model.currency.CurrencyRate
+import org.expenny.service.domain.model.currency.Currency
+import org.expenny.service.domain.controller.currency.dto.CurrencyDto
+import org.expenny.service.domain.controller.currency.dto.CurrencyRateDto
+import org.expenny.service.domain.model.currency.CurrencyRate
 
 object CurrencyMapper {
 

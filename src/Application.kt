@@ -1,13 +1,13 @@
-package dev.ducketapp.service
+package org.expenny.service
 
-import dev.ducketapp.service.app.database.AppDatabase
-import dev.ducketapp.service.app.scheduler.AppCurrencyRatesPullJob
-import dev.ducketapp.service.app.scheduler.AppJobFactory
-import dev.ducketapp.service.auth.authentication.UserPrincipal
-import dev.ducketapp.service.clients.rates.ReferenceRatesClient
-import dev.ducketapp.service.config.*
-import dev.ducketapp.service.domain.service.CurrencyService
-import dev.ducketapp.service.plugins.*
+import org.expenny.service.app.database.AppDatabase
+import org.expenny.service.app.scheduler.AppCurrencyRatesPullJob
+import org.expenny.service.app.scheduler.AppJobFactory
+import org.expenny.service.auth.authentication.UserPrincipal
+import org.expenny.service.clients.rates.ReferenceRatesClient
+import org.expenny.service.config.*
+import org.expenny.service.domain.service.CurrencyService
+import org.expenny.service.plugins.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.engine.*

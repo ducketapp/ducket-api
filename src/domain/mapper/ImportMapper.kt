@@ -1,9 +1,9 @@
-package dev.ducketapp.service.domain.mapper
+package org.expenny.service.domain.mapper
 
-import dev.ducketapp.service.domain.model.imports.Import
-import dev.ducketapp.service.domain.model.imports.ImportUpdate
-import dev.ducketapp.service.domain.controller.imports.dto.ImportDto
-import dev.ducketapp.service.domain.controller.imports.dto.ImportUpdateDto
+import org.expenny.service.domain.model.imports.Import
+import org.expenny.service.domain.model.imports.ImportUpdate
+import org.expenny.service.domain.controller.imports.dto.ImportDto
+import org.expenny.service.domain.controller.imports.dto.ImportUpdateDto
 
 object ImportMapper {
 

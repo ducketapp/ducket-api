@@ -1,4 +1,4 @@
-package dev.ducketapp.service.auth.authentication
+package org.expenny.service.auth.authentication
 
 @Suppress("unused")
 enum class UserRole {

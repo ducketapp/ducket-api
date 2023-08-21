@@ -1,4 +1,4 @@
-package dev.ducketapp.service.config
+package org.expenny.service.config
 
 class AppConfig {
     lateinit var serverConfig: ServerConfig

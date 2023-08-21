@@ -1,6 +1,6 @@
-package dev.ducketapp.service.domain.controller.rule.dto
+package org.expenny.service.domain.controller.rule.dto
 
-import dev.ducketapp.service.app.ImportRuleApplyType
+import org.expenny.service.app.ImportRuleApplyType
 import org.valiktor.functions.*
 
 data class ImportRuleCreateUpdateDto(

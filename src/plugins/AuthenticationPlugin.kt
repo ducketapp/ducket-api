@@ -1,6 +1,6 @@
-package dev.ducketapp.service.plugins
+package org.expenny.service.plugins
 
-import dev.ducketapp.service.auth.authentication.JwtManager
+import org.expenny.service.auth.authentication.JwtManager
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*

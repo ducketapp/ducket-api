@@ -1,8 +1,8 @@
-package dev.ducketapp.service.domain.controller.operation.dto
+package org.expenny.service.domain.controller.operation.dto
 
-import dev.ducketapp.service.app.DEFAULT_SCALE
-import dev.ducketapp.service.app.OperationType
-import dev.ducketapp.service.utils.scaleBetween
+import org.expenny.service.app.DEFAULT_SCALE
+import org.expenny.service.app.OperationType
+import org.expenny.service.utils.scaleBetween
 import org.valiktor.functions.*
 import java.time.Instant
 

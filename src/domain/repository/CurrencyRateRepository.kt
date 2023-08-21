@@ -1,10 +1,10 @@
-package dev.ducketapp.service.domain.repository
+package org.expenny.service.domain.repository
 
-import dev.ducketapp.service.app.database.Transactional
-import dev.ducketapp.service.domain.model.currency.CurrencyRate
-import dev.ducketapp.service.domain.model.currency.CurrencyRateCreate
-import dev.ducketapp.service.domain.model.currency.CurrencyRateEntity
-import dev.ducketapp.service.domain.model.currency.CurrencyRatesTable
+import org.expenny.service.app.database.Transactional
+import org.expenny.service.domain.model.currency.CurrencyRate
+import org.expenny.service.domain.model.currency.CurrencyRateCreate
+import org.expenny.service.domain.model.currency.CurrencyRateEntity
+import org.expenny.service.domain.model.currency.CurrencyRatesTable
 import org.jetbrains.exposed.sql.*
 import java.time.LocalDate
 

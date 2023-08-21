@@ -1,15 +1,15 @@
-package dev.ducketapp.service.domain.service
+package org.expenny.service.domain.service
 
-import dev.ducketapp.service.domain.mapper.OperationMapper
-import dev.ducketapp.service.app.OperationType
-import dev.ducketapp.service.app.database.Transactional
-import dev.ducketapp.service.domain.controller.operation.dto.OperationCreateUpdateDto
-import dev.ducketapp.service.domain.controller.operation.dto.OperationDto
-import dev.ducketapp.service.domain.repository.AccountRepository
-import dev.ducketapp.service.domain.repository.CategoryRepository
-import dev.ducketapp.service.domain.repository.OperationRepository
-import dev.ducketapp.service.plugins.InvalidDataException
-import dev.ducketapp.service.plugins.NoDataFoundException
+import org.expenny.service.domain.mapper.OperationMapper
+import org.expenny.service.app.OperationType
+import org.expenny.service.app.database.Transactional
+import org.expenny.service.domain.controller.operation.dto.OperationCreateUpdateDto
+import org.expenny.service.domain.controller.operation.dto.OperationDto
+import org.expenny.service.domain.repository.AccountRepository
+import org.expenny.service.domain.repository.CategoryRepository
+import org.expenny.service.domain.repository.OperationRepository
+import org.expenny.service.plugins.InvalidDataException
+import org.expenny.service.plugins.NoDataFoundException
 
 class OperationService(
     private val operationRepository: OperationRepository,

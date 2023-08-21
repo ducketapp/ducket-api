@@ -1,7 +1,7 @@
-package dev.ducketapp.service.domain.controller.rule.dto
+package org.expenny.service.domain.controller.rule.dto
 
-import dev.ducketapp.service.app.ImportRuleApplyType
-import dev.ducketapp.service.domain.controller.category.dto.CategoryDto
+import org.expenny.service.app.ImportRuleApplyType
+import org.expenny.service.domain.controller.category.dto.CategoryDto
 
 data class ImportRuleDto(
     val id: Long,

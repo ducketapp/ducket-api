@@ -1,6 +1,6 @@
-package dev.ducketapp.service.utils
+package org.expenny.service.utils
 
-import dev.ducketapp.service.app.BCRYPT_HASH_ROUNDS
+import org.expenny.service.app.BCRYPT_HASH_ROUNDS
 import org.mindrot.jbcrypt.BCrypt
 
 object HashUtils {

@@ -1,4 +1,4 @@
-package dev.ducketapp.service.domain.controller.user.dto
+package org.expenny.service.domain.controller.user.dto
 
 import org.valiktor.functions.isEmail
 import org.valiktor.functions.isNotBlank

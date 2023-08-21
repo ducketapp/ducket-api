@@ -1,4 +1,4 @@
-package dev.ducketapp.service.plugins
+package org.expenny.service.plugins
 
 import freemarker.cache.ClassTemplateLoader
 import freemarker.core.HTMLOutputFormat

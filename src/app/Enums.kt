@@ -1,4 +1,4 @@
-package dev.ducketapp.service.app
+package org.expenny.service.app
 
 
 @Suppress("unused")

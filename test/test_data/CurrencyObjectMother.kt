@@ -1,7 +1,7 @@
-package dev.ducketapp.service.test_data
+package org.expenny.service.test_data
 
-import dev.ducketapp.service.domain.model.currency.Currency
-import dev.ducketapp.service.domain.controller.currency.dto.CurrencyDto
+import org.expenny.service.domain.model.currency.Currency
+import org.expenny.service.domain.controller.currency.dto.CurrencyDto
 
 class CurrencyObjectMother {
     companion object {

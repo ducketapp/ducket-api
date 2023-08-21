@@ -1,7 +1,7 @@
-package dev.ducketapp.service.app.database
+package org.expenny.service.app.database
 
 import com.zaxxer.hikari.HikariConfig
-import dev.ducketapp.service.config.AppConfig
+import org.expenny.service.config.AppConfig
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 
 class TestMainDatabase(appConfig: AppConfig): MainDatabase(appConfig) {

@@ -1,17 +1,17 @@
-package dev.ducketapp.service.domain.service
+package org.expenny.service.domain.service
 
-import dev.ducketapp.service.app.DEFAULT_ROUNDING
-import dev.ducketapp.service.app.DEFAULT_RATE_SCALE
-import dev.ducketapp.service.app.database.Transactional
-import dev.ducketapp.service.domain.mapper.CurrencyMapper
-import dev.ducketapp.service.clients.rates.dto.ReferenceDto
-import dev.ducketapp.service.domain.controller.currency.dto.CurrencyDto
-import dev.ducketapp.service.domain.controller.currency.dto.CurrencyRateDto
-import dev.ducketapp.service.domain.model.currency.CurrencyRateCreate
-import dev.ducketapp.service.domain.repository.CurrencyRateRepository
-import dev.ducketapp.service.domain.repository.CurrencyRepository
-import dev.ducketapp.service.getLogger
-import dev.ducketapp.service.plugins.NoDataFoundException
+import org.expenny.service.app.DEFAULT_ROUNDING
+import org.expenny.service.app.DEFAULT_RATE_SCALE
+import org.expenny.service.app.database.Transactional
+import org.expenny.service.domain.mapper.CurrencyMapper
+import org.expenny.service.clients.rates.dto.ReferenceDto
+import org.expenny.service.domain.controller.currency.dto.CurrencyDto
+import org.expenny.service.domain.controller.currency.dto.CurrencyRateDto
+import org.expenny.service.domain.model.currency.CurrencyRateCreate
+import org.expenny.service.domain.repository.CurrencyRateRepository
+import org.expenny.service.domain.repository.CurrencyRepository
+import org.expenny.service.getLogger
+import org.expenny.service.plugins.NoDataFoundException
 import java.math.BigDecimal.*
 import java.time.LocalDate
 

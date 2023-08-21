@@ -1,4 +1,4 @@
-package dev.ducketapp.service.domain.controller.tag.dto
+package org.expenny.service.domain.controller.tag.dto
 
 import org.valiktor.functions.hasSize
 
