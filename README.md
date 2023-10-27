@@ -1,4 +1,4 @@
-# expenny-service
+# Expenny (backend service)
 [DEPRECATED] Backend service written in Kotlin, using [Ktor 2.0](https://ktor.io/docs/welcome.html), [Exposed ORM framework](https://github.com/JetBrains/Exposed) and [Flyway](https://flywaydb.org/). More about used libraries in gradle.properties 
 
 Manual debug run:
